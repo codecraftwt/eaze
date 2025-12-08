@@ -26,20 +26,20 @@ const Sidebar = () => {
           <FaTachometerAlt className="text-2xl" />
           <span>Dashboard</span>
         </Link>
-        <Link
+        {/* <Link
           to="/applications"
           className={`flex items-center space-x-4 text-xl px-4 py-3 rounded-lg ${isActive('/applications')} hover:bg-blue-700 hover:text-white transition duration-300`}
         >
           <FaClipboardList className="text-2xl" />
           <span>Applications</span>
-        </Link>
-        <Link
+        </Link> */}
+        {/* <Link
           to="/training"
           className={`flex items-center space-x-4 text-xl px-4 py-3 rounded-lg ${isActive('/training')} hover:bg-blue-700 hover:text-white transition duration-300`}
         >
           <FaChalkboardTeacher className="text-2xl" />
           <span>Training</span>
-        </Link>
+        </Link> */}
         <Link
           to="/login"
           className={`flex items-center space-x-4 text-xl px-4 py-3 rounded-lg ${isActive('/login')} hover:bg-blue-700 hover:text-white transition duration-300`}
