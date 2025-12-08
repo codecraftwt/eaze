@@ -10,7 +10,8 @@ import { toast } from "react-toastify";
 const BASE_URL = import.meta.env.VITE_API_URL;
 const CLIENT_ID = import.meta.env.VITE_SF_CLIENT_ID;
 const CLIENT_SECRET = import.meta.env.VITE_SF_CLIENT_SECRET;
-const REGISTRATION_CODE = import.meta.env.VITE_REGISTRATION_CODE;
+const REGISTRATION_CODE = "001cY00000JXauEQAT";
+// const REGISTRATION_CODE = import.meta.env.VITE_REGISTRATION_CODE;
 /* =============================
    GLOBAL TOAST HANDLERS
 =============================== */

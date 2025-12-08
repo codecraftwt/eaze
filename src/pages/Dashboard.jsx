@@ -6,6 +6,7 @@ import { BarChart } from '@mui/x-charts/BarChart';
 import PopupModal from '../components/PopupModal';
 import { Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 const chartSetting = {
   yAxis: [
     {
@@ -195,7 +196,15 @@ function Dashboard() {
       <header className="bg-white p-4 shadow rounded-md mb-6">
         <div className="flex justify-between items-center">
           <h1 className="text-xl font-semibold">Funding Analytics</h1>
-          <div className="text-sm text-gray-500">Short video instructions on how to use your Funding Analytics Portal</div>
+          {/* <div className="text-sm text-gray-500">Short video instructions on how to use your Funding Analytics Portal</div> */}
+          <a
+        href="https://www.loom.com/share/4302a1e8367144febea20c450b25f9fa?sid=39568934-592e-45ad-9f03-512b455fcb1d"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-sm text-gray-500 cursor-pointer hover:text-blue-500"
+      >
+        Short video instructions on how to use your Funding Analytics Portal
+      </a>
           <div className="relative w-60">
             <select
               value={selectedMonth}
