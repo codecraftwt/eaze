@@ -12,7 +12,7 @@ import ComingSoon from '../pages/ComingSoon';
 
 const AppRoutes = () => {
   return (
-    <Router>
+    <Router  basename="/">
       <Routes>
          {/* Redirect empty route ("/") to login */}
         <Route path="/" element={<Navigate to="/login" />} />
