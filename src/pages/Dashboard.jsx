@@ -17,69 +17,69 @@ const chartSetting = {
   height: 300,
 };
 export const dataset = [
-  {
-    london: 59,
-    paris: 57,
-    newYork: 86,
-    seoul: 21,
-    month: 'Jan',
-  },
-  {
-    london: 50,
-    paris: 52,
-    newYork: 78,
-    seoul: 28,
-    month: 'Feb',
-  },
-  {
-    london: 47,
-    paris: 53,
-    newYork: 106,
-    seoul: 41,
-    month: 'Mar',
-  },
-  {
-    london: 54,
-    paris: 56,
-    newYork: 92,
-    seoul: 73,
-    month: 'Apr',
-  },
-  {
-    london: 57,
-    paris: 69,
-    newYork: 92,
-    seoul: 99,
-    month: 'May',
-  },
-  {
-    london: 60,
-    paris: 63,
-    newYork: 103,
-    seoul: 144,
-    month: 'June',
-  },
-  {
-    london: 59,
-    paris: 60,
-    newYork: 105,
-    seoul: 319,
-    month: 'July',
-  },
-  {
-    london: 65,
-    paris: 60,
-    newYork: 106,
-    seoul: 249,
-    month: 'Aug',
-  },
-  {
-    london: 51,
-    paris: 51,
-    newYork: 95,
-    seoul: 131,
-    month: 'Sept',
-  },
+  // {
+  //   london: 59,
+  //   paris: 57,
+  //   newYork: 86,
+  //   seoul: 21,
+  //   month: 'Jan',
+  // },
+  // {
+  //   london: 50,
+  //   paris: 52,
+  //   newYork: 78,
+  //   seoul: 28,
+  //   month: 'Feb',
+  // },
+  // {
+  //   london: 47,
+  //   paris: 53,
+  //   newYork: 106,
+  //   seoul: 41,
+  //   month: 'Mar',
+  // },
+  // {
+  //   london: 54,
+  //   paris: 56,
+  //   newYork: 92,
+  //   seoul: 73,
+  //   month: 'Apr',
+  // },
+  // {
+  //   london: 57,
+  //   paris: 69,
+  //   newYork: 92,
+  //   seoul: 99,
+  //   month: 'May',
+  // },
+  // {
+  //   london: 60,
+  //   paris: 63,
+  //   newYork: 103,
+  //   seoul: 144,
+  //   month: 'June',
+  // },
+  // {
+  //   london: 59,
+  //   paris: 60,
+  //   newYork: 105,
+  //   seoul: 319,
+  //   month: 'July',
+  // },
+  // {
+  //   london: 65,
+  //   paris: 60,
+  //   newYork: 106,
+  //   seoul: 249,
+  //   month: 'Aug',
+  // },
+  // {
+  //   london: 51,
+  //   paris: 51,
+  //   newYork: 95,
+  //   seoul: 131,
+  //   month: 'Sept',
+  // },
   {
     london: 60,
     paris: 65,
@@ -184,6 +184,10 @@ function Dashboard() {
       dispatch(getTotalPreApproved({ token: salesforceToken }));
     }
   }, [dispatch, salesforceToken]);
+
+  useEffect(()=>{
+    console.log(totalApplicationsThisMonth,'totalApplicationsThisMonth');
+  })
 
   // List of months from Jan 25 to Dec 25
   const months = [

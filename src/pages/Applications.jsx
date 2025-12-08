@@ -11,7 +11,36 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { BarChart } from '@mui/x-charts/BarChart';
+import { PieChart, pieArcLabelClasses } from '@mui/x-charts/PieChart';
+// import { desktopOS, valueFormatter } from './webUsageStats';
 
+// donut chat data
+export const desktopOS = [
+  {
+    label: 'Windows',
+    value: 72.72,
+  },
+  {
+    label: 'OS X',
+    value: 16.38,
+  },
+  {
+    label: 'Linux',
+    value: 3.83,
+  },
+  {
+    label: 'Chrome OS',
+    value: 2.42,
+  },
+  {
+    label: 'Other',
+    value: 4.65,
+  },
+];
+
+
+export const valueFormatter = (item) => `${item.value}%`;
 // Register chart elements
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend);
 
@@ -129,17 +158,29 @@ const ApplicationsPage = () => {
               <h2 className="text-lg font-semibold mb-4">Declined Stats</h2>
               <div className="flex items-center justify-between">
                 <div className="w-48">
-                  <Doughnut data={declinedChart} ref={declinedChartRef} />
+                  {/* <Doughnut data={declinedChart} ref={declinedChartRef} /> */}
+                  <PieChart
+                    series={[
+                      {
+                        data: desktopOS,
+                        highlightScope: { fade: 'global', highlight: 'item' },
+                        faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
+                        valueFormatter,
+                      },
+                    ]}
+                    height={200}
+                    width={200}
+                  />
                 </div>
 
                 <div className="text-sm">
-                  <div className="flex items-center gap-2">
+                  {/* <div className="flex items-center gap-2">
                     <span
                       className="w-3 h-3 rounded-full"
                       style={{ backgroundColor: declinedChart.datasets[0].backgroundColor[0] }}
                     ></span>
                     Declined - Client Does Not Meet Minimum Credit Requirements
-                  </div>
+                  </div> */}
                   <div className="text-right font-semibold mt-4">$44,659,530</div>
                 </div>
               </div>
@@ -165,7 +206,12 @@ const ApplicationsPage = () => {
             {/* CHART - Monthly Summary */}
             <div className="bg-white p-6 rounded-lg shadow">
               <h2 className="text-lg font-semibold mb-4">Monthly Summary</h2>
-              <Bar data={chartData} options={chartOptions} />
+              {/* <Bar data={chartData} options={chartOptions} /> */}
+              <BarChart
+                xAxis={[{ data: ['group A', 'group B', 'group C'] }]}
+                series={[{ data: [4, 3, 5] }, { data: [1, 6, 3] }, { data: [2, 5, 6] }]}
+                height={300}
+              />
             </div>
           </div>
         )}
@@ -196,10 +242,22 @@ const ApplicationsPage = () => {
 
               <div className="flex items-center justify-between">
                 <div className="w-48">
-                  <Doughnut data={currentChart} ref={currentChartRef} />
+                  {/* <Doughnut data={currentChart} ref={currentChartRef} /> */}
+                  <PieChart
+                    series={[
+                      {
+                        data: desktopOS,
+                        highlightScope: { fade: 'global', highlight: 'item' },
+                        faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
+                        valueFormatter,
+                      },
+                    ]}
+                    height={200}
+                    width={200}
+                  />
                 </div>
 
-                <ul className="text-sm space-y-2">
+                {/* <ul className="text-sm space-y-2">
                   {currentChart.labels.map((label, i) => (
                     <li key={i} className="flex items-center gap-2">
                       <span
@@ -212,7 +270,7 @@ const ApplicationsPage = () => {
                       {label}
                     </li>
                   ))}
-                </ul>
+                </ul> */}
               </div>
             </div>
 
@@ -224,11 +282,23 @@ const ApplicationsPage = () => {
 
               <div className="flex items-center justify-between">
                 <div className="w-48">
-                  <Doughnut data={preApprovedChart} ref={preApprovedChartRef} />
+                  {/* <Doughnut data={preApprovedChart} ref={preApprovedChartRef} /> */}
+                  <PieChart
+                    series={[
+                      {
+                        data: desktopOS,
+                        highlightScope: { fade: 'global', highlight: 'item' },
+                        faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
+                        valueFormatter,
+                      },
+                    ]}
+                    height={200}
+                    width={200}
+                  />
                 </div>
 
                 <div className="text-sm">
-                  <div className="flex items-center gap-2">
+                  {/* <div className="flex items-center gap-2">
                     <span
                       className="w-3 h-3 rounded-full"
                       style={{
@@ -237,7 +307,7 @@ const ApplicationsPage = () => {
                       }}
                     ></span>
                     Pre-Approved Pending Income Verification
-                  </div>
+                  </div> */}
 
                   <div className="text-right font-semibold mt-4">$27,000.00</div>
                 </div>
@@ -288,10 +358,22 @@ const ApplicationsPage = () => {
 
               <div className="flex items-center justify-between">
                 <div className="w-48">
-                  <Doughnut data={approvedChart} ref={approvedChartRef} />
+                  {/* <Doughnut data={approvedChart} ref={approvedChartRef} /> */}
+                  <PieChart
+                    series={[
+                      {
+                        data: desktopOS,
+                        highlightScope: { fade: 'global', highlight: 'item' },
+                        faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
+                        valueFormatter,
+                      },
+                    ]}
+                    height={200}
+                    width={200}
+                  />
                 </div>
 
-                <ul className="text-sm space-y-2">
+                {/* <ul className="text-sm space-y-2">
                   {approvedChart.labels.map((label, i) => (
                     <li key={i} className="flex items-center gap-2">
                       <span
@@ -303,7 +385,7 @@ const ApplicationsPage = () => {
                       {label}
                     </li>
                   ))}
-                </ul>
+                </ul> */}
               </div>
             </div>
 
@@ -315,11 +397,23 @@ const ApplicationsPage = () => {
 
               <div className="flex items-center justify-between">
                 <div className="w-48">
-                  <Doughnut data={preApprovedChart} ref={preApprovedChartRef} />
+                  {/* <Doughnut data={preApprovedChart} ref={preApprovedChartRef} /> */}
+                  <PieChart
+                    series={[
+                      {
+                        data: desktopOS,
+                        highlightScope: { fade: 'global', highlight: 'item' },
+                        faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
+                        valueFormatter,
+                      },
+                    ]}
+                    height={200}
+                    width={200}
+                  />
                 </div>
 
                 <div className="text-sm">
-                  <div className="flex items-center gap-2">
+                  {/* <div className="flex items-center gap-2">
                     <span
                       className="w-3 h-3 rounded-full"
                       style={{
@@ -327,7 +421,7 @@ const ApplicationsPage = () => {
                       }}
                     ></span>
                     Pre-Approved Pending Income Verification
-                  </div>
+                  </div> */}
 
                   <div className="text-right font-semibold mt-4">$27,000.00</div>
                 </div>
@@ -384,10 +478,15 @@ const ApplicationsPage = () => {
             {/* CHART - Monthly Summary */}
             <div className="bg-white p-6 rounded-lg shadow">
               <h2 className="text-lg font-semibold mb-4">Monthly Summary</h2>
-              <Bar data={chartData} options={chartOptions} />
+              {/* <Bar data={chartData} options={chartOptions} /> */}
+              <BarChart
+                xAxis={[{ data: ['group A', 'group B', 'group C'] }]}
+                series={[{ data: [4, 3, 5] }, { data: [1, 6, 3] }, { data: [2, 5, 6] }]}
+                height={300}
+              />
             </div>
 
-            
+
           </div>
         )}
       </div>

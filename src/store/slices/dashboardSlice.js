@@ -166,10 +166,7 @@ const dashboardSlice = createSlice({
       })
       .addCase(getTotalApplicationsThisMonth.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        console.log(action.payload, 'action.payload');
-        let a = transformLeadData(action.payload)
-        console.log(a,'transformLeadData(action.payload)')
-        state.totalApplicationsThisMonth = transformLeadData(action.payload);
+        state.totalApplicationsThisMonth = action.payload;
       })
       .addCase(getTotalApplicationsThisMonth.rejected, (state, action) => {
         state.status = 'failed';
@@ -180,7 +177,7 @@ const dashboardSlice = createSlice({
       })
       .addCase(getApprovedThisMonth.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.approvedApplicationsThisMonth = transformLeadData(action.payload);
+        state.approvedApplicationsThisMonth = action.payload;
       })
       .addCase(getApprovedThisMonth.rejected, (state, action) => {
         state.status = 'failed';
@@ -191,7 +188,7 @@ const dashboardSlice = createSlice({
       })
       .addCase(getPreApprovedThisMonth.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.preApprovedApplicationsThisMonth = transformLeadData(action.payload);
+        state.preApprovedApplicationsThisMonth = action.payload;
       })
       .addCase(getPreApprovedThisMonth.rejected, (state, action) => {
         state.status = 'failed';
@@ -202,7 +199,7 @@ const dashboardSlice = createSlice({
       })
       .addCase(getDeclinedThisMonth.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.declinedApplicationsThisMonth =transformLeadData(action.payload);
+        state.declinedApplicationsThisMonth =action.payload;
       })
       .addCase(getDeclinedThisMonth.rejected, (state, action) => {
         state.status = 'failed';
@@ -213,7 +210,7 @@ const dashboardSlice = createSlice({
       })
       .addCase(getTotalApplications.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.totalApplications = transformLeadData(action.payload);
+        state.totalApplications = action.payload;
       })
       .addCase(getTotalApplications.rejected, (state, action) => {
         state.status = 'failed';
@@ -224,7 +221,7 @@ const dashboardSlice = createSlice({
       })
       .addCase(getTotalApproved.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.totalApproved = transformLeadData(action.payload);
+        state.totalApproved = action.payload;
       })
       .addCase(getTotalApproved.rejected, (state, action) => {
         state.status = 'failed';
@@ -235,7 +232,7 @@ const dashboardSlice = createSlice({
       })
       .addCase(getTotalDeclined.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.totalDeclined = transformLeadData(action.payload);
+        state.totalDeclined = action.payload;
       })
       .addCase(getTotalDeclined.rejected, (state, action) => {
         state.status = 'failed';
@@ -246,7 +243,7 @@ const dashboardSlice = createSlice({
       })
       .addCase(getTotalPreApproved.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.totalPreApproved = transformLeadData(action.payload);
+        state.totalPreApproved = action.payload;
       })
       .addCase(getTotalPreApproved.rejected, (state, action) => {
         state.status = 'failed';
@@ -257,7 +254,7 @@ const dashboardSlice = createSlice({
       })
       .addCase(getTotalDeclinePercent.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.totalDeclinePercent = transformLeadData(action.payload);
+        state.totalDeclinePercent = action.payload;
       })
       .addCase(getTotalDeclinePercent.rejected, (state, action) => {
         state.status = 'failed';
@@ -268,7 +265,7 @@ const dashboardSlice = createSlice({
       })
       .addCase(getTopDeclineReason.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.topDeclineReason = transformLeadData(action.payload);
+        state.topDeclineReason = action.payload;
       })
       .addCase(getTopDeclineReason.rejected, (state, action) => {
         state.status = 'failed';
