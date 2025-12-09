@@ -1,57 +1,86 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FaTachometerAlt, FaClipboardList, FaChalkboardTeacher, FaSignOutAlt } from 'react-icons/fa'; // Using React Icons for better design
+import {
+  LayoutGrid,
+  ClipboardList,
+  LogOut,
+  Menu,
+} from "lucide-react";
 import logo from '../assets/image.png';
 
-const Sidebar = () => {
-  const location = useLocation(); // Get the current route
+const Sidebar = ({ isOpen, setIsOpen }) => {
+  const location = useLocation();
 
-  // Helper function to check if the link is active
-  const isActive = (path) => location.pathname === path ? 'bg-blue-600 text-white' : 'text-blue-200';
+  const isActive = (path) =>
+    location.pathname === path
+      ? "bg-blue-100 text-blue-600 font-semibold"
+      : "text-gray-500 hover:text-blue-600";
 
   return (
-    <div className="flex flex-col w-64 bg-[#222653] text-white h-screen p-6 space-y-8">
-      {/* Logo Section */}
-      <div className="flex justify-center items-center space-x-3 mb-12">
-        {/* <div className="text-3xl font-semibold text-blue-400">EAZE Consulting</div> */}
-        <img src={logo} alt="EAZE Consulting Logo" className="max-w-full h-auto" style={{ width: '200px' ,height:'80px'}} />
+    <div
+      className={`
+        h-full bg-white shadow-md flex flex-col p-6
+        transition-all duration-300 ease-in-out
+        ${isOpen ? "w-64" : "w-22"}
+      `}
+    >
+      {/* Logo + Toggle */}
+      <div
+        className={`
+          flex items-center mb-12 transition-all duration-300 ease-in-out
+          ${isOpen ? "justify-between" : "flex-col-reverse"}
+        `}
+      >
+        <img src={logo} alt="Logo" className="w-12 transition-all duration-300 ease-in-out" />
+
+        {/* Toggle Button */}
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="p-2 rounded-lg hover:bg-gray-100 hidden lg:block text-black transition-all duration-300 ease-in-out"
+        >
+          <Menu size={22} />
+        </button>
       </div>
 
       {/* Navigation Links */}
-      <div className="flex flex-col space-y-6">
+      <nav className="flex flex-col space-y-3 transition-all duration-300 ease-in-out">
+
         <Link
           to="/dashboard"
-          className={`flex items-center space-x-4 text-xl px-4 py-3 rounded-lg ${isActive('/dashboard')} hover:bg-blue-700 hover:text-white transition duration-300`}
+          className={`flex items-center space-x-3 py-2 px-3 rounded-xl transition-all duration-300 ease-in-out ${isActive("/dashboard")}`}
         >
-          <FaTachometerAlt className="text-2xl" />
-          <span>Dashboard</span>
+          <LayoutGrid size={20} className="transition-all duration-300 ease-in-out" />
+          {isOpen && <span className="transition-opacity duration-300 ease-in-out">Dashboard</span>}
         </Link>
-        {/* <Link
+
+        <Link
           to="/applications"
-          className={`flex items-center space-x-4 text-xl px-4 py-3 rounded-lg ${isActive('/applications')} hover:bg-blue-700 hover:text-white transition duration-300`}
+          className={`flex items-center space-x-3 py-2 px-3 rounded-xl transition-all duration-300 ease-in-out ${isActive("/applications")}`}
         >
-          <FaClipboardList className="text-2xl" />
-          <span>Applications</span>
-        </Link> */}
-        {/* <Link
-          to="/training"
-          className={`flex items-center space-x-4 text-xl px-4 py-3 rounded-lg ${isActive('/training')} hover:bg-blue-700 hover:text-white transition duration-300`}
-        >
-          <FaChalkboardTeacher className="text-2xl" />
-          <span>Training</span>
-        </Link> */}
+          <ClipboardList size={20} className="transition-all duration-300 ease-in-out" />
+          {isOpen && <span className="transition-opacity duration-300 ease-in-out">Applications</span>}
+        </Link>
+
         <Link
           to="/login"
-          className={`flex items-center space-x-4 text-xl px-4 py-3 rounded-lg ${isActive('/login')} hover:bg-blue-700 hover:text-white transition duration-300`}
+          className={`flex items-center space-x-3 py-2 px-3 rounded-xl transition-all duration-300 ease-in-out ${isActive("/login")}`}
         >
-          <FaSignOutAlt className="text-2xl" />
-          <span>Logout</span>
+          <LogOut size={20} className="transition-all duration-300 ease-in-out" />
+          {isOpen && <span className="transition-opacity duration-300 ease-in-out">Logout</span>}
         </Link>
-      </div>
 
-      {/* Footer */}
-      <div className="mt-auto text-sm text-center text-blue-300">
-        <p>© 2025 EAZE Consulting. All rights reserved.</p>
+      </nav>
+
+      {/* Footer Section */}
+      <div className="mt-auto pt-10 flex items-center space-x-2 transition-all duration-300 ease-in-out">
+        <img src={logo} className="w-6 transition-all duration-300 ease-in-out" />
+
+        {isOpen && (
+          <div className="transition-opacity duration-300 ease-in-out">
+            <p className="text-gray-700 text-sm font-semibold">Meta Platforms</p>
+            <p className="text-gray-400 text-sm">Hiring Manager</p>
+          </div>
+        )}
       </div>
     </div>
   );

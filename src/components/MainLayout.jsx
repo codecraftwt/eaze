@@ -1,45 +1,50 @@
 import React, { useState } from 'react';
-import { Outlet } from 'react-router-dom'; // Import Outlet
+import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
-import { FaBars, FaTimes } from 'react-icons/fa'; // Importing hamburger and close icons
+import { FaBars, FaTimes } from 'react-icons/fa';
 
 const MainLayout = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false); // For toggling the sidebar
-
-  // Function to toggle the sidebar on small screens
-  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
+  const [isOpen, setIsOpen] = useState(true); // Desktop mini/expand
+  const [mobileOpen, setMobileOpen] = useState(false); // Mobile open/close
 
   return (
     <div className="flex h-screen overflow-hidden">
-      {/* Sidebar: Fixed on large screens and overlaid on small screens */}
+
+      {/* Sidebar */}
       <div
-        className={`fixed lg:relative lg:w-64 w-64 bg-gray-800 text-white h-full transition-transform duration-300 ease-in-out ${
-          sidebarOpen ? 'transform translate-x-0' : 'transform -translate-x-full'
-        } lg:translate-x-0`} // On mobile, it's hidden by default and toggled with transform
+        className={`
+          fixed lg:relative h-full bg-gray-800 text-white
+          transition-all duration-300 ease-in-out
+          ${mobileOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0
+          ${isOpen ? 'lg:w-64' : 'lg:w-20'} w-64
+        `}
       >
-        <Sidebar />
-        {/* Close Button on Mobile */}
-        <div className="lg:hidden absolute top-4 right-4">
-          <button onClick={toggleSidebar} className="text-2xl text-white">
-            <FaTimes />
-          </button>
-        </div>
+        <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} />
+
+        {/* Mobile close button */}
+        <button
+          className="lg:hidden absolute top-4 right-4 text-black text-2xl"
+          onClick={() => setMobileOpen(false)}
+        >
+          <FaTimes />
+        </button>
       </div>
 
-      {/* Main Content: Scrollable */}
+      {/* Main content */}
       <div
-        className={`flex-1 p-0 overflow-y-auto h-full transition-all duration-300 ${
-          sidebarOpen ? 'lg:ml-64' : 'ml-0' // Adjust layout based on sidebar visibility
-        }`}
+        className={`
+          flex-1 overflow-y-auto
+          transition-all duration-300 ease-in-out h-full
+        `}
       >
-        {/* Hamburger Icon for small screens */}
+        {/* Mobile hamburger */}
         <div className="lg:hidden p-4">
-          <button onClick={toggleSidebar} className="text-2xl text-gray-800">
+          <button onClick={() => setMobileOpen(true)} className="text-2xl">
             <FaBars />
           </button>
         </div>
 
-        <Outlet /> {/* This will render the selected page (e.g., Dashboard) */}
+        <Outlet />
       </div>
     </div>
   );

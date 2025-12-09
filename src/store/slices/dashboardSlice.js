@@ -36,7 +36,7 @@ export const getTotalApplicationsThisMonth = createAsyncThunk(
     const data = await fetchData('gettotalapplicationthismonth', { accountId: REGISTRATION_CODE, leadSource: LEADSOURCE }, token)
       .catch(rejectWithValue);
 
-      console.log(data, 'data');
+      // console.log(data, 'data');
     return data?.data || [];
   }
 );
