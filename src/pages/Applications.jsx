@@ -1,20 +1,22 @@
 import React, { useEffect, useRef, useState } from "react";
 import LeadTabs from "../components/LeadTabs.jsx";
-import { Bar, Doughnut } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  ArcElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
 import { BarChart } from '@mui/x-charts/BarChart';
 import { PieChart, pieArcLabelClasses } from '@mui/x-charts/PieChart';
 // import { desktopOS, valueFormatter } from './webUsageStats';
+import { AiOutlineFile } from 'react-icons/ai';   // Import Document Icon
+import { FiDollarSign } from 'react-icons/fi';     // Import Dollar Icon
+import { AiOutlineUser } from 'react-icons/ai';       // For Current Applications
+import { FiCheckCircle } from 'react-icons/fi';        // For Revenue in-progress
+import { HiOutlineChartPie } from 'react-icons/hi';
+// import { FiCheckCircle } from 'react-icons/fi';   // Check Icon
+import { HiCurrencyDollar } from 'react-icons/hi';  // Dollar Icon
+import { GiMoneyStack } from 'react-icons/gi';      // Money Stack Icon
+import { AiOutlineCheckCircle } from 'react-icons/ai'; // Another check icon
 
+// import { FiCheckCircle } from 'react-icons/fi';      // Checkmark Icon
+// import { HiCurrencyDollar } from 'react-icons/hi';    // Dollar Icon
+import { AiOutlineCloseCircle } from 'react-icons/ai'; // Decline Icon
+import { FaExclamationCircle } from 'react-icons/fa'; // Warning Icon
 // donut chat data
 export const desktopOS = [
   {
@@ -42,7 +44,6 @@ export const desktopOS = [
 
 export const valueFormatter = (item) => `${item.value}%`;
 // Register chart elements
-ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend);
 
 const ApplicationsPage = () => {
   const [selectedTab, setSelectedTab] = useState(0);
@@ -149,6 +150,436 @@ const ApplicationsPage = () => {
     <div className="p-4 bg-gray-100 min-h-screen">
       {/* MAIN GRID */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+
+        {/* RIGHT SIDE - CARDS + CHART (40%) */}
+        {selectedTab === 0 && (
+          <>
+            <div className="lg:col-span-2 space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* CARD 1 - New Applications */}
+                <div className="bg-white p-6 rounded-lg shadow flex items-center space-x-4">
+                  <AiOutlineFile className="h-8 w-8 text-gray-500" />  {/* Icon */}
+                  <div>
+                    <div className="text-gray-500 text-sm">New Applications</div>
+                    <div className="text-3xl font-semibold mt-2">0</div>
+                  </div>
+                </div>
+
+                {/* CARD 2 - Revenue Overview */}
+                <div className="bg-white p-6 rounded-lg shadow flex items-center space-x-4">
+                  <FiDollarSign className="h-8 w-8 text-gray-500" />  {/* Icon */}
+                  <div>
+                    <div className="text-gray-500 text-sm">Revenue</div>
+                    <div className="text-3xl font-semibold mt-2">$0</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* CHART - Monthly Summary */}
+              <div className="bg-white p-6 rounded-lg shadow mt-6">
+                <h2 className="text-lg font-semibold mb-4">Monthly Summary</h2>
+                {/* <Bar data={chartData} options={chartOptions} /> */}
+                <BarChart
+                  xAxis={[{ data: ['group A', 'group B', 'group C'] }]}
+                  series={[{ data: [4, 3, 5] }, { data: [1, 6, 3] }, { data: [2, 5, 6] }]}
+                  height={300}
+                />
+              </div>
+            </div>
+          </>
+        )}
+
+
+        {/* ====================== CURRENT TAB RIGHT PANEL ====================== */}
+        {selectedTab === 1 && (
+          <div className="lg:col-span-2 space-y-6">
+            {/* CARDS */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* CARD 1 - Current Applications */}
+              <div className="bg-white p-6 rounded-lg shadow flex justify-between">
+                <div>
+                  <div className="text-gray-500 text-sm">Current Applications</div>
+                  <div className="text-3xl font-semibold mt-2">26</div>
+                </div>
+                <div className="text-4xl text-gray-500">
+                  <AiOutlineUser />
+                </div>
+              </div>
+
+              {/* CARD 2 - Revenue in-progress */}
+              <div className="bg-white p-6 rounded-lg shadow flex justify-between">
+                <div>
+                  <div className="text-gray-500 text-sm">Revenue in-progress</div>
+                  <div className="text-3xl font-semibold mt-2">$376,100</div>
+                </div>
+                <div className="text-4xl text-green-500">
+                  <FiCheckCircle />
+                </div>
+              </div>
+            </div>
+
+            {/* DONUT CHART CARD #1 */}
+            <div className="bg-white p-6 rounded-lg shadow">
+              <h2 className="text-lg font-semibold mb-4">Current</h2>
+              <div className="flex items-center justify-between">
+                <div className="w-48">
+                  <PieChart
+                    series={[{
+                      data: desktopOS,
+                      highlightScope: { fade: 'global', highlight: 'item' },
+                      faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
+                      valueFormatter,
+                    }]}
+                    height={200}
+                    width={200}
+                  />
+                </div>
+                <div className="text-sm text-gray-600 flex items-center">
+                  <HiOutlineChartPie className="h-5 w-5 mr-2" />
+                  <span>Current Data</span>
+                </div>
+              </div>
+            </div>
+
+            {/* DONUT CHART CARD #2 */}
+            <div className="bg-white p-6 rounded-lg shadow">
+              <h2 className="text-lg font-semibold mb-4">
+                Pre-Approved - Client Has Not Scheduled Call With EAZE
+              </h2>
+              <div className="flex items-center justify-between">
+                <div className="w-48">
+                  <PieChart
+                    series={[{
+                      data: desktopOS,
+                      highlightScope: { fade: 'global', highlight: 'item' },
+                      faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
+                      valueFormatter,
+                    }]}
+                    height={200}
+                    width={200}
+                  />
+                </div>
+                <div className="text-sm text-right font-semibold mt-4">
+                  <div className="text-right font-semibold mt-4">$27,000.00</div>
+                  <div className="flex items-center justify-end text-gray-500 mt-2">
+                    <HiOutlineChartPie className="h-5 w-5 mr-2" />
+                    <span>Pending Income Verification</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ====================== APPROVED TAB RIGHT PANEL ====================== */}
+        {selectedTab === 2 && (
+          <div className="lg:col-span-2 space-y-6">
+            {/* CARDS */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* CARD 1 - Compare to last month */}
+              <div className="bg-white p-6 rounded-lg shadow flex justify-between">
+                <div>
+                  <div className="text-gray-500 text-sm">Compare to last month</div>
+                  <div className="text-3xl font-semibold mt-2">200.00%</div>
+                </div>
+                <div className="text-4xl text-green-500">
+                  <FiCheckCircle /> {/* Checkmark icon */}
+                </div>
+              </div>
+
+              {/* CARD 2 - This Month Approved */}
+              <div className="bg-white p-6 rounded-lg shadow flex justify-between">
+                <div>
+                  <div className="text-gray-500 text-sm">This Month Approved</div>
+                  <div className="text-3xl font-semibold mt-2">5</div>
+                </div>
+                <div className="text-4xl text-green-500">
+                  <FiCheckCircle /> {/* Checkmark icon */}
+                </div>
+              </div>
+            </div>
+
+            {/* CARDS 3 & 4 */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* CARD 3 - This Month Revenue */}
+              <div className="bg-white p-6 rounded-lg shadow flex justify-between">
+                <div>
+                  <div className="text-gray-500 text-sm">This Month Revenue</div>
+                  <div className="text-3xl font-semibold mt-2">$47,500</div>
+                </div>
+                <div className="text-4xl text-yellow-500">
+                  <HiCurrencyDollar /> {/* Dollar icon */}
+                </div>
+              </div>
+
+              {/* CARD 4 - Total Approved */}
+              <div className="bg-white p-6 rounded-lg shadow flex justify-between">
+                <div>
+                  <div className="text-gray-500 text-sm">Total Approved</div>
+                  <div className="text-3xl font-semibold mt-2">137</div>
+                </div>
+                <div className="text-4xl text-green-500">
+                  <FiCheckCircle /> {/* Checkmark icon */}
+                </div>
+              </div>
+            </div>
+
+            {/* CARD 5 - Total Revenue */}
+            <div className="bg-white p-6 rounded-lg shadow flex justify-between">
+              <div>
+                <div className="text-gray-500 text-sm">Total Revenue</div>
+                <div className="text-3xl font-semibold mt-2">$2,447,515</div>
+              </div>
+              <div className="text-4xl text-blue-500">
+                <GiMoneyStack /> {/* Money stack icon */}
+              </div>
+            </div>
+
+            {/* CHART - Monthly Summary */}
+            <div className="bg-white p-6 rounded-lg shadow">
+              <h2 className="text-lg font-semibold mb-4">Monthly Summary</h2>
+              {/* <Bar data={chartData} options={chartOptions} /> */}
+              <BarChart
+                xAxis={[{ data: ['group A', 'group B', 'group C'] }]}
+                series={[{ data: [4, 3, 5] }, { data: [1, 6, 3] }, { data: [2, 5, 6] }]}
+                height={300}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* ====================== DECLINED TAB RIGHT PANEL ====================== */}
+        {/* RIGHT SIDE - CARDS + CHART (40%) */}
+        {selectedTab === 3 && (  // This will render when the "Declined" tab is selected
+          <div className="lg:col-span-2 space-y-6">
+            {/* First Row - Card 1 and Card 2 */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* CARD 1 - Declined This Month */}
+              <div className="bg-white p-6 rounded-lg shadow flex justify-between">
+                <div>
+                  <div className="text-3xl font-semibold">19</div>
+                  <div className="text-gray-500 text-sm mt-2">Declined This month</div>
+                </div>
+                <div className="text-4xl text-red-500">
+                  <AiOutlineCloseCircle /> {/* Decline Icon */}
+                </div>
+              </div>
+
+              {/* CARD 2 - Total Declined */}
+              <div className="bg-white p-6 rounded-lg shadow flex justify-between">
+                <div>
+                  <div className="text-3xl font-semibold">1426</div>
+                  <div className="text-gray-500 text-sm mt-2">Total Declined</div>
+                </div>
+                <div className="text-4xl text-red-500">
+                  <AiOutlineCloseCircle /> {/* Decline Icon */}
+                </div>
+              </div>
+            </div>
+
+            {/* Second Row - Card 3 and Card 4 */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* CARD 3 - Decline in Applications From Last Month */}
+              <div className="bg-white p-6 rounded-lg shadow flex justify-between">
+                <div>
+                  <div className="text-3xl font-semibold text-red-500">79.17%</div>
+                  <div className="text-gray-500 text-sm mt-2">Decline in Applications From Last Month</div>
+                </div>
+                <div className="text-4xl text-red-500">
+                  <FaExclamationCircle /> {/* Warning Icon */}
+                </div>
+              </div>
+
+              {/* CARD 4 - Declined in Revenue This Month */}
+              <div className="bg-white p-6 rounded-lg shadow flex justify-between">
+                <div>
+                  <div className="text-3xl font-semibold">$193,500</div>
+                  <div className="text-gray-500 text-sm mt-2">Declined in Revenue This Month</div>
+                </div>
+                <div className="text-4xl text-red-500">
+                  <HiCurrencyDollar /> {/* Dollar Icon */}
+                </div>
+              </div>
+            </div>
+
+            {/* Third Row - Card 5 and Card 6 */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* CARD 5 - Top Declined Reason */}
+              <div className="bg-white p-6 rounded-lg shadow">
+                <div className="text-3xl font-semibold">$44,659,530</div>
+                <div className="text-gray-500 text-sm mt-1 font-semibold">
+                  Top Declined Reason:
+                </div>
+                <div className="text-gray-600 text-xs mt-1">
+                  Declined - Client Does Not Meet Minimum Credit Requirements
+                </div>
+              </div>
+
+              {/* CARD 6 - Declined in Revenue */}
+              <div className="bg-white p-6 rounded-lg shadow flex justify-between">
+                <div>
+                  <div className="text-3xl font-semibold">$51,440,248</div>
+                  <div className="text-gray-500 text-sm mt-2">Declined in Revenue</div>
+                </div>
+                <div className="text-4xl text-red-500">
+                  <HiCurrencyDollar /> {/* Dollar Icon */}
+                </div>
+              </div>
+            </div>
+
+            {/* CHART - Monthly Summary */}
+            <div className="bg-white p-6 rounded-lg shadow">
+              <h2 className="text-lg font-semibold mb-4">Monthly Summary</h2>
+              {/* <Bar data={chartData} options={chartOptions} /> */}
+              <BarChart
+                xAxis={[{ data: ['group A', 'group B', 'group C'] }]}
+                series={[{ data: [4, 3, 5] }, { data: [1, 6, 3] }, { data: [2, 5, 6] }]}
+                height={300}
+              />
+            </div>
+          </div>
+        )}
+        {/* ====================== closed Lost TAB RIGHT PANEL ====================== */}
+        {/* RIGHT SIDE - CARDS + CHART (40%) */}
+        {selectedTab === 4 && (  // This will render when the "Declined" tab is selected
+          <div className="lg:col-span-2 space-y-6">
+            {/* First Row - Card 1 and Card 2 */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* CARD 1 - Closed This Month */}
+              <div className="bg-white p-6 rounded-lg shadow flex justify-between">
+                <div>
+                  <div className="text-3xl font-semibold">11</div>
+                  <div className="text-gray-500 text-sm mt-2">Closed This month</div>
+                </div>
+                <div className="text-4xl text-red-500">
+                  <AiOutlineCloseCircle /> {/* Decline Icon */}
+                </div>
+              </div>
+
+              {/* CARD 2 - Total Lost */}
+              <div className="bg-white p-6 rounded-lg shadow flex justify-between">
+                <div>
+                  <div className="text-3xl font-semibold">482</div>
+                  <div className="text-gray-500 text-sm mt-2">Total Lost</div>
+                </div>
+                <div className="text-4xl text-red-500">
+                  <AiOutlineCloseCircle /> {/* Decline Icon */}
+                </div>
+              </div>
+            </div>
+
+            {/* Second Row - Card 3 and Card 4 */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* CARD 3 - Lost in Applications From Last Month */}
+              <div className="bg-white p-6 rounded-lg shadow flex justify-between">
+                <div>
+                  <div className="text-3xl font-semibold text-red-500">79.17%</div>
+                  <div className="text-gray-500 text-sm mt-2">Lost in Applications From Last Month</div>
+                </div>
+                <div className="text-4xl text-red-500">
+                  <FaExclamationCircle /> {/* Warning Icon */}
+                </div>
+              </div>
+
+              {/* CARD 4 - Lost in Revenue This Month */}
+              <div className="bg-white p-6 rounded-lg shadow flex justify-between">
+                <div>
+                  <div className="text-3xl font-semibold">$193,500</div>
+                  <div className="text-gray-500 text-sm mt-2">Lost in Revenue This Month</div>
+                </div>
+                <div className="text-4xl text-red-500">
+                  <HiCurrencyDollar /> {/* Dollar Icon */}
+                </div>
+              </div>
+            </div>
+
+            {/* Third Row - Card 5 and Card 6 */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* CARD 5 - Top Lost Reason */}
+              <div className="bg-white p-6 rounded-lg shadow">
+                <div className="text-3xl font-semibold">$44,659,530</div>
+                <div className="text-gray-500 text-sm mt-1 font-semibold">
+                  Top Lost Reason:
+                </div>
+                <div className="text-gray-600 text-xs mt-1">
+                  Closed Lost - Terms Pitched - Client Did Not Move Forward With Offer
+                </div>
+              </div>
+
+              {/* CARD 6 - Lost in Revenue */}
+              <div className="bg-white p-6 rounded-lg shadow flex justify-between">
+                <div>
+                  <div className="text-3xl font-semibold">$51,440,248</div>
+                  <div className="text-gray-500 text-sm mt-2">Lost in Revenue</div>
+                </div>
+                <div className="text-4xl text-red-500">
+                  <HiCurrencyDollar /> {/* Dollar Icon */}
+                </div>
+              </div>
+            </div>
+
+            {/* CHART - Monthly Summary */}
+            <div className="bg-white p-6 rounded-lg shadow">
+              <h2 className="text-lg font-semibold mb-4">Monthly Summary</h2>
+              {/* <Bar data={chartData} options={chartOptions} /> */}
+              <BarChart
+                xAxis={[{ data: ['group A', 'group B', 'group C'] }]}
+                series={[{ data: [4, 3, 5] }, { data: [1, 6, 3] }, { data: [2, 5, 6] }]}
+                height={300}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* ======================= Declined - Pre-Qualifier =============================================== */}
+        {selectedTab === 5 && (  // This will render when the "Declined" tab is selected
+          <div className="lg:col-span-2 space-y-6">
+            {/* First Row - Card 1 and Card 2 */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* CARD 1 - Closed This Month */}
+              <div className="bg-white p-6 rounded-lg shadow flex justify-between">
+                <div>
+                  <div className="text-3xl font-semibold">11</div>
+                  <div className="text-gray-500 text-sm mt-2">Declined This month</div>
+                </div>
+                <div className="text-4xl text-red-500">
+                  <AiOutlineCloseCircle /> {/* Decline Icon */}
+                </div>
+              </div>
+
+              {/* CARD 2 - Total Lost */}
+              <div className="bg-white p-6 rounded-lg shadow flex justify-between">
+                <div>
+                  <div className="text-3xl font-semibold">482</div>
+                  <div className="text-gray-500 text-sm mt-2">Total Declined</div>
+                </div>
+                <div className="text-4xl text-red-500">
+                  <AiOutlineCloseCircle /> {/* Decline Icon */}
+                </div>
+              </div>
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow flex justify-between">
+              <div>
+                <div className="text-3xl font-semibold text-red-500">79.17%</div>
+                <div className="text-gray-500 text-sm mt-2">Decline in Applications From Last Month</div>
+              </div>
+              <div className="text-4xl text-red-500">
+                <FaExclamationCircle /> {/* Warning Icon */}
+              </div>
+            </div>
+
+            {/* CHART - Monthly Summary */}
+            <div className="bg-white p-6 rounded-lg shadow">
+              <h2 className="text-lg font-semibold mb-4">Monthly Summary</h2>
+              {/* <Bar data={chartData} options={chartOptions} /> */}
+              <BarChart
+                xAxis={[{ data: ['group A', 'group B', 'group C'] }]}
+                series={[{ data: [4, 3, 5] }, { data: [1, 6, 3] }, { data: [2, 5, 6] }]}
+                height={300}
+              />
+            </div>
+          </div>
+        )}
         {/* LEFT SIDE - TABLE (60%) */}
         <div className="lg:col-span-3 bg-white p-4 rounded-lg shadow">
           <LeadTabs onTabChange={setSelectedTab} />
@@ -186,309 +617,41 @@ const ApplicationsPage = () => {
               </div>
             </div>
           )}
+          {selectedTab === 4 && (
+            <div className="bg-white p-6 rounded-lg shadow">
+              <h2 className="text-lg font-semibold mb-4">Closed Stats</h2>
+              <div className="flex items-center justify-between">
+                <div className="w-48">
+                  {/* <Doughnut data={declinedChart} ref={declinedChartRef} /> */}
+                  <PieChart
+                    series={[
+                      {
+                        data: desktopOS,
+                        highlightScope: { fade: 'global', highlight: 'item' },
+                        faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
+                        valueFormatter,
+                      },
+                    ]}
+                    height={200}
+                    width={200}
+                  />
+                </div>
+
+                <div className="text-sm">
+                  {/* <div className="flex items-center gap-2">
+                    <span
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: declinedChart.datasets[0].backgroundColor[0] }}
+                    ></span>
+                    Declined - Client Does Not Meet Minimum Credit Requirements
+                  </div> */}
+                  <div className="text-right font-semibold mt-4">$44,659,530</div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* RIGHT SIDE - CARDS + CHART (40%) */}
-        {selectedTab === 0 && (
-          <div className="lg:col-span-2 space-y-6">
-            {/* CARD 1 - New Applications */}
-            <div className="bg-white p-6 rounded-lg shadow">
-              <div className="text-gray-500 text-sm">New Applications</div>
-              <div className="text-3xl font-semibold mt-2">0</div>
-            </div>
-
-            {/* CARD 2 - Revenue Overview */}
-            <div className="bg-white p-6 rounded-lg shadow">
-              <div className="text-gray-500 text-sm">Revenue</div>
-              <div className="text-3xl font-semibold mt-2">$0</div>
-            </div>
-
-            {/* CHART - Monthly Summary */}
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h2 className="text-lg font-semibold mb-4">Monthly Summary</h2>
-              {/* <Bar data={chartData} options={chartOptions} /> */}
-              <BarChart
-                xAxis={[{ data: ['group A', 'group B', 'group C'] }]}
-                series={[{ data: [4, 3, 5] }, { data: [1, 6, 3] }, { data: [2, 5, 6] }]}
-                height={300}
-              />
-            </div>
-          </div>
-        )}
-
-        {/* ====================== CURRENT TAB RIGHT PANEL ====================== */}
-        {selectedTab === 1 && (
-          <div className="lg:col-span-2 space-y-6">
-            {/* CARDS */}
-            <div className="bg-white p-6 rounded-lg shadow flex justify-between">
-              <div>
-                <div className="text-gray-500 text-sm">Current Applications</div>
-                <div className="text-3xl font-semibold mt-2">26</div>
-              </div>
-              <div className="text-4xl">👤</div>
-            </div>
-
-            <div className="bg-white p-6 rounded-lg shadow flex justify-between">
-              <div>
-                <div className="text-gray-500 text-sm">Revenue in-progress</div>
-                <div className="text-3xl font-semibold mt-2">$376,100</div>
-              </div>
-              <div className="text-4xl">✔</div>
-            </div>
-
-            {/* DONUT CHART CARD #1 */}
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h2 className="text-lg font-semibold mb-4">Current</h2>
-
-              <div className="flex items-center justify-between">
-                <div className="w-48">
-                  {/* <Doughnut data={currentChart} ref={currentChartRef} /> */}
-                  <PieChart
-                    series={[
-                      {
-                        data: desktopOS,
-                        highlightScope: { fade: 'global', highlight: 'item' },
-                        faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
-                        valueFormatter,
-                      },
-                    ]}
-                    height={200}
-                    width={200}
-                  />
-                </div>
-
-                {/* <ul className="text-sm space-y-2">
-                  {currentChart.labels.map((label, i) => (
-                    <li key={i} className="flex items-center gap-2">
-                      <span
-                        className="w-3 h-3 rounded-full"
-                        style={{
-                          backgroundColor:
-                            currentChart.datasets[0].backgroundColor[i],
-                        }}
-                      ></span>
-                      {label}
-                    </li>
-                  ))}
-                </ul> */}
-              </div>
-            </div>
-
-            {/* DONUT CHART CARD #2 */}
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h2 className="text-lg font-semibold mb-4">
-                Pre-Approved - Client Has Not Scheduled Call With EAZE
-              </h2>
-
-              <div className="flex items-center justify-between">
-                <div className="w-48">
-                  {/* <Doughnut data={preApprovedChart} ref={preApprovedChartRef} /> */}
-                  <PieChart
-                    series={[
-                      {
-                        data: desktopOS,
-                        highlightScope: { fade: 'global', highlight: 'item' },
-                        faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
-                        valueFormatter,
-                      },
-                    ]}
-                    height={200}
-                    width={200}
-                  />
-                </div>
-
-                <div className="text-sm">
-                  {/* <div className="flex items-center gap-2">
-                    <span
-                      className="w-3 h-3 rounded-full"
-                      style={{
-                        backgroundColor:
-                          preApprovedChart.datasets[0].backgroundColor[0],
-                      }}
-                    ></span>
-                    Pre-Approved Pending Income Verification
-                  </div> */}
-
-                  <div className="text-right font-semibold mt-4">$27,000.00</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ====================== APPROVED TAB RIGHT PANEL ====================== */}
-        {selectedTab === 2 && (
-          <div className="lg:col-span-2 space-y-6">
-            {/* CARDS */}
-            <div className="bg-white p-6 rounded-lg shadow flex justify-between">
-              <div>
-                <div className="text-gray-500 text-sm">This Month Approved</div>
-                <div className="text-3xl font-semibold mt-2">5</div>
-              </div>
-              <div className="text-4xl">✅</div>
-            </div>
-
-            <div className="bg-white p-6 rounded-lg shadow flex justify-between">
-              <div>
-                <div className="text-gray-500 text-sm">This Month Revenue</div>
-                <div className="text-3xl font-semibold mt-2">$47,500</div>
-              </div>
-              <div className="text-4xl">💰</div>
-            </div>
-
-            <div className="bg-white p-6 rounded-lg shadow flex justify-between">
-              <div>
-                <div className="text-gray-500 text-sm">Total Approved</div>
-                <div className="text-3xl font-semibold mt-2">137</div>
-              </div>
-              <div className="text-4xl">✅</div>
-            </div>
-
-            <div className="bg-white p-6 rounded-lg shadow flex justify-between">
-              <div>
-                <div className="text-gray-500 text-sm">Total Revenue</div>
-                <div className="text-3xl font-semibold mt-2">$2,447,515</div>
-              </div>
-              <div className="text-4xl">💵</div>
-            </div>
-
-            {/* DONUT CHART CARD #1 */}
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h2 className="text-lg font-semibold mb-4">Approved</h2>
-
-              <div className="flex items-center justify-between">
-                <div className="w-48">
-                  {/* <Doughnut data={approvedChart} ref={approvedChartRef} /> */}
-                  <PieChart
-                    series={[
-                      {
-                        data: desktopOS,
-                        highlightScope: { fade: 'global', highlight: 'item' },
-                        faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
-                        valueFormatter,
-                      },
-                    ]}
-                    height={200}
-                    width={200}
-                  />
-                </div>
-
-                {/* <ul className="text-sm space-y-2">
-                  {approvedChart.labels.map((label, i) => (
-                    <li key={i} className="flex items-center gap-2">
-                      <span
-                        className="w-3 h-3 rounded-full"
-                        style={{
-                          backgroundColor: approvedChart.datasets[0].backgroundColor[i],
-                        }}
-                      ></span>
-                      {label}
-                    </li>
-                  ))}
-                </ul> */}
-              </div>
-            </div>
-
-            {/* DONUT CHART CARD #2 */}
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h2 className="text-lg font-semibold mb-4">
-                Pre-Approved - Client Has Not Scheduled Call With EAZE
-              </h2>
-
-              <div className="flex items-center justify-between">
-                <div className="w-48">
-                  {/* <Doughnut data={preApprovedChart} ref={preApprovedChartRef} /> */}
-                  <PieChart
-                    series={[
-                      {
-                        data: desktopOS,
-                        highlightScope: { fade: 'global', highlight: 'item' },
-                        faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
-                        valueFormatter,
-                      },
-                    ]}
-                    height={200}
-                    width={200}
-                  />
-                </div>
-
-                <div className="text-sm">
-                  {/* <div className="flex items-center gap-2">
-                    <span
-                      className="w-3 h-3 rounded-full"
-                      style={{
-                        backgroundColor: preApprovedChart.datasets[0].backgroundColor[0],
-                      }}
-                    ></span>
-                    Pre-Approved Pending Income Verification
-                  </div> */}
-
-                  <div className="text-right font-semibold mt-4">$27,000.00</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* RIGHT SIDE - CARDS + CHART (40%) */}
-        {selectedTab === 3 && (  // This will render when the "Declined" tab is selected
-          <div className="lg:col-span-2 space-y-6">
-
-            {/* CARD 1 */}
-            <div className="bg-white p-6 rounded-lg shadow">
-              <div className="text-3xl font-semibold">19</div>
-              <div className="text-gray-500 text-sm mt-2">Declined This month</div>
-            </div>
-
-            {/* CARD 2 */}
-            <div className="bg-white p-6 rounded-lg shadow">
-              <div className="text-3xl font-semibold">1426</div>
-              <div className="text-gray-500 text-sm mt-2">Total Declined</div>
-            </div>
-
-            {/* CARD 3 */}
-            <div className="bg-white p-6 rounded-lg shadow">
-              <div className="text-3xl font-semibold text-red-500">79.17%</div>
-              <div className="text-gray-500 text-sm mt-2">Decline in Applications From Last Month</div>
-            </div>
-
-            {/* CARD 4 */}
-            <div className="bg-white p-6 rounded-lg shadow">
-              <div className="text-3xl font-semibold">$193,500</div>
-              <div className="text-gray-500 text-sm mt-2">Declined in Revenue This Month</div>
-            </div>
-
-            {/* CARD 5 */}
-            <div className="bg-white p-6 rounded-lg shadow">
-              <div className="text-3xl font-semibold">$44,659,530</div>
-              <div className="text-gray-500 text-sm mt-1 font-semibold">
-                Top Declined Reason:
-              </div>
-              <div className="text-gray-600 text-xs mt-1">
-                Declined - Client Does Not Meet Minimum Credit Requirements
-              </div>
-            </div>
-
-            {/* CARD 6 */}
-            <div className="bg-white p-6 rounded-lg shadow">
-              <div className="text-3xl font-semibold">$51,440,248</div>
-              <div className="text-gray-500 text-sm mt-2">Declined in Revenue</div>
-            </div>
-
-            {/* CHART - Monthly Summary */}
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h2 className="text-lg font-semibold mb-4">Monthly Summary</h2>
-              {/* <Bar data={chartData} options={chartOptions} /> */}
-              <BarChart
-                xAxis={[{ data: ['group A', 'group B', 'group C'] }]}
-                series={[{ data: [4, 3, 5] }, { data: [1, 6, 3] }, { data: [2, 5, 6] }]}
-                height={300}
-              />
-            </div>
-
-
-          </div>
-        )}
       </div>
     </div>
   );
