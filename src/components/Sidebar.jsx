@@ -31,7 +31,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           ${isOpen ? "justify-between" : "flex-col-reverse"}
         `}
       >
-        <img src={logo} alt="Logo" className="w-12 transition-all duration-300 ease-in-out" />
+        <img src={logo} alt="Logo" className="w-12 transition-all duration-300 ease-in-out"  style={isOpen ? { width: '170px', height: '70px' } : {}}/>
 
         {/* Toggle Button */}
         <button
@@ -72,7 +72,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
       </nav>
 
       {/* Footer Section */}
-      <div className="mt-auto pt-10 flex items-center space-x-2 transition-all duration-300 ease-in-out">
+      {/* <div className="mt-auto pt-10 flex items-center space-x-2 transition-all duration-300 ease-in-out">
         <img src={logo} className="w-6 transition-all duration-300 ease-in-out" />
 
         {isOpen && (
@@ -81,7 +81,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
             <p className="text-gray-400 text-sm">Hiring Manager</p>
           </div>
         )}
-      </div>
+      </div> */}
     </div>
   );
 };

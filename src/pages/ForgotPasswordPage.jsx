@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import AuthHeader from "../components/AuthHeader";
 import { changePassword } from "../store/slices/authSlice";
 import { toast } from "react-toastify";
+import logo from '../assets/image.png';
 
 const ForgotPasswordPage = () => {
   const dispatch = useDispatch();
@@ -48,13 +49,17 @@ const ForgotPasswordPage = () => {
   return (
     <div className="flex flex-col md:flex-row h-screen">
       {/* LEFT SIDE */}
-      <div className="w-full md:w-1/2">
+      {/* <div className="w-full md:w-1/2">
         <AuthHeader />
-      </div>
+      </div> */}
 
       {/* RIGHT SIDE */}
-      <div className="w-full md:w-1/2 flex justify-center items-center bg-[#e9f2f7]">
+      <div className="w-full flex justify-center items-center bg-[#e9f2f7]">
         <div className="w-full max-w-sm p-8 bg-white rounded-xl shadow-lg">
+          <div className="flex justify-center mb-6">
+            <img src={logo} alt="Logo" className="w-24 h-24 object-contain" />
+          </div>
+
           <h2 className="text-3xl font-semibold text-blue-600">
             Reset Your Password
           </h2>

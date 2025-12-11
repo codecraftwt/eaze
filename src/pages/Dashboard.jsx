@@ -4,119 +4,11 @@ import { getTotalApplicationsThisMonth, getTotalApplications, getApprovedThisMon
 import { getSalesforceToken } from '../store/slices/authSlice'; // Ensure correct import
 import { BarChart } from '@mui/x-charts/BarChart';
 import PopupModal from '../components/PopupModal';
-import { Select, MenuItem, FormControl, InputLabel } from '@mui/material';
-import axios from 'axios';
-import { Link } from 'react-router-dom';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Typography
-} from "@mui/material";
-const chartSetting = {
-  yAxis: [
-    {
-      label: 'rainfall (mm)',
-      width: 60,
-    },
-  ],
-  height: 300,
-};
-export const dataset = [
-  // {
-  //   london: 59,
-  //   paris: 57,
-  //   newYork: 86,
-  //   seoul: 21,
-  //   month: 'Jan',
-  // },
-  // {
-  //   london: 50,
-  //   paris: 52,
-  //   newYork: 78,
-  //   seoul: 28,
-  //   month: 'Feb',
-  // },
-  // {
-  //   london: 47,
-  //   paris: 53,
-  //   newYork: 106,
-  //   seoul: 41,
-  //   month: 'Mar',
-  // },
-  // {
-  //   london: 54,
-  //   paris: 56,
-  //   newYork: 92,
-  //   seoul: 73,
-  //   month: 'Apr',
-  // },
-  // {
-  //   london: 57,
-  //   paris: 69,
-  //   newYork: 92,
-  //   seoul: 99,
-  //   month: 'May',
-  // },
-  // {
-  //   london: 60,
-  //   paris: 63,
-  //   newYork: 103,
-  //   seoul: 144,
-  //   month: 'June',
-  // },
-  // {
-  //   london: 59,
-  //   paris: 60,
-  //   newYork: 105,
-  //   seoul: 319,
-  //   month: 'July',
-  // },
-  // {
-  //   london: 65,
-  //   paris: 60,
-  //   newYork: 106,
-  //   seoul: 249,
-  //   month: 'Aug',
-  // },
-  // {
-  //   london: 51,
-  //   paris: 51,
-  //   newYork: 95,
-  //   seoul: 131,
-  //   month: 'Sept',
-  // },
-  {
-    london: 60,
-    paris: 65,
-    newYork: 97,
-    seoul: 55,
-    month: 'Oct',
-  },
-  {
-    london: 67,
-    paris: 64,
-    newYork: 76,
-    seoul: 48,
-    month: 'Nov',
-  },
-  {
-    london: 61,
-    paris: 70,
-    newYork: 103,
-    seoul: 25,
-    month: 'Dec',
-  },
-];
 
 export function valueFormatter(value) {
   return `${value}mm`;
 }
-const DeclinedSummaryCard = ({ declinePercent, topDeclineReason ,declineValue}) => (
+const DeclinedSummaryCard = ({ declinePercent, topDeclineReason, declineValue }) => (
   <div className="w-full bg-white rounded-xl shadow-sm p-6 flex items-center justify-between mb-6 mt-5">
     <div>
       <p className="text-3xl font-bold text-[#0A2156]">{declinePercent}%</p>
@@ -136,17 +28,20 @@ const MonthlySummaryChart = () => {
   return (
     <div className="bg-white p-6 rounded-lg shadow-md mt-6">
       <h3 className="text-xl font-semibold mb-4">Monthly Summary</h3>
-      <BarChart
-        dataset={dataset}
-        xAxis={[{ dataKey: 'month' }]}
-        series={[
-          { dataKey: 'london', label: 'London', valueFormatter },
-          { dataKey: 'paris', label: 'Paris', valueFormatter },
-          { dataKey: 'newYork', label: 'New York', valueFormatter },
-          { dataKey: 'seoul', label: 'Seoul', valueFormatter },
-        ]}
-        {...chartSetting}
-      />
+      {declinedPreQualifierChartData?.months.length > 0 ||
+        declinedPreQualifierChartData?.totalLeads.length > 0 ||
+        declinedPreQualifierChartData?.newLeads.length > 0 ? (
+        <BarChart
+          xAxis={[{ data: declinedPreQualifierChartData.months }]} // Pass months as the x-axis labels
+          series={[
+            { data: declinedPreQualifierChartData.totalLeads, label: 'Total', id: 'pvId' }, // Total leads series
+            { data: declinedPreQualifierChartData.newLeads, label: 'Declined', id: 'uvId' },   // New leads series
+          ]}
+          height={300}
+        />
+      ) : (
+        <div>No data available</div> // Fallback message when no data exists
+      )}
     </div>
   );
 };
@@ -175,6 +70,12 @@ function Dashboard() {
   const [isModalAllOpen, setModalAllOpen] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState('Jan 25');
   const [isActive, setIsActive] = useState('approved');
+  const [barChartData, setBarChartData] = useState({
+    months: [],
+    approved: [],
+    current: [],
+    declined: [],
+  });
 
   const categoryMap = {
     approved: [
@@ -321,6 +222,47 @@ function Dashboard() {
     return result;
   }
 
+  function formatLeadsByStatusUpdated(data, categoryMap) {
+    // Initialize arrays for Approved, Current (Pre-Approved), and Declined counts
+    const months = [
+      "Jan 25", "Feb 25", "Mar 25", "Apr 25", "May 25", "Jun 25", "Jul 25", "Aug 25",
+      "Sep 25", "Oct 25", "Nov 25", "Dec 25"
+    ];
+
+    const approved = new Array(12).fill(0);
+    const current = new Array(12).fill(0);  // 'Current' corresponds to Pre-approved
+    const declined = new Array(12).fill(0);
+
+    // Helper function to get the month index from the date
+    function getMonthIndex(date) {
+      const month = new Date(date).getMonth(); // Get the month index (0-11)
+      return month;
+    }
+
+    // Process each lead and classify by month and status
+    data.forEach(lead => {
+      const monthIndex = getMonthIndex(lead.CreatedDate);
+
+      // Increment count for total leads
+      if (categoryMap.approved.includes(lead.Status)) {
+        approved[monthIndex] += 1; // Increment approved leads
+      } else if (categoryMap.declined.includes(lead.Status)) {
+        declined[monthIndex] += 1; // Increment declined leads
+      } else if (categoryMap.preApproved.includes(lead.Status)) {
+        current[monthIndex] += 1; // Increment current leads (Pre-approved)
+      }
+    });
+
+    // Return the formatted JSON
+    return {
+      months,
+      approved,
+      current,
+      declined
+    };
+  }
+
+
 
 
   // this month
@@ -371,7 +313,7 @@ function Dashboard() {
     if (totalApplicationsThisMonth.length !== 0) {
       console.log(totalApplicationsThisMonth.length, 'totalApplicationsThisMonth');
       const result = groupLeadStatuses(categoryMap, totalApplicationsThisMonth);
-      console.log(result,'result')
+      console.log(result, 'result')
       setGroupedThisMonthData(result);
       //   console.log(totalApplicationsThisMonth.map(item => item.Loan_Amount__c || 0)   // extract only loan amounts
       // .reduce((sum, amount) => sum + amount, 0), 'totalApplicationsThisMonth--this month loan amount');
@@ -379,26 +321,6 @@ function Dashboard() {
         item.Status.toLowerCase().startsWith("closed lost"));
       console.log([...new Set(closedLost.map(item => item.Status))], 'closedLost status')
     }
-
-    // if (approvedApplicationsThisMonth.length !== 0) {
-    //   // extract only loan amounts
-    //   //   console.log(approvedApplicationsThisMonth.map(item => item.Loan_Amount__c || 0)   
-    //   // .reduce((sum, amount) => sum + amount, 0), 'approvedApplicationsThisMonth');
-    //   console.log([...new Set(approvedApplicationsThisMonth.map(item => item.Status))], 'approvedApplicationsThisMonth status')
-    // }
-
-    // if (declinedApplicationsThisMonth.length !== 0) {
-    //   //   console.log(declinedApplicationsThisMonth.map(item => item.Loan_Amount__c || 0)   // extract only loan amounts
-    //   // .reduce((sum, amount) => sum + amount, 0), 'declinedApplicationsThisMonth');
-    //   console.log([...new Set(declinedApplicationsThisMonth.map(item => item.Status))], 'declinedApplicationsThisMonth status')
-    // }
-
-    // if (preApprovedApplicationsThisMonth.length !== 0) {
-    //   //   console.log(preApprovedApplicationsThisMonth.map(item => item.Loan_Amount__c || 0)   // extract only loan amounts
-    //   // .reduce((sum, amount) => sum + amount, 0), 'preApprovedApplicationsThisMonth');
-    //   console.log([...new Set(preApprovedApplicationsThisMonth.map(item => item.Status))], 'preApprovedApplicationsThisMonth status')
-
-    // }
 
     // Total stats
     if (totalApplications.length !== 0) {
@@ -409,6 +331,9 @@ function Dashboard() {
         item.Status.toLowerCase().startsWith("declined"));
       console.log([...new Set(closedLost.map(item => item.Status))], 'declined status')
       setGroupedAllMonthData(result);
+      const barChat = formatLeadsByStatusUpdated(totalApplications, categoryMap);
+      console.log(barChat, 'barChat')
+      setBarChartData(barChat);
       //   console.log(totalApplications.length, 'totalApplications');
       //   console.log(totalApplications.map(item => item.Loan_Amount__c || 0)   // extract only loan amounts
       // .reduce((sum, amount) => sum + amount, 0), 'totalApplications--this month loan amount');
@@ -419,16 +344,8 @@ function Dashboard() {
       console.log(totalApproved.map(item => item.Loan_Amount__c || 0).reduce((sum, amount) => sum + amount, 0), 'totalApproved');
     }
 
-    // if (totalDeclined.length !== 0) {
-    //   console.log(totalDeclined.map(item => item.Loan_Amount__c || 0).reduce((sum, amount) => sum + amount, 0), 'totalDeclined');
-    // }
-
-    // if (totalPreApproved.length !== 0) {
-    //   console.log(totalPreApproved.map(item => item.Loan_Amount__c || 0).reduce((sum, amount) => sum + amount, 0), 'totalPreApproved');
-    // }
-
-    if(totalDeclinePercent!==null){
-      console.log(totalDeclinePercent,'totalDeclinePercent')
+    if (totalDeclinePercent !== null) {
+      console.log(totalDeclinePercent, 'totalDeclinePercent')
     }
 
   }, [
@@ -446,10 +363,10 @@ function Dashboard() {
   useEffect(() => {
     if (totalApplications.length !== 0) {
       console.log(totalApplications, 'totalApplications-----------');
-      const data = totalApplications.filter((m)=>m.Status==topDeclineReason?.decline_reason).map(item => item.Loan_Amount__c || 0).reduce((sum, amount) => sum + amount, 0).toLocaleString()
-      console.log(data,'data')
+      const data = totalApplications.filter((m) => m.Status == topDeclineReason?.decline_reason).map(item => item.Loan_Amount__c || 0).reduce((sum, amount) => sum + amount, 0).toLocaleString()
+      console.log(data, 'data')
     }
-  }, [topDeclineReason,totalApplications]);
+  }, [topDeclineReason, totalApplications]);
 
   // List of months from Jan 25 to Dec 25
   const months = [
@@ -532,11 +449,29 @@ function Dashboard() {
       <DeclinedSummaryCard
         declinePercent={totalDeclinePercent?.decline_percent}
         topDeclineReason={topDeclineReason?.decline_reason}
-        declineValue={totalApplications.filter((m)=>m.Status==topDeclineReason?.decline_reason).map(item => item.Loan_Amount__c || 0).reduce((sum, amount) => sum + amount, 0).toLocaleString()}
+        declineValue={totalApplications.filter((m) => m.Status == topDeclineReason?.decline_reason).map(item => item.Loan_Amount__c || 0).reduce((sum, amount) => sum + amount, 0).toLocaleString()}
       />
 
       {/* Monthly Summary Chart */}
-      <MonthlySummaryChart />
+      {/* <MonthlySummaryChart /> */}
+      <div className="bg-white p-6 rounded-lg shadow-md mt-6">
+        <h3 className="text-xl font-semibold mb-4">Monthly Summary</h3>
+        {barChartData?.months.length > 0 ||
+          barChartData?.approved.length > 0 || barChartData?.declined.length > 0 ||
+          barChartData?.current.length > 0 ? (
+          <BarChart
+            xAxis={[{ data: barChartData.months }]} // Pass months as the x-axis labels
+            series={[
+              { data: barChartData.approved, label: 'Approved', id: 'pvId' }, // Total leads series
+              { data: barChartData.current, label: 'Current', id: 'uvId' },   // New leads series
+              { data: barChartData.declined, label: 'Declined', id: 'udId' },   // New leads series
+            ]}
+            height={300}
+          />
+        ) : (
+          <div>No data available</div> // Fallback message when no data exists
+        )}
+      </div>
       <PopupModal groupedData={groupedThisMonthData} isActive={isActive} isOpen={isModalOpen} onClose={closeModal} title="Declined Summary" content="Declined — Client Does Not Meet Minimum Credit Requirements" />
       <PopupModal groupedData={groupedAllMonthData} isActive={isActive} isOpen={isModalAllOpen} onClose={closeAllModal} title="Declined Summary" content="Declined — Client Does Not Meet Minimum Credit Requirements" />
     </div>

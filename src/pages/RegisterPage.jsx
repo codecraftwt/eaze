@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { registerUser, getSalesforceToken } from "../store/slices/authSlice";
 import { toast } from "react-toastify";
+import logo from '../assets/image.png';
 
 const RegisterPage = () => {
   const dispatch = useDispatch();
@@ -106,13 +107,17 @@ const RegisterPage = () => {
   return (
     <div className="flex flex-col md:flex-row h-screen">
       {/* Left side */}
-      <div className="w-full md:w-1/2 bg-blue-500 hidden md:block">
+      {/* <div className="w-full md:w-1/2 bg-blue-500 hidden md:block">
         <AuthHeader />
-      </div>
+      </div> */}
 
       {/* Right side */}
-      <div className="w-full md:w-1/2 flex flex-col justify-start items-center bg-[#e9f2f7] overflow-auto h-full md:ml-auto mt-8 md:mt-0">
+      <div className="w-full flex flex-col justify-start items-center bg-[#e9f2f7] overflow-auto h-full md:ml-auto mt-8 md:mt-0">
         <div className="text-center mt-10 px-4">
+                    <div className="flex justify-center mb-6">
+            <img src={logo} alt="Logo" className="w-24 h-24 object-contain" />
+          </div>
+
           <h2 className="text-3xl font-semibold text-blue-600">
             Create Your Account
           </h2>

@@ -4,6 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser, getSalesforceToken } from "../store/slices/authSlice";
 import { toast } from "react-toastify";
+import logo from '../assets/image.png';
 
 const LoginPage = () => {
   const dispatch = useDispatch();
@@ -71,13 +72,17 @@ const LoginPage = () => {
   return (
     <div className="flex flex-col md:flex-row h-screen">
       {/* Left Section */}
-      <div className="w-full md:w-1/2">
+      {/* <div className="w-full md:w-1/2">
         <AuthHeader />
-      </div>
+      </div> */}
 
       {/* Right Section */}
-      <div className="w-full md:w-1/2 flex justify-center items-center bg-[#e9f2f7]">
+      <div className="w-full  flex justify-center items-center bg-[#e9f2f7]">
         <div className="w-full max-w-sm p-8 bg-white rounded-xl shadow-lg">
+          <div className="flex justify-center mb-6">
+            <img src={logo} alt="Logo" className="w-24 h-24 object-contain" />
+          </div>
+
           <h2 className="text-3xl font-semibold text-blue-600">Welcome Back</h2>
           <p className="mt-2 text-gray-500">
             Sign in to access your applications and dashboard.
