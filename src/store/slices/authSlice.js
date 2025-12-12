@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
    ENV VARIABLES
 =============================== */
 const BASE_URL = import.meta.env.VITE_API_URL;
+const TOKEN_URL = import.meta.env.VITE_API_TOKEN_URL;
 const CLIENT_ID = import.meta.env.VITE_SF_CLIENT_ID;
 const CLIENT_SECRET = import.meta.env.VITE_SF_CLIENT_SECRET;
 const REGISTRATION_CODE = "001cY00000JXauEQAT";
@@ -64,7 +65,7 @@ export const getSalesforceToken = createAsyncThunk(
     try {
       const response = await axios.get(
         // `https://salesforcetoken1-cvs3z1jef-nirsubhas-projects.vercel.app/api/token`,
-        `http://localhost:5173/api/token`,
+        `${TOKEN_URL}/api/token`,
         null,
         // {
         //   params: {
