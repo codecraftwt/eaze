@@ -63,18 +63,26 @@ export const getSalesforceToken = createAsyncThunk(
   "auth/getSalesforceToken",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        // `https://salesforcetoken1-cvs3z1jef-nirsubhas-projects.vercel.app/api/token`,
-        `${TOKEN_URL}/api/token`,
-        null,
-        // {
-        //   params: {
-        //     grant_type: "client_credentials",
-        //     client_id: CLIENT_ID,
-        //     client_secret: CLIENT_SECRET,
-        //   },
-        // }
-      );
+      // const response = await axios.get(
+      //   // `https://salesforcetoken1-cvs3z1jef-nirsubhas-projects.vercel.app/api/token`,
+      //   `http://localhost:3000/api/token`,
+      //   // `${TOKEN_URL}/api/token`,
+      //   null,
+      //   // {
+      //   //   params: {
+      //   //     grant_type: "client_credentials",
+      //   //     client_id: CLIENT_ID,
+      //   //     client_secret: CLIENT_SECRET,
+      //   //   },
+      //   // }
+      // );
+
+      const response = await axios.post(`${TOKEN_URL}/api/token`, {
+      SF_INSTANCE: BASE_URL,
+      CLIENT_ID: CLIENT_ID,
+      CLIENT_SECRET: CLIENT_SECRET,
+    });
+
 
       return response.data; // { access_token }
     } catch (error) {
@@ -87,15 +95,21 @@ export const getSalesforceToken = createAsyncThunk(
 /* =========================================================
    2. REGISTER USER
 ========================================================= */
+// Helper function for side effects (e.g., register)
+const register2 = (key) => {
+  // Example logic for the register action (side effect)
+  console.log("Registering with key:", key);
+  // Perform any side effects (like calling an API) here
+};
 export const registerUser = createAsyncThunk(
   "auth/register",
-  async ({ email, password, accountId }, { getState, rejectWithValue }) => {
+  async ({ email, password, accountId,token }, { getState, rejectWithValue }) => {
     try {
-      const token = getState().auth.salesforceToken;
-
+      // const token = getState().auth.salesforceToken;
+      register2("some_key_here");
       const response = await axios.post(
         `${BASE_URL}/services/apexrest/salesforce/portal/auth`,
-        { action: "register", email, password, accountId:REGISTRATION_CODE },
+        { action: "register", email, password, accountId },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -185,6 +199,7 @@ const authSlice = createSlice({
     user: null,
     token: null,
     salesforceToken: null,
+    portalUserId: null,
     status: "idle",
     error: null,
   },
@@ -193,6 +208,9 @@ const authSlice = createSlice({
     logout: (state) => {
       state.user = null;
       state.token = null;
+      state.salesforceToken = null;
+      state.portalUserId = null;
+      state.status = 'idle';  // Reset status if needed
       showSuccess("Logged out successfully");
     },
   },
@@ -238,9 +256,11 @@ const authSlice = createSlice({
         state.error = null; 
       })
       .addCase(loginUser.fulfilled, (state, action) => {
+        console.log(action.payload,'action.payload');
         state.status = "succeeded";
         state.user = action.payload.user;
         state.token = action.payload.token;
+        state.portalUserId = action.payload.portalUserId;
         showSuccess("Login Successful");
       })
       .addCase(loginUser.rejected, (state, action) => {

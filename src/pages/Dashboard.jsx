@@ -52,7 +52,7 @@ function Dashboard() {
   const [leadsData, setLeadsData] = useState([]);
   const [groupedThisMonthData, setGroupedThisMonthData] = useState({});
   const [groupedAllMonthData, setGroupedAllMonthData] = useState({});
-  const { salesforceToken } = useSelector((state) => state.auth);
+  const { salesforceToken,portalUserId } = useSelector((state) => state.auth);
   const {
     totalApplicationsThisMonth,
     approvedApplicationsThisMonth,
@@ -293,18 +293,18 @@ function Dashboard() {
       dispatch(getSalesforceToken()); // Fetch the Salesforce token if not available
     } else {
       // this month
-      dispatch(getTotalApplicationsThisMonth({ token: salesforceToken }));
-      dispatch(getApprovedThisMonth({ token: salesforceToken }));
-      dispatch(getDeclinedThisMonth({ token: salesforceToken }));
-      dispatch(getPreApprovedThisMonth({ token: salesforceToken }));
+      dispatch(getTotalApplicationsThisMonth({accountId:portalUserId, token: salesforceToken }));
+      dispatch(getApprovedThisMonth({accountId:portalUserId, token: salesforceToken }));
+      dispatch(getDeclinedThisMonth({accountId:portalUserId, token: salesforceToken }));
+      dispatch(getPreApprovedThisMonth({accountId:portalUserId, token: salesforceToken }));
 
       // total
-      dispatch(getTotalApplications({ token: salesforceToken }));
-      dispatch(getTotalApproved({ token: salesforceToken }));
-      dispatch(getTotalDeclined({ token: salesforceToken }));
-      dispatch(getTotalPreApproved({ token: salesforceToken }));
-      dispatch(getTotalDeclinePercent({ token: salesforceToken }));
-      dispatch(getTopDeclineReason({ token: salesforceToken }));
+      dispatch(getTotalApplications({accountId:portalUserId, token: salesforceToken }));
+      dispatch(getTotalApproved({accountId:portalUserId, token: salesforceToken }));
+      dispatch(getTotalDeclined({accountId:portalUserId, token: salesforceToken }));
+      dispatch(getTotalPreApproved({accountId:portalUserId, token: salesforceToken }));
+      dispatch(getTotalDeclinePercent({accountId:portalUserId, token: salesforceToken }));
+      dispatch(getTopDeclineReason({accountId:portalUserId, token: salesforceToken }));
     }
   }, [dispatch, salesforceToken]);
 

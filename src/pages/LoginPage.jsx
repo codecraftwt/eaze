@@ -53,7 +53,7 @@ const LoginPage = () => {
 
   try {
     const result = await dispatch(loginUser(formData));
-    console.log(result,'result')
+    console.log(result,'result----')
     if (result.meta.requestStatus === "fulfilled") {
       // toast.success("Login successful!");
       setTimeout(() => navigate("/dashboard"), 900);

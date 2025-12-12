@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutGrid,
   ClipboardList,
@@ -7,14 +7,34 @@ import {
   Menu,
 } from "lucide-react";
 import logo from '../assets/image.png';
+import { logout } from '../store/slices/authSlice';
+import { persistor } from '../store/store';
+import { useDispatch } from 'react-redux';
 
 const Sidebar = ({ isOpen, setIsOpen }) => {
+  const dispatch = useDispatch();
   const location = useLocation();
+   const navigate = useNavigate();
 
   const isActive = (path) =>
     location.pathname === path
       ? "bg-blue-100 text-blue-600 font-semibold"
       : "text-gray-500 hover:text-blue-600";
+
+   const handleLogout = () => {
+        // 1. Clear persisted Redux data
+    // localStorage.removeItem("persist:root");
+
+    // 2. Clear Redux state
+    dispatch(logout());
+
+    // 3. Purge redux-persist cache
+    persistor.purge();
+
+    // 4. Redirect to login page
+    navigate("/login"); 
+
+  };
 
   return (
     <div
@@ -63,6 +83,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
 
         <Link
           to="/login"
+          onClick={handleLogout}
           className={`flex items-center space-x-3 py-2 px-3 rounded-xl transition-all duration-300 ease-in-out ${isActive("/login")}`}
         >
           <LogOut size={20} className="transition-all duration-300 ease-in-out" />

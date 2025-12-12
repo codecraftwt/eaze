@@ -29,7 +29,7 @@ const fetchData = async (endpoint, { accountId, leadSource }, token) => {
 export const getNewLead = createAsyncThunk(
   'application/getNewLead',
   async ({ accountId, leadSource, token }, { rejectWithValue }) => {
-    const data = await fetchData('getnewlead', { accountId: REGISTRATION_CODE, leadSource: LEADSOURCE }, token)
+    const data = await fetchData('getnewlead', { accountId: accountId, leadSource: LEADSOURCE }, token)
       .catch(rejectWithValue);
     return data?.data || [];
   }
@@ -38,7 +38,7 @@ export const getNewLead = createAsyncThunk(
 export const getPreApprovedLead = createAsyncThunk(
   'application/getPreApprovedLead',
   async ({ accountId, leadSource, token }, { rejectWithValue }) => {
-    const data = await fetchData('getpreapprovedlead', { accountId: REGISTRATION_CODE, leadSource: LEADSOURCE }, token)
+    const data = await fetchData('getpreapprovedlead', { accountId: accountId, leadSource: LEADSOURCE }, token)
       .catch(rejectWithValue);
     return data?.data || [];
   }
@@ -47,7 +47,7 @@ export const getPreApprovedLead = createAsyncThunk(
 export const getApprovedLead = createAsyncThunk(
   'application/getApprovedLead',
   async ({ accountId, leadSource, token }, { rejectWithValue }) => {
-    const data = await fetchData('getapprovedlead', { accountId: REGISTRATION_CODE, leadSource: LEADSOURCE }, token)
+    const data = await fetchData('getapprovedlead', { accountId: accountId, leadSource: LEADSOURCE }, token)
       .catch(rejectWithValue);
     return data?.data || [];
   }
@@ -56,7 +56,7 @@ export const getApprovedLead = createAsyncThunk(
 export const getApplicationDeclineLead = createAsyncThunk(
   'application/getApplicationDeclineLead',
   async ({ accountId, leadSource, token }, { rejectWithValue }) => {
-    const data = await fetchData('getapplicationdeclinelead', { accountId: REGISTRATION_CODE, leadSource: LEADSOURCE }, token)
+    const data = await fetchData('getapplicationdeclinelead', { accountId: accountId, leadSource: LEADSOURCE }, token)
       .catch(rejectWithValue);
     return data?.data || [];
   }
@@ -65,7 +65,7 @@ export const getApplicationDeclineLead = createAsyncThunk(
 export const getClosedLost = createAsyncThunk(
   'application/getClosedLost',
   async ({ accountId, leadSource, token }, { rejectWithValue }) => {
-    const data = await fetchData('getclosedlost', { accountId: REGISTRATION_CODE, leadSource: LEADSOURCE }, token)
+    const data = await fetchData('getclosedlost', { accountId: accountId, leadSource: LEADSOURCE }, token)
       .catch(rejectWithValue);
     return data?.data || [];
   }
@@ -74,7 +74,7 @@ export const getClosedLost = createAsyncThunk(
 export const getAllDeclined = createAsyncThunk(
   'application/getAllDeclined',
   async ({ accountId, leadSource, token }, { rejectWithValue }) => {
-    const data = await fetchData('getalldeclined', { accountId: REGISTRATION_CODE, leadSource: LEADSOURCE }, token)
+    const data = await fetchData('getalldeclined', { accountId: accountId, leadSource: LEADSOURCE }, token)
       .catch(rejectWithValue);
     return data?.data || [];
   }

@@ -52,7 +52,7 @@ export const valueFormatter = (item) => `${item.value}%`;
 
 const ApplicationsPage = () => {
   const dispatch = useDispatch();
-  const { salesforceToken } = useSelector((state) => state.auth);
+  const { salesforceToken ,portalUserId} = useSelector((state) => state.auth);
   const { newLeads, preApprovedLeads, approvedLeads, applicationDeclinedLeads, closedLostLeads, allDeclinedLeads, status, error } = useSelector((state) => state.application);
   const {
       totalApplicationsThisMonth,
@@ -380,34 +380,34 @@ const ApplicationsPage = () => {
   useEffect(() => {
     // Trigger actions to fetch data based on the selected tab
     const fetchData = async () => {
-      dispatch(getTotalApproved({ token: salesforceToken }));
+      dispatch(getTotalApproved({accountId:portalUserId, token: salesforceToken }));
       if (selectedTab === 0) {
         // New Applications
         console.log("Fetching New Applications...");
-        await dispatch(getNewLead({ token: salesforceToken }));
+        await dispatch(getNewLead({accountId:portalUserId, token: salesforceToken }));
       } else if (selectedTab === 1) {
         // Current Applications
         console.log("Fetching Current Applications...");
-        await dispatch(getPreApprovedLead({ token: salesforceToken }));
+        await dispatch(getPreApprovedLead({accountId:portalUserId, token: salesforceToken }));
       } else if (selectedTab === 2) {
         // Approved Applications
         console.log("Fetching Approved Applications...");
-        await dispatch(getApprovedLead({ token: salesforceToken }));
+        await dispatch(getApprovedLead({accountId:portalUserId, token: salesforceToken }));
       } else if (selectedTab === 3) {
         // Declined Applications
-         dispatch(getTotalApplications({ token: salesforceToken }));
+         dispatch(getTotalApplications({accountId:portalUserId, token: salesforceToken }));
         console.log("Fetching Declined Applications...");
-        await dispatch(getApplicationDeclineLead({ token: salesforceToken }));
-        dispatch(getTotalDeclined({ token: salesforceToken }));
-              dispatch(getTopDeclineReason({ token: salesforceToken }));
+        await dispatch(getApplicationDeclineLead({accountId:portalUserId, token: salesforceToken }));
+        dispatch(getTotalDeclined({accountId:portalUserId, token: salesforceToken }));
+              dispatch(getTopDeclineReason({accountId:portalUserId, token: salesforceToken }));
       } else if (selectedTab === 4) {
         // Closed Lost Applications
         console.log("Fetching Closed Lost Applications...");
-        await dispatch(getClosedLost({ token: salesforceToken }));
+        await dispatch(getClosedLost({accountId:portalUserId, token: salesforceToken }));
       } else if (selectedTab === 5) {
         // All Declined Applications
         console.log("Fetching All Declined Applications...");
-        await dispatch(getAllDeclined({ token: salesforceToken }));
+        await dispatch(getAllDeclined({accountId:portalUserId, token: salesforceToken }));
       }
     };
     if (!salesforceToken) {

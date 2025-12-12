@@ -10,7 +10,7 @@ const RegisterPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { salesforceToken, status } = useSelector((state) => state.auth);
+  const { salesforceToken, status,portalUserId } = useSelector((state) => state.auth);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -86,7 +86,8 @@ const RegisterPage = () => {
         registerUser({
           email: formData.email,
           password: formData.password,
-          accountId: "001cY00000JXauEQAT", // if needed later
+          accountId: portalUserId, // if needed later
+          token:salesforceToken
         })
       ).unwrap();
 
