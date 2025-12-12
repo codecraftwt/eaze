@@ -62,16 +62,17 @@ export const getSalesforceToken = createAsyncThunk(
   "auth/getSalesforceToken",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        `${BASE_URL}/services/oauth2/token`,
+      const response = await axios.get(
+        // `https://salesforcetoken1-cvs3z1jef-nirsubhas-projects.vercel.app/api/token`,
+        `http://localhost:5173/api/token`,
         null,
-        {
-          params: {
-            grant_type: "client_credentials",
-            client_id: CLIENT_ID,
-            client_secret: CLIENT_SECRET,
-          },
-        }
+        // {
+        //   params: {
+        //     grant_type: "client_credentials",
+        //     client_id: CLIENT_ID,
+        //     client_secret: CLIENT_SECRET,
+        //   },
+        // }
       );
 
       return response.data; // { access_token }
