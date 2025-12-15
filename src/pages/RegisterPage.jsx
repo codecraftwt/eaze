@@ -10,12 +10,13 @@ const RegisterPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { salesforceToken, status,portalUserId } = useSelector((state) => state.auth);
+  const { salesforceToken, status, portalUserId } = useSelector((state) => state.auth);
 
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     confirmPassword: "",
+    registrationCode: "", // new field
   });
 
   const [loading, setLoading] = useState(false);
@@ -45,7 +46,7 @@ const RegisterPage = () => {
      VALIDATION
   ========================================== */
   const validateForm = () => {
-    const { email, password, confirmPassword } = formData;
+    const { email, password, confirmPassword, registrationCode } = formData;
 
     if (!email || !/\S+@\S+\.\S+/.test(email)) {
       toast.error("Please enter a valid email");
@@ -59,6 +60,11 @@ const RegisterPage = () => {
 
     if (password !== confirmPassword) {
       toast.error("Passwords do not match");
+      return false;
+    }
+
+    if (!registrationCode) {
+      toast.error("Registration code is required");
       return false;
     }
 
@@ -86,15 +92,16 @@ const RegisterPage = () => {
         registerUser({
           email: formData.email,
           password: formData.password,
-          accountId: portalUserId, // if needed later
-          token:salesforceToken
+          accountId: formData.registrationCode, // if needed later
+          token: salesforceToken,
+          // registrationCode: formData.registrationCode, // send the registration code
         })
       ).unwrap();
 
       // toast.success("Account created successfully!");
 
       // clear form
-      setFormData({ email: "", password: "", confirmPassword: "" });
+      setFormData({ email: "", password: "", confirmPassword: "", registrationCode: "" });
 
       navigate("/login");
     } catch (err) {
@@ -115,7 +122,7 @@ const RegisterPage = () => {
       {/* Right side */}
       <div className="w-full flex flex-col justify-start items-center bg-[#e9f2f7] overflow-auto h-full md:ml-auto mt-8 md:mt-0">
         <div className="text-center mt-10 px-4">
-                    <div className="flex justify-center mb-6">
+          <div className="flex justify-center mb-6">
             <img src={logo} alt="Logo" className="w-24 h-24 object-contain" />
           </div>
 
@@ -167,6 +174,19 @@ const RegisterPage = () => {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   placeholder="Confirm your password"
+                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-600"
+                />
+              </div>
+
+              {/* Registration Code */}
+              <div className="flex flex-col">
+                <label className="text-sm text-gray-600">Registration Code</label>
+                <input
+                  type="text"
+                  name="registrationCode"
+                  value={formData.registrationCode}
+                  onChange={handleChange}
+                  placeholder="Enter your registration code"
                   className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-600"
                 />
               </div>
