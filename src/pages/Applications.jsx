@@ -1061,6 +1061,32 @@ const ApplicationsPage = () => {
                   <div>No data available</div> // Fallback message when no data exists
                 )}
             </div>
+
+             {selectedTab === 4 && (
+            <div className="bg-white p-6 rounded-lg shadow">
+              <h2 className="text-lg font-semibold mb-4">Closed Stats</h2>
+              <div className="flex items-center justify-between">
+                <div className="w-full">
+                  {/* <Doughnut data={declinedChart} ref={declinedChartRef} /> */}
+                  {chartClosedLostData.length > 0 ? (
+                    <PieChart
+                      series={[{
+                        data: chartClosedLostData,
+                        highlightScope: { fade: 'global', highlight: 'item' },
+                        faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
+                        valueFormatter,
+                      }]}
+                      height={200}
+                      width={200}
+                    />
+                  ) : (
+                    <div>No data available</div>
+                  )}
+                </div>
+
+              </div>
+            </div>
+          )}
           </div>
         )}
 
@@ -1152,31 +1178,7 @@ const ApplicationsPage = () => {
               </div>
             </div>
           )}
-          {selectedTab === 4 && (
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h2 className="text-lg font-semibold mb-4">Closed Stats</h2>
-              <div className="flex items-center justify-between">
-                <div className="w-full">
-                  {/* <Doughnut data={declinedChart} ref={declinedChartRef} /> */}
-                  {chartClosedLostData.length > 0 ? (
-                    <PieChart
-                      series={[{
-                        data: chartClosedLostData,
-                        highlightScope: { fade: 'global', highlight: 'item' },
-                        faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
-                        valueFormatter,
-                      }]}
-                      height={200}
-                      width={200}
-                    />
-                  ) : (
-                    <div>No data available</div>
-                  )}
-                </div>
-
-              </div>
-            </div>
-          )}
+         
         </div>
 
       </div>

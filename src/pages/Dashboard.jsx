@@ -113,6 +113,85 @@ function Dashboard() {
       "Closed Lost - Pre-Approved - Client Did Not Receive Large Enough Approval"
     ]
   };
+  const categoryMapNew = {
+    approved: [
+      "Funded - Invoice EAZE Client",
+      "Approved By Lender-Funding In Progress",
+      "EAZE Invoice Paid - File Closed"
+    ],
+    declined: [
+      "Declined - Client Does Not Meet Minimum Credit Requirements",
+      "Declined - Client did not pass the pre-qualifying questions",
+      "Declined - Client Does Not Meet Minimum 35k Annual Income Requirements",
+      "Declined - Client Declined During Income Verification",
+      "Declined - Client Does Not Meet Minimum 2 Years Of Self-Employment Requirements",
+      "Declined - Client Does Not Meet Minimum W-2 1 Year Employment Requirements",
+      "Declined Debt To Income Ratio – File Closed",
+      "Declined - Client's Credit over 620 - Declined By All Lenders"
+    ],
+    declinedthisMonth: [
+      "Declined - Client Does Not Meet Minimum Credit Requirements"
+    ],
+    preApproved: [
+      "Pre-Approved Pending Income Verification",
+      "Client has accepted terms - Moving forward with income Verification",
+      "Terms Pitched - Email to Agent To Follow Up",
+      "All Docs In - Pending Final Underwriting Decision"
+    ],
+    closedLost: [
+      "Closed Lost - Pre-approved - Client Missed EAZE Consultation - Message to Agent",
+      "Closed Lost - Terms Pitched - Client Did Not Move Forward With Offer",
+      "Closed Lost - Pre-Approved - Client Not Moving Forward with Opportunity",
+      "Closed Lost - Pre-Approved - Client Never Scheduled Appointment With EAZE",
+      "Closed Lost - Pre-Approved -  Per Agent - Client Not Moving Forward with Opportunity",
+      "Closed Lost - Pre-Approved - Client Non-Responsive During Income Verification",
+      "Closed Lost - Alert - Please Check Notes",
+      "Closed Lost  - Client Non-Responsive During Verification Call",
+      "Closed Lost - Pre-approved - Client Canceled EAZE Consultation",
+      "Closed Lost - Pre-approved - Client Self-Funded Program",
+      "Closed Lost - Pre-Approved - Client Did Not Receive Large Enough Approval"
+    ]
+  };
+
+  function getDeclinedLeadsCount(fields, apiResponse) {
+  const currentDate = new Date();
+  const currentMonth = currentDate.getMonth(); // Current month (0-11)
+  const currentYear = currentDate.getFullYear(); // Current year (e.g., 2025)
+
+  // Filter for declined leads and check if the "Declined_or_Closed_Lost_Date__c" is in the current month
+  const declinedLeadsThisMonth = apiResponse.filter(lead => {
+    const declinedDate = new Date(lead.Declined_or_Closed_Lost_Date__c);
+    return (
+      fields.declinedthisMonth.includes(lead.Status) && // Check if lead's status is in 'declined' category
+      declinedDate.getMonth() === currentMonth &&
+      declinedDate.getFullYear() === currentYear
+    );
+  });
+
+  return declinedLeadsThisMonth.length; // Return the count of declined leads
+}
+
+function filterDeclinedLeadsForMonth(data, monthName, statusCategory) {
+    // Map month name to the corresponding month number (0-based, so Dec is 11)
+    const monthMapping = {
+        "Jan 25": 0, "Feb 25": 1, "Mar 25": 2, "Apr 25": 3, "May 25": 4, 
+        "Jun 25": 5, "Jul 25": 6, "Aug 25": 7, "Sep 25": 8, "Oct 25": 9, 
+        "Nov 25": 10, "Dec 25": 11
+    };
+
+    // Get the month number for the provided monthName (e.g., "Dec 25" -> 11)
+    const monthNumber = monthMapping[monthName];
+
+    // Filter the data for leads that were declined in the specific month (e.g., December)
+    return data.filter(lead => {
+        const declinedDate = new Date(lead.Declined_or_Closed_Lost_Date__c);
+        const isDeclinedStatus = statusCategory.declined.includes(lead.Status);
+        
+        // Check if the lead's Declined or Closed Lost Date is in the specified month (e.g., December)
+        return isDeclinedStatus && declinedDate.getMonth() === monthNumber;
+    });
+}
+
 
   function groupLeadStatuses(categoryMap, leads) {
     const result = {
@@ -222,50 +301,197 @@ function Dashboard() {
     return result;
   }
 
-  function formatLeadsByStatusUpdated(data, categoryMap) {
-    // Initialize arrays for Approved, Current (Pre-Approved), and Declined counts
-    const months = [
-      "Jan 25", "Feb 25", "Mar 25", "Apr 25", "May 25", "Jun 25", "Jul 25", "Aug 25",
-      "Sep 25", "Oct 25", "Nov 25", "Dec 25"
-    ];
+//   function formatLeadsByStatusUpdated(data, categoryMap) {
+//     // Initialize arrays for Approved, Current (Pre-Approved), and Declined counts
+//     const months = [
+//       "Jan 25", "Feb 25", "Mar 25", "Apr 25", "May 25", "Jun 25", "Jul 25", "Aug 25",
+//       "Sep 25", "Oct 25", "Nov 25", "Dec 25"
+//     ];
 
-    const approved = new Array(12).fill(0);
-    const current = new Array(12).fill(0);  // 'Current' corresponds to Pre-approved
-    const declined = new Array(12).fill(0);
+//     const approved = new Array(12).fill(0);
+//     const current = new Array(12).fill(0);  // 'Current' corresponds to Pre-approved
+//     const declined = new Array(12).fill(0);
 
-    // Helper function to get the month index from the date
-    function getMonthIndex(date) {
-      const month = new Date(date).getMonth(); // Get the month index (0-11)
-      return month;
-    }
+//     // Helper function to get the month index from the date
+//     // function getMonthIndex(date) {
+//     //   console.log(date, 'date')
+//     //   const month = new Date(date).getMonth(); // Get the month index (0-11)
+//     //   // console.log(month, 'month')
+//     //   return month;
+//     // }
 
-    // Process each lead and classify by month and status
-    data.forEach(lead => {
-      const monthIndex = getMonthIndex(lead.CreatedDate);
+//     function getMonthIndex(date) {
+//   // console.log(date, 'date');
+  
+//   const parsedDate = new Date(date);  // Convert the string to a Date object
+//   const month = parsedDate.getMonth(); // Get the month index (0-11)
+//   const year = parsedDate.getFullYear();  // Get the full year
+  
+//   // Adjust the year part to only consider the last two digits
+//   const yearShort = year % 100;  // This gets the last two digits (e.g., 2022 -> 22)
+//   // console.log(month, 'month', yearShort, 'yearShort');
+  
+//   // If the year is 2022 or 2023, for example, you could map it to "25" as needed
+//   // Example: year == 2022 -> 25 or use your own logic to adjust the mapping
+  
+//   // Return the month index
+//   return month;
+// }
 
-      // Increment count for total leads
-      if (categoryMap.approved.includes(lead.Status)) {
-        approved[monthIndex] += 1; // Increment approved leads
-      } else if (categoryMap.declined.includes(lead.Status)) {
-        declined[monthIndex] += 1; // Increment declined leads
-      } else if (categoryMap.preApproved.includes(lead.Status)) {
-        current[monthIndex] += 1; // Increment current leads (Pre-approved)
-      }
-    });
+//     // Process each lead and classify by month and status
+//     data.forEach(lead => {
+//       const monthIndex = getMonthIndex(lead.CreatedDate);
+//       // console.log(monthIndex, 'monthIndex')
+//       // Increment count for total leads
+//       if (categoryMap.approved.includes(lead.Status)) {
+//         approved[monthIndex] += 1; // Increment approved leads
+//       } else if (categoryMap.declined.includes(lead.Status)) {
+//         declined[monthIndex] += 1; // Increment declined leads
+//       } else if (categoryMap.preApproved.includes(lead.Status)) {
+//         current[monthIndex] += 1; // Increment current leads (Pre-approved)
+//       }
+//     });
 
-    // Return the formatted JSON
-    return {
-      months,
-      approved,
-      current,
-      declined
-    };
-  }
+//     // Return the formatted JSON
+//     return {
+//       months,
+//       approved,
+//       current,
+//       declined
+//     };
+//   }
 
 
 
 
   // this month
+  
+  function formatLeadsByStatusUpdated(data, categoryMap) {
+  // Initialize arrays for Approved, Current (Pre-Approved), and Declined counts
+  const months = [
+    "Jan 25", "Feb 25", "Mar 25", "Apr 25", "May 25", "Jun 25", "Jul 25", "Aug 25",
+    "Sep 25", "Oct 25", "Nov 25", "Dec 25"
+  ];
+
+  // Array to hold counts for each month of the year
+  const approved = new Array(12).fill(0);
+  const current = new Array(12).fill(0);  // 'Current' corresponds to Pre-approved
+  const declined = new Array(12).fill(0);
+
+  // Helper function to get the month index and filter by year 2025
+  function getMonthIndex(date) {
+    const parsedDate = new Date(date);  // Convert the string to a Date object
+    const month = parsedDate.getMonth(); // Get the month index (0-11)
+    const year = parsedDate.getFullYear();  // Get the full year
+    
+    // Only process the data for the year 2025
+    if (year !== 2025) {
+      return -1;  // Return -1 if the year is not 2025 (ignores this lead)
+    }
+
+    return month;  // Return the month index if the year is 2025
+  }
+
+  // Process each lead and classify by month and status
+  data.forEach(lead => {
+    const monthIndex = getMonthIndex(lead.CreatedDate);
+    
+    // If the year is not 2025, skip this lead
+    if (monthIndex === -1) return;
+
+    // Increment count for total leads based on the status
+    if (categoryMap.approved.includes(lead.Status)) {
+      approved[monthIndex] += 1; // Increment approved leads
+    } else if (categoryMap.declined.includes(lead.Status)) {
+      declined[monthIndex] += 1; // Increment declined leads
+    } else if (categoryMap.preApproved.includes(lead.Status)) {
+      current[monthIndex] += 1; // Increment current leads (Pre-approved)
+    }
+  });
+
+  // Return the formatted JSON with counts for each month for the year 2025
+  return {
+    months,
+    approved,
+    current,
+    declined
+  };
+}
+function formatLeadsByStatusUpdatedNew(data, categoryMap) {
+  // Initialize arrays for Approved, Current (Pre-Approved), Declined, and Closed Lost counts
+  const months = [
+    "Jan 25", "Feb 25", "Mar 25", "Apr 25", "May 25", "Jun 25", "Jul 25", "Aug 25",
+    "Sep 25", "Oct 25", "Nov 25", "Dec 25"
+  ];
+
+  // Array to hold counts for each month of the year
+  const approved = new Array(12).fill(0);
+  const current = new Array(12).fill(0);  // 'Current' corresponds to Pre-approved
+  const declined = new Array(12).fill(0);
+  const closedLost = new Array(12).fill(0); // Array for "Closed Lost" status
+
+  // This array will hold the final data as an array of objects
+  const monthlyData = [];
+
+  // Helper function to get the month index and filter by year 2025
+  function getMonthIndex(date) {
+    const parsedDate = new Date(date);  // Convert the string to a Date object
+    const month = parsedDate.getMonth(); // Get the month index (0-11)
+    const year = parsedDate.getFullYear();  // Get the full year
+    
+    // Only process the data for the year 2025
+    if (year !== 2025) {
+      return -1;  // Return -1 if the year is not 2025 (ignores this lead)
+    }
+
+    return month;  // Return the month index if the year is 2025
+  }
+
+  // Process each lead and classify by month and status
+  data.forEach(lead => {
+    const monthIndex = getMonthIndex(lead.CreatedDate);
+    
+    // If the year is not 2025, skip this lead
+    if (monthIndex === -1) return;
+
+    // Increment the count for each category and push the data into the monthlyData array
+    if (categoryMap.approved.includes(lead.Status)) {
+      approved[monthIndex] += 1; // Increment approved leads
+      monthlyData.push({
+        month: months[monthIndex],
+        status: "Approved",
+        count: approved[monthIndex]
+      });
+    } else if (categoryMap.declined.includes(lead.Status)) {
+      declined[monthIndex] += 1; // Increment declined leads
+      monthlyData.push({
+        month: months[monthIndex],
+        status: "Declined",
+        count: declined[monthIndex]
+      });
+    } else if (categoryMap.preApproved.includes(lead.Status)) {
+      current[monthIndex] += 1; // Increment current leads (Pre-approved)
+      monthlyData.push({
+        month: months[monthIndex],
+        status: "Pre-Approved",
+        count: current[monthIndex]
+      });
+    } else if (categoryMap.closedLost.includes(lead.Status)) {
+      closedLost[monthIndex] += 1; // Increment closed lost leads
+      monthlyData.push({
+        month: months[monthIndex],
+        status: "Closed Lost",
+        count: closedLost[monthIndex]
+      });
+    }
+  });
+
+  // Return the formatted array of objects
+  return monthlyData;
+}
+
+
+  
   const openModal = (category) => {
     setModalOpen(true);
     setIsActive(category);  // Set isActive dynamically based on the category or some other criteria
@@ -320,6 +546,9 @@ function Dashboard() {
       const closedLost = totalApplicationsThisMonth.filter(item =>
         item.Status.toLowerCase().startsWith("closed lost"));
       console.log([...new Set(closedLost.map(item => item.Status))], 'closedLost status')
+
+//       const declinedCount = getDeclinedLeadsCount(categoryMap, totalApplicationsThisMonth);
+// console.log('Declined Leads Count for This Month-----:', declinedCount);
     }
 
     // Total stats
@@ -332,8 +561,16 @@ function Dashboard() {
       console.log([...new Set(closedLost.map(item => item.Status))], 'declined status')
       setGroupedAllMonthData(result);
       const barChat = formatLeadsByStatusUpdated(totalApplications, categoryMap);
+      // const barChatNew = formatLeadsByStatusUpdatedNew(totalApplications, categoryMap);
+      // console.log(barChatNew, 'barChatNew')
       console.log(barChat, 'barChat')
       setBarChartData(barChat);
+
+      const declinedCount = getDeclinedLeadsCount(categoryMapNew, totalApplications);
+console.log('Declined Leads Count for This Month:', declinedCount);
+
+const declinedCountNew = filterDeclinedLeadsForMonth(totalApplications, "Dec 25", categoryMapNew);
+console.log(declinedCountNew,'declinedCountNew----')
       //   console.log(totalApplications.length, 'totalApplications');
       //   console.log(totalApplications.map(item => item.Loan_Amount__c || 0)   // extract only loan amounts
       // .reduce((sum, amount) => sum + amount, 0), 'totalApplications--this month loan amount');

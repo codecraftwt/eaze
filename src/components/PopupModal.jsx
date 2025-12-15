@@ -24,15 +24,15 @@ export function GroupedLeadStatuses({ groupedData, isActive }) {
   const getCategoryColor = (category) => {
     switch (category) {
       case 'approved':
-        return '#4CAF50'; // Green
+        return '#FFFFFF'; // Green
       case 'preApproved':
-        return '#FFEB3B'; // Yellow
+        return '#FFFFFF'; // Yellow
       case 'declined':
-        return '#F44336'; // Red
+        return '#FFFFFF'; // Red
       case 'closedLost':
-        return '#FF9800'; // Orange
+        return '#FFFFFF'; // Orange
       case 'gloable': // Global color
-        return '#B0BEC5'; // Grey for Global (change as needed)
+        return '#FFFFFF'; // Grey for Global (change as needed)
       default:
         return '#FFFFFF'; // White (default color)
     }
@@ -110,7 +110,7 @@ export function GroupedLeadStatuses({ groupedData, isActive }) {
                 style={{
                   cursor: 'pointer',
                   backgroundColor: getCategoryColor(isActive),
-                  color: 'white',
+                  color: 'black',
                   padding: '10px',
                   borderRadius: '4px',
                 }}

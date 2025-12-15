@@ -85,10 +85,48 @@ export default function LeadTabs({ onTabChange, data,onMonthChange }) {
             console.log("New Leads: ", newLeads);
             groupedData = groupLeadsByStatus(newLeads);
             setGroupedLeads(Object.values(groupedData));
+
+             const selectedMonthIndex = new Date(Date.parse(selectedMonth + " 1, 2025")).getMonth();
+
+            // Filter leads by the selected month
+            const filteredLeads = newLeads.filter((lead) => {
+                const leadDate = new Date(lead.CreatedDate); // Convert the CreatedDate to a Date object
+                const leadMonthIndex = leadDate.getMonth(); // Get the month index (0 for January, 1 for February, etc.)
+
+                // Check if the lead's month matches the selected month and if the status is 'Funded - Invoice EAZE Client'
+                return leadMonthIndex === selectedMonthIndex 
+            });
+
+            console.log("Filtered Approved Leads: ", filteredLeads);
+
+            // Group the filtered leads by their status
+            groupedData = groupLeadsByStatus(filteredLeads);
+
+            // Set the grouped leads for rendering
+            setGroupedLeads(Object.values(groupedData));
         }
         if (preApprovedLeads.length > 0 && tab === 1) {
             console.log("Pre-Approved Leads: ", preApprovedLeads);
             groupedData = groupLeadsByStatus(preApprovedLeads);
+            setGroupedLeads(Object.values(groupedData));
+
+            const selectedMonthIndex = new Date(Date.parse(selectedMonth + " 1, 2025")).getMonth();
+
+            // Filter leads by the selected month
+            const filteredLeads = preApprovedLeads.filter((lead) => {
+                const leadDate = new Date(lead.CreatedDate); // Convert the CreatedDate to a Date object
+                const leadMonthIndex = leadDate.getMonth(); // Get the month index (0 for January, 1 for February, etc.)
+
+                // Check if the lead's month matches the selected month and if the status is 'Funded - Invoice EAZE Client'
+                return leadMonthIndex === selectedMonthIndex 
+            });
+
+            console.log("Filtered Approved Leads: ", filteredLeads);
+
+            // Group the filtered leads by their status
+            groupedData = groupLeadsByStatus(filteredLeads);
+
+            // Set the grouped leads for rendering
             setGroupedLeads(Object.values(groupedData));
         }
         if (approvedLeads.length > 0 && tab === 2) {
@@ -252,7 +290,7 @@ export default function LeadTabs({ onTabChange, data,onMonthChange }) {
     return (
         <Box sx={{ width: "100%", p: 3 }}>
             {/* Date Dropdown */}
-            {(tab == 2 || tab == 3 || tab == 4 || tab == 5 )&&
+            {(tab == 0 ||tab == 1 ||tab == 2 || tab == 3 || tab == 4 || tab == 5 )&&
              <div className="flex justify-end">
                 <FormControl sx={{ mb: 3, width: 200, }}>
                     <InputLabel>Month</InputLabel>
