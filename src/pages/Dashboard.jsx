@@ -388,7 +388,7 @@ function Dashboard() {
           >
             Short video instructions on how to use your Funding Analytics Portal
           </a>
-          <div className="relative w-60">
+          {/* <div className="relative w-60">
             <select
               value={selectedMonth}
               onChange={handleMonthChange}
@@ -406,10 +406,9 @@ function Dashboard() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
               </svg>
             </div>
-          </div>
+          </div> */}
         </div>
       </header>
-
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-white p-6 rounded-lg shadow-md" onClick={() => openModal('gloable')}>
           <h3 className="text-gray-500 text-sm">Applications This Month</h3>
