@@ -281,22 +281,45 @@ const ApplicationsPage = () => {
 
     return formattedData;
   }
-  function formatPreApprovedData(leads) {
-    console.log(leads, 'leads')
-    // Filter for leads with "Pre-Approved - Client Has Not Scheduled Call With EAZE" status
-    const filteredLeads = leads.filter(lead => lead.Status == 'Pre-Approved Pending Income Verification');
-    console.log(filteredLeads, 'filteredLeads')
-    // Sum the Loan_Amount__c for the filtered leads
-    const totalLoanAmount = filteredLeads.reduce((sum, lead) => sum + lead.Loan_Amount__c, 0);
+  // function formatPreApprovedData(leads) {
+  //   console.log(leads, 'leads')
+  //   // Filter for leads with "Pre-Approved - Client Has Not Scheduled Call With EAZE" status
+  //   const filteredLeads = leads.filter(lead => lead.Status == 'Pre-Approved Pending Income Verification');
+  //   console.log(filteredLeads, 'filteredLeads')
+  //   // Sum the Loan_Amount__c for the filtered leads
+  //   const totalLoanAmount = filteredLeads.reduce((sum, lead) => sum + lead.Loan_Amount__c, 0);
 
-    // Format the data for the PieChart
-    return [
-      {
-        label: 'Pre-Approved Pending Income Verification',
-        value: totalLoanAmount,
-      }
-    ];
-  }
+  //   // Format the data for the PieChart
+  //   return [
+  //     {
+  //       label: 'Pre-Approved Pending Income Verification',
+  //       value: totalLoanAmount,
+  //     }
+  //   ];
+  // }
+function formatPreApprovedData(leads) {
+  console.log(leads, 'leads');
+  
+  // Group leads by their status
+  const statusGroups = leads.reduce((acc, lead) => {
+    const { Status, Loan_Amount__c } = lead;
+    if (!acc[Status]) {
+      acc[Status] = 0; // Initialize the value if it's the first time we encounter this status
+    }
+    acc[Status] += Loan_Amount__c; // Sum the Loan_Amount__c for the same status
+    return acc;
+  }, {});
+
+  console.log(statusGroups, 'statusGroups');
+
+  // Format the data for the PieChart
+  const formattedData = Object.keys(statusGroups).map(status => ({
+    label: status,
+    value: statusGroups[status]
+  }));
+
+  return formattedData;
+}
 
   // aproved
   function calculatePercentageChange(selectedMonth, approvedLeads) {
@@ -371,6 +394,7 @@ const ApplicationsPage = () => {
       }
     }
 
+     percentage = Math.round(percentage * 100) / 100;
     // Return the percentage value
     return percentage;
 }
