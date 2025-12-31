@@ -16,6 +16,7 @@ const ForgotPasswordPage = () => {
     email: "",
     oldPassword: "",
     newPassword: "",
+    confirmPassword: "", // New field for confirm password
   });
 
   const handleChange = (e) => {
@@ -26,25 +27,30 @@ const ForgotPasswordPage = () => {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  try {
-    const result = await dispatch(changePassword(formData));
-
-    if (result.meta.requestStatus === "fulfilled") {
-      // toast.success("Your password has been updated successfully!");
-      navigate("/login");
-    } else {
-      // 🔥 Show proper API error message
-      // toast.error(result.payload || "Failed to change password.");
+    // Check if the new password and confirm password match
+    if (formData.newPassword !== formData.confirmPassword) {
+      toast.error("New password and confirm password do not match.");
+      return;
     }
 
-  } catch (error) {
-    // 🔥 Catch unexpected JS/Runtime errors
-    toast.error("Something went wrong. Please try again.");
-  }
-};
+    try {
+      const result = await dispatch(changePassword(formData));
+      console.log(result, 'result---------');
+      if (result.meta.requestStatus === "fulfilled") {
+        toast.success("Your password has been updated successfully!");
+        navigate("/login");
+      } else {
+        // 🔥 Show proper API error message
+        toast.error(result.payload || "Failed to change password.");
+      }
 
+    } catch (error) {
+      // 🔥 Catch unexpected JS/Runtime errors
+      toast.error("Something went wrong. Please try again.");
+    }
+  };
 
   return (
     <div className="flex flex-col md:flex-row h-screen">
@@ -97,12 +103,25 @@ const ForgotPasswordPage = () => {
             {/* New Password */}
             <div className="flex flex-col">
               <label className="text-sm text-gray-600">New Password</label>
-            <input
+              <input
                 type="password"
                 name="newPassword"
                 value={formData.newPassword}
                 onChange={handleChange}
                 placeholder="Enter new password"
+                className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-600"
+              />
+            </div>
+
+            {/* Confirm Password */}
+            <div className="flex flex-col">
+              <label className="text-sm text-gray-600">Confirm Password</label>
+              <input
+                type="password"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                placeholder="Confirm your new password"
                 className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-600"
               />
             </div>
