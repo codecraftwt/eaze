@@ -27,6 +27,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
 
     // 2. Clear Redux state
     dispatch(logout());
+    localStorage.clear()
 
     // 3. Purge redux-persist cache
     persistor.purge();

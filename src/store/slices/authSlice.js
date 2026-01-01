@@ -56,6 +56,48 @@ const handleError = (error) => {
   }
 };
 
+// const handleError = (error, dispatch) => {
+//   // Detect token expiration error (401 or specific token expiration message)
+//   if (error?.response?.status === 401 || error?.response?.data?.message?.includes('expired')) {
+//     showError("Session expired, please login again.");
+    
+//     // Clear the localStorage
+//     // localStorage.removeItem('persist:root'); // This clears the persisted Redux store, including the token
+//     // dispatch(logout());  // Logout user in Redux state
+    
+//     // Call the token API again
+//     dispatch(getSalesforceToken())
+//       .then((action) => {
+//         if (action.payload?.access_token) {
+//           // Retry the original request with the new token, you can modify to retry the request automatically
+//           // Example: retrying an API call after token refresh (this needs to be implemented where necessary)
+//         }
+//       })
+//       .catch(() => {
+//         // Handle failure to refresh token (force logout, etc.)
+//         showError("Failed to refresh token. Please login again.");
+//       });
+
+//     return;
+//   }
+  
+//   // Handle other errors
+//   const status = error?.response?.status;
+//   switch (status) {
+//     case 400:
+//       showError("400 - Bad Request: Invalid or incomplete data.");
+//       break;
+//     case 404:
+//       showError("404 - API endpoint not found.");
+//       break;
+//     case 500:
+//       showError("500 - Internal Server Error.");
+//       break;
+//     default:
+//       showError(error?.response?.data?.message || "Unexpected error occurred");
+//   }
+// };
+
 /* =========================================================
    1. GET SALESFORCE ACCESS TOKEN
 ========================================================= */
