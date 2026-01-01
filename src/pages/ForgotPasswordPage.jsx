@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import AuthHeader from "../components/AuthHeader";
-import { changePassword } from "../store/slices/authSlice";
+import { changePassword, getSalesforceToken } from "../store/slices/authSlice";
 import { toast } from "react-toastify";
 import logo from '../assets/image.png';
 
@@ -44,6 +44,10 @@ const ForgotPasswordPage = () => {
       } else {
         // 🔥 Show proper API error message
         toast.error(result.payload || "Failed to change password.");
+        if(result.payload=='Request failed with status code 401'){
+                localStorage.clear()
+                dispatch(getSalesforceToken());
+              }
       }
 
     } catch (error) {

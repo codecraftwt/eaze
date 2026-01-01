@@ -88,7 +88,7 @@ const RegisterPage = () => {
     // toast.info("Connecting...");
 
     try {
-      await dispatch(
+      const result=await dispatch(
         registerUser({
           email: formData.email,
           password: formData.password,
@@ -96,14 +96,28 @@ const RegisterPage = () => {
           token: salesforceToken,
           // registrationCode: formData.registrationCode, // send the registration code
         })
-      ).unwrap();
-
+      );
+      console.log(result,'result-----')
       // toast.success("Account created successfully!");
 
       // clear form
-      setFormData({ email: "", password: "", confirmPassword: "", registrationCode: "" });
+      // setFormData({ email: "", password: "", confirmPassword: "", registrationCode: "" });
 
-      navigate("/login");
+      // navigate("/login");
+
+      if (result.meta.requestStatus === "fulfilled") {
+            // toast.success("Login successful!");
+            setFormData({ email: "", password: "", confirmPassword: "", registrationCode: "" });
+            setTimeout(() => navigate("/login"), 900);
+          } else {
+            console.log(result.payload)
+            // 🔥 result.payload contains your API error (e.g., "Invalid email or password")
+            toast.error(result.payload || "Login failed");
+            if(result.payload=='Request failed with status code 401'){
+              localStorage.clear()
+              dispatch(getSalesforceToken());
+            }
+          }
     } catch (err) {
       // error already handled globally inside slice
       toast.error(err);
