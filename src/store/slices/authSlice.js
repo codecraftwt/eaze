@@ -3,7 +3,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { toast } from "react-toastify";
- const corsProxy = 'https://cors-anywhere.herokuapp.com/';
+const corsProxy = 'https://cors-anywhere.herokuapp.com/';
 /* =============================
    ENV VARIABLES
 =============================== */
@@ -27,9 +27,9 @@ const handleError = (error) => {
     error?.response === undefined
   ) {
     // showError("CORS Error: Salesforce blocked the request. Use backend proxy.");
-      showError(
-    "We’re having trouble connecting to Salesforce. Please try again in a moment."
-  );
+    showError(
+      "We’re having trouble connecting to Salesforce. Please try again in a moment."
+    );
     return;
   }
   const status = error?.response?.status;
@@ -39,11 +39,11 @@ const handleError = (error) => {
       showError("400 - Bad Request: Invalid or incomplete data.");
       break;
 
-      // case 401:{
-      //   showError("401 - Bad Request: Invalid or incomplete data.");
-      //   localStorage.clear()
-      //   break;
-      // }
+    // case 401:{
+    //   showError("401 - Bad Request: Invalid or incomplete data.");
+    //   localStorage.clear()
+    //   break;
+    // }
 
 
     case 404:
@@ -85,10 +85,10 @@ export const getSalesforceToken = createAsyncThunk(
       // );
 
       const response = await axios.post(`${TOKEN_URL}/api/token`, {
-      SF_INSTANCE: BASE_URL,
-      CLIENT_ID: CLIENT_ID,
-      CLIENT_SECRET: CLIENT_SECRET,
-    });
+        SF_INSTANCE: BASE_URL,
+        CLIENT_ID: CLIENT_ID,
+        CLIENT_SECRET: CLIENT_SECRET,
+      });
 
 
       return response.data; // { access_token }
@@ -110,7 +110,7 @@ const register2 = (key) => {
 };
 export const registerUser = createAsyncThunk(
   "auth/register",
-  async ({ email, password, accountId,token }, { getState, rejectWithValue }) => {
+  async ({ email, password, accountId, token }, { getState, rejectWithValue }) => {
     try {
       // const token = getState().auth.salesforceToken;
       register2("some_key_here");
@@ -124,7 +124,7 @@ export const registerUser = createAsyncThunk(
           },
         }
       );
-      if (!response.data.success && response.data.message ) {
+      if (!response.data.success && response.data.message) {
         return rejectWithValue(response.data.message);
       }
       return response.data;
@@ -156,7 +156,7 @@ export const loginUser = createAsyncThunk(
       );
       // 🔥 If Salesforce returns success=false → treat as error
       if (!response.data.success && response.data.message) {
-        return rejectWithValue(response.data.message );
+        return rejectWithValue(response.data.message);
       }
       return response.data;
     } catch (error) {
@@ -185,8 +185,8 @@ export const changePassword = createAsyncThunk(
           },
         }
       );
-       if (!response.data.success && response.data.message) {
-        return rejectWithValue(response.data.message );
+      if (!response.data.success && response.data.message) {
+        return rejectWithValue(response.data.message);
       }
 
       return response.data;
@@ -196,6 +196,72 @@ export const changePassword = createAsyncThunk(
     }
   }
 );
+
+/* =========================================================
+   5. FORGOT PASSWORD
+========================================================= */
+export const forgotPassword = createAsyncThunk(
+  "auth/forgotPassword",
+  async ({ email }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/services/apexrest/salesforce/portal/auth`,
+        {
+          action: "forgotpassword",
+          email,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      handleError(error);
+      return rejectWithValue(
+        error.response?.data?.message || error.message
+      );
+    }
+  }
+);
+/* =========================================================
+   6. RESET PASSWORD
+========================================================= */
+export const resetPassword = createAsyncThunk(
+  "auth/resetPassword",
+  async ({ email, token, newPassword }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/services/apexrest/salesforce/portal/auth`,
+        {
+          action: "resetpassword",
+          email,
+          token,
+          newpassword: newPassword,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.data.success && response.data.message) {
+        return rejectWithValue(response.data.message);
+      }
+
+      return response.data;
+    } catch (error) {
+      handleError(error);
+      return rejectWithValue(
+        error.response?.data?.message || error.message
+      );
+    }
+  }
+);
+
 
 /* =========================================================
    SLICE
@@ -227,7 +293,7 @@ const authSlice = createSlice({
     builder
       .addCase(getSalesforceToken.pending, (state) => {
         state.status = "loading";
-        state.error = null; 
+        state.error = null;
       })
       .addCase(getSalesforceToken.fulfilled, (state, action) => {
         state.status = "succeeded";
@@ -244,7 +310,7 @@ const authSlice = createSlice({
     builder
       .addCase(registerUser.pending, (state) => {
         state.status = "loading";
-        state.error = null; 
+        state.error = null;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.status = "succeeded";
@@ -261,10 +327,10 @@ const authSlice = createSlice({
     builder
       .addCase(loginUser.pending, (state) => {
         state.status = "loading";
-        state.error = null; 
+        state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
-        console.log(action.payload,'action.payload');
+        console.log(action.payload, 'action.payload');
         state.status = "succeeded";
         state.user = action.payload.user;
         state.token = action.payload.token;
@@ -280,7 +346,7 @@ const authSlice = createSlice({
     builder
       .addCase(changePassword.pending, (state) => {
         state.status = "loading";
-        state.error = null; 
+        state.error = null;
       })
       .addCase(changePassword.fulfilled, (state) => {
         state.status = "succeeded";
@@ -290,6 +356,37 @@ const authSlice = createSlice({
         state.status = "failed";
         state.error = action.payload;
       });
+
+    /* ---- Forgot Password ---- */
+    builder
+      .addCase(forgotPassword.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(forgotPassword.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        showSuccess(action.payload.message);
+      })
+      .addCase(forgotPassword.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      });
+
+    /* ---- Reset Password ---- */
+    builder
+      .addCase(resetPassword.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(resetPassword.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        showSuccess(action.payload.message || "Password reset successful");
+      })
+      .addCase(resetPassword.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      });
+
   },
 });
 

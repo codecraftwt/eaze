@@ -122,6 +122,71 @@ export const getTopDeclineReason = createAsyncThunk(
   }
 );
 
+export const getLoanByTypeThisMonth = createAsyncThunk(
+  'dashboard/getLoanByTypeThisMonth',
+  async ({ accountId, token }, { rejectWithValue }) => {
+    try {
+      const data = await fetchData(
+        'getloanbytype',
+        { accountId, leadSource: LEADSOURCE },
+        token
+      );
+      return data?.data || [];
+    } catch (err) {
+      return rejectWithValue(err);
+    }
+  }
+);
+
+export const getLoanByTypeAllTime = createAsyncThunk(
+  'dashboard/getLoanByTypeAllTime',
+  async ({ accountId, token }, { rejectWithValue }) => {
+    try {
+      const data = await fetchData(
+        'getloanbytypealltime',
+        { accountId, leadSource: LEADSOURCE },
+        token
+      );
+      return data?.data || [];
+    } catch (err) {
+      return rejectWithValue(err);
+    }
+  }
+);
+
+export const getCashCollectedThisMonth = createAsyncThunk(
+  'dashboard/getCashCollectedThisMonth',
+  async ({ accountId, token }, { rejectWithValue }) => {
+    try {
+      const data = await fetchData(
+        'getcashcollectedamount',
+        { accountId, leadSource: LEADSOURCE },
+        token
+      );
+      return data?.data || [];
+    } catch (err) {
+      return rejectWithValue(err);
+    }
+  }
+);
+
+export const getCashCollectedAllTime = createAsyncThunk(
+  'dashboard/getCashCollectedAllTime',
+  async ({ accountId, token }, { rejectWithValue }) => {
+    try {
+      const data = await fetchData(
+        'getcashcollectedamountalltime',
+        { accountId, leadSource: LEADSOURCE },
+        token
+      );
+      return data?.data || [];
+    } catch (err) {
+      return rejectWithValue(err);
+    }
+  }
+);
+
+
 export const transformLeadData = (data) => {
   return data.map(item => {
     const updatedItem = { ...item };
@@ -154,6 +219,10 @@ const dashboardSlice = createSlice({
     totalPreApproved: [],
     totalDeclinePercent: null,
     topDeclineReason: null,
+    loanByTypeThisMonth: [],
+  loanByTypeAllTime: [],
+  cashCollectedThisMonth: [],
+  cashCollectedAllTime: [],
     status: 'idle', // 'loading', 'succeeded', 'failed'
     error: null,
   },
@@ -271,7 +340,59 @@ const dashboardSlice = createSlice({
         state.status = 'failed';
         console.log(action.error.message,'action.error.message')
         state.error = action.payload || action.error.message;
-      });
+      })
+      // Loan By Type – This Month
+.addCase(getLoanByTypeThisMonth.pending, (state) => {
+  state.status = 'loading';
+})
+.addCase(getLoanByTypeThisMonth.fulfilled, (state, action) => {
+  state.status = 'succeeded';
+  state.loanByTypeThisMonth = action.payload;
+})
+.addCase(getLoanByTypeThisMonth.rejected, (state, action) => {
+  state.status = 'failed';
+  state.error = action.payload || action.error.message;
+})
+
+// Loan By Type – All Time
+.addCase(getLoanByTypeAllTime.pending, (state) => {
+  state.status = 'loading';
+})
+.addCase(getLoanByTypeAllTime.fulfilled, (state, action) => {
+  state.status = 'succeeded';
+  state.loanByTypeAllTime = action.payload;
+})
+.addCase(getLoanByTypeAllTime.rejected, (state, action) => {
+  state.status = 'failed';
+  state.error = action.payload || action.error.message;
+})
+
+// Cash Collected – This Month
+.addCase(getCashCollectedThisMonth.pending, (state) => {
+  state.status = 'loading';
+})
+.addCase(getCashCollectedThisMonth.fulfilled, (state, action) => {
+  state.status = 'succeeded';
+  state.cashCollectedThisMonth = action.payload;
+})
+.addCase(getCashCollectedThisMonth.rejected, (state, action) => {
+  state.status = 'failed';
+  state.error = action.payload || action.error.message;
+})
+
+// Cash Collected – All Time
+.addCase(getCashCollectedAllTime.pending, (state) => {
+  state.status = 'loading';
+})
+.addCase(getCashCollectedAllTime.fulfilled, (state, action) => {
+  state.status = 'succeeded';
+  state.cashCollectedAllTime = action.payload;
+})
+.addCase(getCashCollectedAllTime.rejected, (state, action) => {
+  state.status = 'failed';
+  state.error = action.payload || action.error.message;
+})
+
   },
 });
 

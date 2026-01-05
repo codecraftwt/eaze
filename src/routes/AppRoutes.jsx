@@ -9,6 +9,7 @@ import MainLayout from '../components/MainLayout'; // Import MainLayout
 import Applications from '../pages/Applications';
 import ForgotPasswordPage from '../pages/ForgotPasswordPage';
 import ComingSoon from '../pages/ComingSoon';
+import Loan from '../pages/Loan';
 
 const AppRoutes = () => {
   return (
@@ -20,6 +21,7 @@ const AppRoutes = () => {
         <Route element={<MainLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/applications" element={<Applications />} />
+          <Route path="/loan" element={<Loan />} />
         </Route>
         
         {/* Routes that don't need the sidebar */}

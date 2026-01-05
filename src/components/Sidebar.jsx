@@ -5,6 +5,7 @@ import {
   ClipboardList,
   LogOut,
   Menu,
+  HandCoins,
 } from "lucide-react";
 import logo from '../assets/image.png';
 import { logout } from '../store/slices/authSlice';
@@ -80,6 +81,13 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
         >
           <ClipboardList size={20} className="transition-all duration-300 ease-in-out" />
           {isOpen && <span className="transition-opacity duration-300 ease-in-out">Applications</span>}
+        </Link>
+        <Link
+          to="/loan"
+          className={`flex items-center space-x-3 py-2 px-3 rounded-xl transition-all duration-300 ease-in-out ${isActive("/loan")}`}
+        >
+          <HandCoins size={20} className="transition-all duration-300 ease-in-out" />
+          {isOpen && <span className="transition-opacity duration-300 ease-in-out">loan</span>}
         </Link>
 
         <Link
