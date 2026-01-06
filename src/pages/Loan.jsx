@@ -677,7 +677,7 @@ function Loan() {
 
             {/* <p className='mb-2 mt-2'>This Year</p> */}
             <span className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 mb-5 mt-5">
-                This Year
+                Last 12 Year
             </span>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -705,7 +705,7 @@ function Loan() {
                                 if (!item.CreatedDate) return false;
                                 return (
                                     new Date(item.CreatedDate).getFullYear() ===
-                                    new Date().getFullYear()
+                                    new Date().getFullYear()-1
                                 );
                             })
                             .map(item =>
@@ -722,7 +722,7 @@ function Loan() {
                         ${cashCollectedAllTime
                             .filter(item => {
                                 if (!item.CreatedDate) return false;
-                                return new Date(item.CreatedDate).getFullYear() === new Date().getFullYear();
+                                return new Date(item.CreatedDate).getFullYear() === new Date().getFullYear()-1;
                             })
                             .map(item => Number(item.Loan_Amount__c || 0))
                             .reduce((sum, amount) => sum + amount, 0)
