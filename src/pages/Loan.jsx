@@ -546,14 +546,14 @@ function Loan() {
 
     return (
         <div className="bg-gray-100 min-h-screen p-6">
-            {/* <header className="bg-white p-4 shadow rounded-md mb-6">
+            <header className="bg-white p-4 shadow rounded-md mb-6">
                 <div className="flex justify-between items-center">
                     <h1 className="text-xl font-semibold">Loan</h1>
                     <p className="text-sm text-gray-500 ">
                         {totalApproved[0]?.Account_Name__c}
                     </p>
                 </div>
-            </header> */}
+            </header>
             <p className='mb-2'>This Month</p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -583,7 +583,7 @@ function Loan() {
                 </div>
                 <div className="bg-white p-6 rounded-lg shadow-md" >
                     <h3 className="text-gray-500 text-sm">Total Loan Amount </h3>
-                    <p className="text-2xl font-bold mt-2">{loanByTypeThisMonth.map(item => item.expr0 || 0).reduce((sum, amount) => sum + amount, 0).toLocaleString()}</p>
+                    <p className="text-2xl font-bold mt-2">${loanByTypeThisMonth.map(item => item.expr0 || 0).reduce((sum, amount) => sum + amount, 0).toLocaleString()}</p>
                 </div>
                 
                 {/* <div className="bg-white p-6 rounded-lg shadow-md" >
@@ -675,7 +675,7 @@ function Loan() {
                 </div>
                 <div className="bg-white p-6 rounded-lg shadow-md" >
                     <h3 className="text-gray-500 text-sm">Total Loan Amount </h3>
-                    <p className="text-2xl font-bold mt-2">{loanByTypeAllTime.map(item => item.expr0 || 0).reduce((sum, amount) => sum + amount, 0).toLocaleString()}</p>
+                    <p className="text-2xl font-bold mt-2">${loanByTypeAllTime.map(item => item.expr0 || 0).reduce((sum, amount) => sum + amount, 0).toLocaleString()}</p>
                 </div>
                 
                 {/* <div className="bg-white p-6 rounded-lg shadow-md" >

@@ -652,6 +652,42 @@ function formatPreApprovedData(leads) {
   return (
     <div className="p-4 bg-gray-100 min-h-screen">
       {/* MAIN GRID */}
+      <header className="bg-white p-4 shadow rounded-md mb-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-xl font-semibold">Application</h1>
+          {/* <div className="text-sm text-gray-500">Short video instructions on how to use your Funding Analytics Portal</div> */}
+          {/* <a
+            href="https://www.loom.com/share/4302a1e8367144febea20c450b25f9fa?sid=39568934-592e-45ad-9f03-512b455fcb1d"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-gray-500 cursor-pointer hover:text-blue-500"
+          >
+            Short video instructions on how to use your Funding Analytics Portal
+          </a> */}
+          <p className="text-sm text-gray-500 ">
+            {newLeads[0]?.Account_Name__c}
+          </p>
+          {/* <div className="relative w-60">
+            <select
+              value={selectedMonth}
+              onChange={handleMonthChange}
+              className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            >
+              <option value="" disabled>Select a Month</option>
+              {months.map((month) => (
+                <option key={month} value={month} className="text-gray-700">
+                  {month}
+                </option>
+              ))}
+            </select>
+            <div className="absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 pointer-events-none">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+          </div> */}
+        </div>
+      </header>
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
 
         {/* RIGHT SIDE - CARDS + CHART (40%) */}

@@ -65,7 +65,7 @@ function Dashboard() {
     totalDeclinePercent,
     topDeclineReason,
   } = useSelector((state) => state.dashboard);
-
+const [selectedYear, setSelectedYear] = useState('2026');
   const [isModalOpen, setModalOpen] = useState(false);
   const [isModalAllOpen, setModalAllOpen] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState('Jan 25');
@@ -366,57 +366,38 @@ function Dashboard() {
 
   // this month
 
-  function formatLeadsByStatusUpdated(data, categoryMap) {
-    // Initialize arrays for Approved, Current (Pre-Approved), and Declined counts
-    const months = [
-      "Jan 26", "Feb 26", "Mar 26", "Apr 26", "May 26", "Jun 26", "Jul 26", "Aug 26",
-      "Sep 26", "Oct 26", "Nov 26", "Dec 26"
-    ];
+  function formatLeadsByStatusUpdated(data, categoryMap, yearToFilter) {
+  // Dynamically generate labels like "Jan 26" or "Jan 25"
+  const shortYear = yearToFilter.slice(-2); 
+  const months = [
+    `Jan ${shortYear}`, `Feb ${shortYear}`, `Mar ${shortYear}`, `Apr ${shortYear}`, 
+    `May ${shortYear}`, `Jun ${shortYear}`, `Jul ${shortYear}`, `Aug ${shortYear}`,
+    `Sep ${shortYear}`, `Oct ${shortYear}`, `Nov ${shortYear}`, `Dec ${shortYear}`
+  ];
 
-    // Array to hold counts for each month of the year
-    const approved = new Array(12).fill(0);
-    const current = new Array(12).fill(0);  // 'Current' corresponds to Pre-approved
-    const declined = new Array(12).fill(0);
+  const approved = new Array(12).fill(0);
+  const current = new Array(12).fill(0);
+  const declined = new Array(12).fill(0);
 
-    // Helper function to get the month index and filter by year 2025
-    function getMonthIndex(date) {
-      const parsedDate = new Date(date);  // Convert the string to a Date object
-      const month = parsedDate.getMonth(); // Get the month index (0-11)
-      const year = parsedDate.getFullYear();  // Get the full year
+  data.forEach(lead => {
+    const parsedDate = new Date(lead.CreatedDate);
+    const month = parsedDate.getMonth();
+    const year = parsedDate.getFullYear();
 
-      // Only process the data for the year 2025
-      if (year !== 2026) {
-        return -1;  // Return -1 if the year is not 2025 (ignores this lead)
-      }
-
-      return month;  // Return the month index if the year is 2025
-    }
-
-    // Process each lead and classify by month and status
-    data.forEach(lead => {
-      const monthIndex = getMonthIndex(lead.CreatedDate);
-
-      // If the year is not 2025, skip this lead
-      if (monthIndex === -1) return;
-
-      // Increment count for total leads based on the status
+    // Only process the data for the year selected in the dropdown
+    if (year.toString() === yearToFilter) {
       if (categoryMap.approved.includes(lead.Status)) {
-        approved[monthIndex] += 1; // Increment approved leads
+        approved[month] += 1;
       } else if (categoryMap.declined.includes(lead.Status)) {
-        declined[monthIndex] += 1; // Increment declined leads
+        declined[month] += 1;
       } else if (categoryMap.preApproved.includes(lead.Status)) {
-        current[monthIndex] += 1; // Increment current leads (Pre-approved)
+        current[month] += 1;
       }
-    });
+    }
+  });
 
-    // Return the formatted JSON with counts for each month for the year 2025
-    return {
-      months,
-      approved,
-      current,
-      declined
-    };
-  }
+  return { months, approved, current, declined };
+}
   function formatLeadsByStatusUpdatedNew(data, categoryMap) {
     // Initialize arrays for Approved, Current (Pre-Approved), Declined, and Closed Lost counts
     const months = [
@@ -566,7 +547,7 @@ function Dashboard() {
         item.Status.toLowerCase().startsWith("declined"));
       console.log([...new Set(closedLost.map(item => item.Status))], 'declined status')
       setGroupedAllMonthData(result);
-      const barChat = formatLeadsByStatusUpdated(totalApplications, categoryMap);
+      const barChat = formatLeadsByStatusUpdated(totalApplications, categoryMap,selectedYear);
       // const barChatNew = formatLeadsByStatusUpdatedNew(totalApplications, categoryMap);
       // console.log(barChatNew, 'barChatNew')
       console.log(barChat, 'barChat')
@@ -601,6 +582,7 @@ function Dashboard() {
     totalDeclined,
     totalPreApproved,
     totalDeclinePercent,
+    selectedYear
   ]);
 
   useEffect(() => {
@@ -700,7 +682,19 @@ function Dashboard() {
       {/* Monthly Summary Chart */}
       {/* <MonthlySummaryChart /> */}
       <div className="bg-white p-6 rounded-lg shadow-md mt-6">
-        <h3 className="text-xl font-semibold mb-4">Monthly Summary</h3>
+        <div className="flex justify-between items-center mb-4">
+    <h3 className="text-xl font-semibold">Monthly Summary</h3>
+    
+    {/* Year Dropdown */}
+    <select
+      value={selectedYear}
+      onChange={(e) => setSelectedYear(e.target.value)}
+      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+    >
+      <option value="2025">2025</option>
+      <option value="2026">2026</option>
+    </select>
+  </div>
         {barChartData?.months.length > 0 ||
           barChartData?.approved.length > 0 || barChartData?.declined.length > 0 ||
           barChartData?.current.length > 0 ? (

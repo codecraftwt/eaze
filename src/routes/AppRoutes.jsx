@@ -10,6 +10,8 @@ import Applications from '../pages/Applications';
 import ForgotPasswordPage from '../pages/ForgotPasswordPage';
 import ComingSoon from '../pages/ComingSoon';
 import Loan from '../pages/Loan';
+import ForgotPasswordPage2 from '../pages/ForgotPasswordPage2';
+import ResetPasswordPage from '../pages/ResetPasswordPage';
 
 const AppRoutes = () => {
   return (
@@ -28,7 +30,8 @@ const AppRoutes = () => {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
          {/* Forgot password route */}
-        <Route path="/reset-password" element={<ForgotPasswordPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage2 />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         {/* <Route path="/dashboard" element={<ComingSoon />} /> */}
 
       </Routes>

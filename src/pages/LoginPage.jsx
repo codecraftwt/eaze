@@ -125,8 +125,8 @@ const LoginPage = () => {
 
             {/* Reset Password */}
             <div className="flex items-center justify-between">
-              <Link to="/reset-password" className="text-sm text-blue-600">
-                Reset Password
+              <Link to="/forgot-password" className="text-sm text-blue-600">
+                Forget Password
               </Link>
             </div>
 
