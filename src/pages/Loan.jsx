@@ -509,6 +509,7 @@ function Loan() {
         if (!salesforceToken) {
             dispatch(getSalesforceToken()); // Fetch the Salesforce token if not available
         } else {
+            dispatch(getTotalApproved({ accountId: portalUserId, token: salesforceToken }));
             dispatch(getLoanByTypeThisMonth({ accountId: portalUserId, token: salesforceToken }));
             dispatch(getLoanByTypeAllTime({ accountId: portalUserId, token: salesforceToken }));
             dispatch(getCashCollectedThisMonth({ accountId: portalUserId, token: salesforceToken }));
@@ -550,12 +551,13 @@ function Loan() {
         }, 0);
 
         console.log("This month cash collected:", totalCashThisMonth);
-
+        console.log(totalApproved, 'totalApproved')
     }, [
         loanByTypeThisMonth,
         loanByTypeAllTime,
         cashCollectedThisMonth,
         cashCollectedAllTime,
+        totalApproved
     ]);
 
 
@@ -583,29 +585,27 @@ function Loan() {
                     </p>
                 </div>
             </header>
-            <p className='mb-2'>This Month</p>
+            <span className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 mb-5">
+                This Month
+            </span>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {loanTypes.map(type => {
-                    const matchedLoan = loanByTypeThisMonth.find(
-                        f => f.Loan_Program_Type__c?.toLowerCase() === type.key
-                    );
+                {loanByTypeThisMonth.map(loan => (
+                    <div
+                        key={loan.Loan_Program_Type__c}
+                        className="bg-white p-6 rounded-lg shadow-md"
+                    >
+                        <h3 className="text-gray-500 text-sm">
+                            {loan.Loan_Program_Label__c
+                                || loan.Loan_Program_Type__c}
+                        </h3>
 
-                    return (
-                        <div
-                            key={type.key}
-                            className="bg-white p-6 rounded-lg shadow-md"
-                        >
-                            <h3 className="text-gray-500 text-sm">
-                                {type.label}
-                            </h3>
+                        <p className="text-2xl font-bold mt-2">
+                            {loan.expr0 ?? 0}
+                        </p>
+                    </div>
+                ))}
 
-                            <p className="text-2xl font-bold mt-2">
-                                {matchedLoan ? matchedLoan.expr0 : 0}
-                            </p>
-                        </div>
-                    );
-                })}
                 <div className="bg-white p-6 rounded-lg shadow-md" >
                     <h3 className="text-gray-500 text-sm">Total Cash Collected</h3>
                     <p className="text-2xl font-bold mt-2">${cashCollectedThisMonth.map(item => item.Cash_Collected__c || 0).reduce((sum, amount) => sum + amount, 0).toLocaleString()}</p>
@@ -675,29 +675,28 @@ function Loan() {
 
             </div>
 
-            <p className='mb-2 mt-2'>This Year</p>
+            {/* <p className='mb-2 mt-2'>This Year</p> */}
+            <span className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 mb-5 mt-5">
+                This Year
+            </span>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {loanTypes.map(type => {
-                    const matchedLoan = loanByTypeAllTime.find(
-                        f => f.Loan_Program_Type__c?.toLowerCase() === type.key
-                    );
+                {loanByTypeAllTime.map(loan => (
+                    <div
+                        key={loan.Loan_Program_Type__c}
+                        className="bg-white p-6 rounded-lg shadow-md"
+                    >
+                        <h3 className="text-gray-500 text-sm">
+                            {loan.Loan_Program_Label__c ||
+                                loan.Loan_Program_Type__c}
+                        </h3>
 
-                    return (
-                        <div
-                            key={type.key}
-                            className="bg-white p-6 rounded-lg shadow-md"
-                        >
-                            <h3 className="text-gray-500 text-sm">
-                                {type.label}
-                            </h3>
+                        <p className="text-2xl font-bold mt-2">
+                            {loan.expr0 ?? 0}
+                        </p>
+                    </div>
+                ))}
 
-                            <p className="text-2xl font-bold mt-2">
-                                {matchedLoan ? matchedLoan.expr0 : 0}
-                            </p>
-                        </div>
-                    );
-                })}
                 <div className="bg-white p-6 rounded-lg shadow-md" >
                     <h3 className="text-gray-500 text-sm">Total Cash Collected</h3>
                     <p className="text-2xl font-bold mt-2">
@@ -792,7 +791,7 @@ function Loan() {
 
             </div>
             <div
-                className="bg-white p-6 rounded-lg shadow-md mt-3"
+                className="bg-white p-6 rounded-lg shadow-md mt-6"
             >
                 <CashCollectedByMonthChart leads={cashCollectedAllTime} />
             </div>

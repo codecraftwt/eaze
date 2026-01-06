@@ -234,8 +234,9 @@ export const forgotPassword = createAsyncThunk(
 ========================================================= */
 export const resetPassword = createAsyncThunk(
   "auth/resetPassword",
-  async ({ email, token, newPassword }, { rejectWithValue }) => {
+  async ({ email, token, newPassword }, { getState,rejectWithValue }) => {
     try {
+      const tokenG = getState().auth.salesforceToken;
       const response = await axios.post(
         `${BASE_URL}/services/apexrest/salesforce/portal/auth`,
         {
@@ -246,6 +247,7 @@ export const resetPassword = createAsyncThunk(
         },
         {
           headers: {
+            Authorization: `Bearer ${tokenG}`,
             "Content-Type": "application/json",
           },
         }

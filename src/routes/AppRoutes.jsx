@@ -12,6 +12,7 @@ import ComingSoon from '../pages/ComingSoon';
 import Loan from '../pages/Loan';
 import ForgotPasswordPage2 from '../pages/ForgotPasswordPage2';
 import ResetPasswordPage from '../pages/ResetPasswordPage';
+import ForgotResetPasswordPage from '../pages/ForgotPasswordPage2';
 
 const AppRoutes = () => {
   return (
@@ -30,7 +31,7 @@ const AppRoutes = () => {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
          {/* Forgot password route */}
-        <Route path="/forgot-password" element={<ForgotPasswordPage2 />} />
+        <Route path="/forgot-password" element={<ForgotResetPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         {/* <Route path="/dashboard" element={<ComingSoon />} /> */}
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { resetPassword } from "../store/slices/authSlice";
+import { getSalesforceToken, resetPassword } from "../store/slices/authSlice";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -14,8 +14,32 @@ const ResetPasswordPage = () => {
     newPassword: "",
     confirmPassword: "",
   });
-  const [token, setToken] = useState(null);
+  const [email, setEmail] = useState(null);  // Store email
+  const [token, setToken] = useState(null);  // Store token
 
+  // Function to get query params (email and token)
+  const getQueryParams = () => {
+    const urlParams = new URLSearchParams(location.search);
+    return {
+      token: urlParams.get("token"),
+      email: urlParams.get("email"),
+    };
+  };
+
+  // Effect to get the token and email from URL
+  useEffect(() => {
+    dispatch(getSalesforceToken());
+    const { token, email } = getQueryParams();
+    if (token && email) {
+      setToken(token);  // Set token
+      setEmail(email);   // Set email
+    } else {
+      toast.error("Invalid or expired reset link.");
+      navigate("/forgot-password");
+    }
+  }, [location.search, navigate]);
+
+  // Handle form input change
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
@@ -23,21 +47,7 @@ const ResetPasswordPage = () => {
     }));
   };
 
-  const getQueryParams = () => {
-    const urlParams = new URLSearchParams(location.search);
-    return urlParams.get("token"); // Get token from URL query params
-  };
-
-  useEffect(() => {
-    const resetToken = getQueryParams();
-    if (resetToken) {
-      setToken(resetToken); // Set token in the state
-    } else {
-      toast.error("Invalid or expired reset link.");
-      navigate("/forgot-password");
-    }
-  }, [location.search, navigate]);
-
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -47,10 +57,17 @@ const ResetPasswordPage = () => {
     }
 
     try {
-      const result = await dispatch(resetPassword({ email: "user@example.com", token, newPassword: formData.newPassword }));
+      const result = await dispatch(
+        resetPassword({
+          email,
+          token,
+          newPassword: formData.newPassword,
+        })
+      );
+
       if (result.meta.requestStatus === "fulfilled") {
         toast.success("Password has been reset successfully!");
-        navigate("/login"); // Redirect to login after password reset
+        navigate("/login");  // Redirect to login after successful reset
       } else {
         toast.error(result.payload || "Failed to reset password.");
       }
