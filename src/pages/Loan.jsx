@@ -4,6 +4,7 @@ import { getTotalApplicationsThisMonth, getTotalApplications, getApprovedThisMon
 import { getSalesforceToken } from '../store/slices/authSlice'; // Ensure correct import
 import { BarChart } from '@mui/x-charts/BarChart';
 import PopupModal from '../components/PopupModal';
+import CashCollectedByMonthChart from '../components/CashCollectedByMonthChart';
 
 export function valueFormatter(value) {
     return `${value}mm`;
@@ -523,6 +524,33 @@ function Loan() {
         console.log(cashCollectedAllTime, 'cashCollectedAllTime')
         console.log(new Set(cashCollectedAllTime.map(m => m.Loan_Program_Type__c)), 'Loan_Program_Type__c__test')
 
+        // const response = /* paste the API response object here */;
+
+        const now = new Date();
+        const currentMonth = now.getMonth(); // 0-based
+        const currentYear = now.getFullYear();
+
+        const totalCashThisMonth = cashCollectedAllTime.reduce((sum, lead) => {
+            const createdDate = new Date(lead.CreatedDate);
+
+            if (
+                createdDate.getMonth() === currentMonth &&
+                createdDate.getFullYear() === currentYear &&
+                lead.Cash_Collected__c
+            ) {
+                // Remove commas and convert to number
+                const cash = Number(
+                    String(lead.Cash_Collected__c).replace(/,/g, "")
+                );
+
+                return sum + (isNaN(cash) ? 0 : cash);
+            }
+
+            return sum;
+        }, 0);
+
+        console.log("This month cash collected:", totalCashThisMonth);
+
     }, [
         loanByTypeThisMonth,
         loanByTypeAllTime,
@@ -544,6 +572,7 @@ function Loan() {
         { key: "eaze cap", label: "Eaze Cap" },
     ];
 
+
     return (
         <div className="bg-gray-100 min-h-screen p-6">
             <header className="bg-white p-4 shadow rounded-md mb-6">
@@ -557,7 +586,7 @@ function Loan() {
             <p className='mb-2'>This Month</p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                 {loanTypes.map(type => {
+                {loanTypes.map(type => {
                     const matchedLoan = loanByTypeThisMonth.find(
                         f => f.Loan_Program_Type__c?.toLowerCase() === type.key
                     );
@@ -568,7 +597,7 @@ function Loan() {
                             className="bg-white p-6 rounded-lg shadow-md"
                         >
                             <h3 className="text-gray-500 text-sm">
-                                 {type.label}
+                                {type.label}
                             </h3>
 
                             <p className="text-2xl font-bold mt-2">
@@ -579,13 +608,13 @@ function Loan() {
                 })}
                 <div className="bg-white p-6 rounded-lg shadow-md" >
                     <h3 className="text-gray-500 text-sm">Total Cash Collected</h3>
-                    <p className="text-2xl font-bold mt-2">${cashCollectedThisMonth.map(item => item.Loan_Amount__c || 0).reduce((sum, amount) => sum + amount, 0).toLocaleString()}</p>
+                    <p className="text-2xl font-bold mt-2">${cashCollectedThisMonth.map(item => item.Cash_Collected__c || 0).reduce((sum, amount) => sum + amount, 0).toLocaleString()}</p>
                 </div>
                 <div className="bg-white p-6 rounded-lg shadow-md" >
                     <h3 className="text-gray-500 text-sm">Total Loan Amount </h3>
-                    <p className="text-2xl font-bold mt-2">${loanByTypeThisMonth.map(item => item.expr0 || 0).reduce((sum, amount) => sum + amount, 0).toLocaleString()}</p>
+                    <p className="text-2xl font-bold mt-2">${cashCollectedThisMonth.map(item => item.Loan_Amount__c || 0).reduce((sum, amount) => sum + amount, 0).toLocaleString()}</p>
                 </div>
-                
+
                 {/* <div className="bg-white p-6 rounded-lg shadow-md" >
                     <h3 className="text-gray-500 text-sm">Loan Amount ({loanByTypeThisMonth[0]?.Loan_Program_Type__c}) This Month</h3>
                     <p className="text-2xl font-bold mt-2">${loanByTypeThisMonth.map(item => item.expr0 || 0).reduce((sum, amount) => sum + amount, 0).toLocaleString()}</p>
@@ -649,7 +678,7 @@ function Loan() {
             <p className='mb-2 mt-2'>This Year</p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                 {loanTypes.map(type => {
+                {loanTypes.map(type => {
                     const matchedLoan = loanByTypeAllTime.find(
                         f => f.Loan_Program_Type__c?.toLowerCase() === type.key
                     );
@@ -660,7 +689,7 @@ function Loan() {
                             className="bg-white p-6 rounded-lg shadow-md"
                         >
                             <h3 className="text-gray-500 text-sm">
-                                 {type.label}
+                                {type.label}
                             </h3>
 
                             <p className="text-2xl font-bold mt-2">
@@ -671,13 +700,38 @@ function Loan() {
                 })}
                 <div className="bg-white p-6 rounded-lg shadow-md" >
                     <h3 className="text-gray-500 text-sm">Total Cash Collected</h3>
-                    <p className="text-2xl font-bold mt-2">${cashCollectedAllTime.map(item => item.Loan_Amount__c || 0).reduce((sum, amount) => sum + amount, 0).toLocaleString()}</p>
+                    <p className="text-2xl font-bold mt-2">
+                        ${cashCollectedAllTime
+                            .filter(item => {
+                                if (!item.CreatedDate) return false;
+                                return (
+                                    new Date(item.CreatedDate).getFullYear() ===
+                                    new Date().getFullYear()
+                                );
+                            })
+                            .map(item =>
+                                Number(String(item.Cash_Collected__c || 0).replace(/,/g, ""))
+                            )
+                            .reduce((sum, amount) => sum + amount, 0)
+                            .toLocaleString()}
+                    </p>
+
                 </div>
                 <div className="bg-white p-6 rounded-lg shadow-md" >
                     <h3 className="text-gray-500 text-sm">Total Loan Amount </h3>
-                    <p className="text-2xl font-bold mt-2">${loanByTypeAllTime.map(item => item.expr0 || 0).reduce((sum, amount) => sum + amount, 0).toLocaleString()}</p>
+                    <p className="text-2xl font-bold mt-2">
+                        ${cashCollectedAllTime
+                            .filter(item => {
+                                if (!item.CreatedDate) return false;
+                                return new Date(item.CreatedDate).getFullYear() === new Date().getFullYear();
+                            })
+                            .map(item => Number(item.Loan_Amount__c || 0))
+                            .reduce((sum, amount) => sum + amount, 0)
+                            .toLocaleString()}
+                    </p>
+
                 </div>
-                
+
                 {/* <div className="bg-white p-6 rounded-lg shadow-md" >
                     <h3 className="text-gray-500 text-sm">Loan Amount ({loanByTypeThisMonth[0]?.Loan_Program_Type__c}) This Month</h3>
                     <p className="text-2xl font-bold mt-2">${loanByTypeThisMonth.map(item => item.expr0 || 0).reduce((sum, amount) => sum + amount, 0).toLocaleString()}</p>
@@ -737,7 +791,12 @@ function Loan() {
 
 
             </div>
-            
+            <div
+                className="bg-white p-6 rounded-lg shadow-md mt-3"
+            >
+                <CashCollectedByMonthChart leads={cashCollectedAllTime} />
+            </div>
+
         </div>
     );
 }
