@@ -27,6 +27,11 @@ const ForgotResetPasswordPage = () => {
     };
   };
 
+  useEffect(() => {
+      dispatch(getSalesforceToken());
+//   if (!salesforceToken) {
+//   }
+}, [dispatch, salesforceToken]);
   // Extract email and token from URL when the page loads
   useEffect(() => {
     if (salesforceToken && !token) {
@@ -34,10 +39,6 @@ const ForgotResetPasswordPage = () => {
       if (token && email) {
         setToken(token);  // Set token from query params
         setEmail(email);   // Set email from query params
-      }
-    } else {
-      if (!salesforceToken) {
-        dispatch(getSalesforceToken());
       }
     }
   }, [dispatch, salesforceToken, token, location.search]);

@@ -677,7 +677,7 @@ function Loan() {
 
             {/* <p className='mb-2 mt-2'>This Year</p> */}
             <span className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 mb-5 mt-5">
-                Last 12 Year
+                Last 12 Month
             </span>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
