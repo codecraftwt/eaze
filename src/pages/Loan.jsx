@@ -1,23 +1,23 @@
 import React, { use, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getTotalApplicationsThisMonth, getTotalApplications, getApprovedThisMonth, getTotalApproved, getDeclinedThisMonth, getTotalDeclined, getPreApprovedThisMonth, getTotalPreApproved, getTotalDeclinePercent, getTopDeclineReason, getLoanByTypeThisMonth, getLoanByTypeAllTime, getCashCollectedThisMonth, getCashCollectedAllTime } from '../store/slices/dashboardSlice'; 
-import { getSalesforceToken } from '../store/slices/authSlice'; 
+import { getTotalApplicationsThisMonth, getTotalApplications, getApprovedThisMonth, getTotalApproved, getDeclinedThisMonth, getTotalDeclined, getPreApprovedThisMonth, getTotalPreApproved, getTotalDeclinePercent, getTopDeclineReason, getLoanByTypeThisMonth, getLoanByTypeAllTime, getCashCollectedThisMonth, getCashCollectedAllTime } from '../store/slices/dashboardSlice';
+import { getSalesforceToken } from '../store/slices/authSlice';
 import { BarChart } from '@mui/x-charts/BarChart';
 import CashCollectedByMonthChart from '../components/CashCollectedByMonthChart';
 
 // MUI Imports
-import { 
-    Dialog, 
-    DialogTitle, 
-    DialogContent, 
-    DialogActions, 
-    Button, 
-    Table, 
-    TableBody, 
-    TableCell, 
-    TableContainer, 
-    TableHead, 
-    TableRow, 
+import {
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    Button,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
     Paper,
     IconButton
 } from '@mui/material';
@@ -35,15 +35,15 @@ const MonthlySummaryChart = () => {
                 declinedPreQualifierChartData?.totalLeads.length > 0 ||
                 declinedPreQualifierChartData?.newLeads.length > 0 ? (
                 <BarChart
-                    xAxis={[{ data: declinedPreQualifierChartData.months }]} 
+                    xAxis={[{ data: declinedPreQualifierChartData.months }]}
                     series={[
-                        { data: declinedPreQualifierChartData.totalLeads, label: 'Total', id: 'pvId' }, 
-                        { data: declinedPreQualifierChartData.newLeads, label: 'Declined', id: 'uvId' },   
+                        { data: declinedPreQualifierChartData.totalLeads, label: 'Total', id: 'pvId' },
+                        { data: declinedPreQualifierChartData.newLeads, label: 'Declined', id: 'uvId' },
                     ]}
                     height={300}
                 />
             ) : (
-                <div>No data available</div> 
+                <div>No data available</div>
             )}
         </div>
     );
@@ -68,7 +68,7 @@ function Loan() {
 
     useEffect(() => {
         if (!salesforceToken) {
-            dispatch(getSalesforceToken()); 
+            dispatch(getSalesforceToken());
         } else {
             dispatch(getTotalApproved({ accountId: portalUserId, token: salesforceToken }));
             dispatch(getLoanByTypeThisMonth({ accountId: portalUserId, token: salesforceToken }));
@@ -80,7 +80,7 @@ function Loan() {
 
     useEffect(() => {
         const now = new Date();
-        const currentMonth = now.getMonth(); 
+        const currentMonth = now.getMonth();
         const currentYear = now.getFullYear();
 
         const totalCashThisMonth = cashCollectedAllTime.reduce((sum, lead) => {
@@ -122,10 +122,10 @@ function Loan() {
     // Dynamic Columns Helper
     const getDynamicColumns = (data) => {
         if (!data || data.length === 0) return [];
-        
+
         // 1. Define fields to exclude
         const excludedFields = ['attributes', 'Id', 'id', 'RecordTypeId', 'Loan_Program_Type__c'];
-        
+
         // 2. Get all valid keys
         let columns = Object.keys(data[0]).filter(key => !excludedFields.includes(key));
 
@@ -135,7 +135,7 @@ function Loan() {
             const nameCol = columns.splice(nameIndex, 1)[0]; // Remove Name from current position
             columns.unshift(nameCol); // Add it to the start
         }
-        
+
         return columns;
     };
 
@@ -170,9 +170,17 @@ function Loan() {
                     </div>
                 ))}
 
-                <div className="bg-white p-6 rounded-lg shadow-md" >
+                <div className="bg-white p-6 rounded-lg shadow-md">
                     <h3 className="text-gray-500 text-sm">Total Cash Collected</h3>
-                    <p className="text-2xl font-bold mt-2">${cashCollectedThisMonth.map(item => item.Cash_Collected__c || 0).reduce((sum, amount) => sum + amount, 0).toLocaleString()}</p>
+                    <p className="text-2xl font-bold mt-2">
+                        ${cashCollectedThisMonth
+                            .reduce((sum, item) => {
+                                // Convert string to number, defaulting to 0 if null/undefined/empty
+                                const amount = parseFloat(item.Cash_Collected__c) || 0;
+                                return sum + amount;
+                            }, 0)
+                            .toLocaleString()}
+                    </p>
                 </div>
                 <div className="bg-white p-6 rounded-lg shadow-md" >
                     <h3 className="text-gray-500 text-sm">Total Loan Amount </h3>
@@ -206,10 +214,19 @@ function Loan() {
                         ${cashCollectedAllTime
                             .filter(item => {
                                 if (!item.CreatedDate) return false;
-                                return (new Date(item.CreatedDate).getFullYear() === new Date().getFullYear() - 1);
+
+                                // Get the year from the record and the year for "Last Year"
+                                const recordYear = new Date(item.CreatedDate).getFullYear();
+                                const lastYear = new Date().getFullYear() - 1;
+
+                                return recordYear === lastYear;
                             })
-                            .map(item => Number(String(item.Cash_Collected__c || 0).replace(/,/g, "")))
-                            .reduce((sum, amount) => sum + amount, 0)
+                            .reduce((sum, item) => {
+                                // Clean the string (remove commas) and convert to a number
+                                const cleanValue = String(item.Cash_Collected__c || "0").replace(/,/g, "");
+                                const amount = parseFloat(cleanValue) || 0;
+                                return sum + amount;
+                            }, 0)
                             .toLocaleString()}
                     </p>
                 </div>
@@ -233,8 +250,8 @@ function Loan() {
             </div>
 
             {/* --- MUI DIALOG (POPUP) --- */}
-            <Dialog 
-                open={open} 
+            <Dialog
+                open={open}
                 onClose={handleClose}
                 maxWidth="lg"
                 fullWidth
@@ -254,13 +271,13 @@ function Loan() {
                             <TableHead>
                                 <TableRow>
                                     {getDynamicColumns(selectedLeads).map((col) => (
-                                        <TableCell 
-                                            key={col} 
-                                            sx={{ 
-                                                fontWeight: 'bold', 
+                                        <TableCell
+                                            key={col}
+                                            sx={{
+                                                fontWeight: 'bold',
                                                 backgroundColor: '#f8f9fa',
-                                                whiteSpace: 'nowrap', 
-                                                minWidth: '150px'     
+                                                whiteSpace: 'nowrap',
+                                                minWidth: '150px'
                                             }}
                                         >
                                             {col.replace('__c', '').replace(/_/g, ' ').replace(/([a-z])([A-Z])/g, '$1 $2').trim()}
