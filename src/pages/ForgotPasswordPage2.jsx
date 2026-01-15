@@ -66,7 +66,7 @@ const ForgotResetPasswordPage = () => {
 
       if (result.meta.requestStatus === "fulfilled") {
         toast.success("If the email exists, a reset link has been sent.");
-        // navigate(`/forgot-reset-password?email=${email}`);
+        navigate(`/login`);
       } else {
         toast.error(result.payload || "Failed to request password reset.");
       }
