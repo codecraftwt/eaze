@@ -20,7 +20,7 @@ import {
 } from "@mui/material";
 import { useSelector } from "react-redux";
 
-export default function LeadTabs({ onTabChange, data,onMonthChange }) {
+export default function LeadTabs({ onTabChange, data, onMonthChange }) {
     const [tab, setTab] = useState(0);
     const [groupedLeads, setGroupedLeads] = useState([]);
     const { newLeads, preApprovedLeads, approvedLeads, applicationDeclinedLeads, closedLostLeads, allDeclinedLeads, status, error } = useSelector((state) => state.application);
@@ -38,7 +38,7 @@ export default function LeadTabs({ onTabChange, data,onMonthChange }) {
 
     useEffect(() => {
         setSelectedMonth(getCurrentMonth());  // Set the default selected month to the current month
-        if(onMonthChange)onMonthChange(getCurrentMonth());
+        if (onMonthChange) onMonthChange(getCurrentMonth());
     }, []);
 
 
@@ -63,6 +63,8 @@ export default function LeadTabs({ onTabChange, data,onMonthChange }) {
                 MobilePhone: lead.MobilePhone,
                 Email: lead.Email,
                 Loan_Amount__c: lead.Loan_Amount__c || null, // If no loan amount, set it to null
+                Cash_Collected__c: lead.Cash_Collected__c || null, // If no loan amount, set it to null
+                Invoice_Paid_Date__c: lead.Invoice_Paid_Date__c || null, // If no loan amount, set it to null
             };
 
             if (acc[statusGroup]) {
@@ -84,9 +86,10 @@ export default function LeadTabs({ onTabChange, data,onMonthChange }) {
         if (newLeads.length > 0 && tab === 0) {
             console.log("New Leads: ", newLeads);
             groupedData = groupLeadsByStatus(newLeads);
+            console.log(groupedData, 'groupedData')
             setGroupedLeads(Object.values(groupedData));
 
-             const selectedMonthIndex = new Date(Date.parse(selectedMonth + " 1, 2025")).getMonth();
+            const selectedMonthIndex = new Date(Date.parse(selectedMonth + " 1, 2025")).getMonth();
 
             // Filter leads by the selected month
             const filteredLeads = newLeads.filter((lead) => {
@@ -94,7 +97,7 @@ export default function LeadTabs({ onTabChange, data,onMonthChange }) {
                 const leadMonthIndex = leadDate.getMonth(); // Get the month index (0 for January, 1 for February, etc.)
 
                 // Check if the lead's month matches the selected month and if the status is 'Funded - Invoice EAZE Client'
-                return leadMonthIndex === selectedMonthIndex 
+                return leadMonthIndex === selectedMonthIndex
             });
 
             console.log("Filtered Approved Leads: ", filteredLeads);
@@ -118,7 +121,7 @@ export default function LeadTabs({ onTabChange, data,onMonthChange }) {
                 const leadMonthIndex = leadDate.getMonth(); // Get the month index (0 for January, 1 for February, etc.)
 
                 // Check if the lead's month matches the selected month and if the status is 'Funded - Invoice EAZE Client'
-                return leadMonthIndex === selectedMonthIndex 
+                return leadMonthIndex === selectedMonthIndex
             });
 
             console.log("Filtered Approved Leads: ", filteredLeads);
@@ -155,7 +158,7 @@ export default function LeadTabs({ onTabChange, data,onMonthChange }) {
             groupedData = groupLeadsByStatus(applicationDeclinedLeads);
             setGroupedLeads(Object.values(groupedData));
 
-             const selectedMonthIndex = new Date(Date.parse(selectedMonth + " 1, 2025")).getMonth();
+            const selectedMonthIndex = new Date(Date.parse(selectedMonth + " 1, 2025")).getMonth();
 
             // Filter leads by the selected month
             const filteredLeads = applicationDeclinedLeads.filter((lead) => {
@@ -163,7 +166,7 @@ export default function LeadTabs({ onTabChange, data,onMonthChange }) {
                 const leadMonthIndex = leadDate.getMonth(); // Get the month index (0 for January, 1 for February, etc.)
 
                 // Check if the lead's month matches the selected month and if the status is 'Funded - Invoice EAZE Client'
-                return leadMonthIndex === selectedMonthIndex 
+                return leadMonthIndex === selectedMonthIndex
             });
 
             console.log("Filtered Approved Leads: ", filteredLeads);
@@ -179,8 +182,8 @@ export default function LeadTabs({ onTabChange, data,onMonthChange }) {
             groupedData = groupLeadsByStatus(closedLostLeads);
             setGroupedLeads(Object.values(groupedData));
 
-            
-             const selectedMonthIndex = new Date(Date.parse(selectedMonth + " 1, 2025")).getMonth();
+
+            const selectedMonthIndex = new Date(Date.parse(selectedMonth + " 1, 2025")).getMonth();
 
             // Filter leads by the selected month
             const filteredLeads = closedLostLeads.filter((lead) => {
@@ -188,7 +191,7 @@ export default function LeadTabs({ onTabChange, data,onMonthChange }) {
                 const leadMonthIndex = leadDate.getMonth(); // Get the month index (0 for January, 1 for February, etc.)
 
                 // Check if the lead's month matches the selected month and if the status is 'Funded - Invoice EAZE Client'
-                return leadMonthIndex === selectedMonthIndex 
+                return leadMonthIndex === selectedMonthIndex
             });
 
             console.log("Filtered Approved Leads: ", filteredLeads);
@@ -205,7 +208,7 @@ export default function LeadTabs({ onTabChange, data,onMonthChange }) {
             groupedData = groupLeadsByStatus(allDeclinedLeads);
             setGroupedLeads(Object.values(groupedData));
 
-             const selectedMonthIndex = new Date(Date.parse(selectedMonth + " 1, 2025")).getMonth();
+            const selectedMonthIndex = new Date(Date.parse(selectedMonth + " 1, 2025")).getMonth();
 
             // Filter leads by the selected month
             const filteredLeads = allDeclinedLeads.filter((lead) => {
@@ -213,7 +216,7 @@ export default function LeadTabs({ onTabChange, data,onMonthChange }) {
                 const leadMonthIndex = leadDate.getMonth(); // Get the month index (0 for January, 1 for February, etc.)
 
                 // Check if the lead's month matches the selected month and if the status is 'Funded - Invoice EAZE Client'
-                return leadMonthIndex === selectedMonthIndex 
+                return leadMonthIndex === selectedMonthIndex
             });
 
             console.log("Filtered Approved Leads: ", filteredLeads);
@@ -226,12 +229,12 @@ export default function LeadTabs({ onTabChange, data,onMonthChange }) {
         }
 
         console.log('status', status);
-    }, [newLeads, preApprovedLeads, approvedLeads, applicationDeclinedLeads, closedLostLeads, allDeclinedLeads, tab,selectedMonth]);
+    }, [newLeads, preApprovedLeads, approvedLeads, applicationDeclinedLeads, closedLostLeads, allDeclinedLeads, tab, selectedMonth]);
 
 
     const handleMonthChange = (event) => {
         setSelectedMonth(event.target.value);
-        if(onMonthChange)onMonthChange(event.target.value);
+        if (onMonthChange) onMonthChange(event.target.value);
     };
     // ===================================================
     // UI SECTION COMPONENT
@@ -251,6 +254,8 @@ export default function LeadTabs({ onTabChange, data,onMonthChange }) {
                             <TableCell sx={{ width: 550 }}><strong>Phone</strong></TableCell>
                             <TableCell><strong>Email</strong></TableCell>
                             <TableCell><strong>Amount</strong></TableCell>
+                            <TableCell><strong>Cash Collected</strong></TableCell>
+                            <TableCell><strong>Invoice Paid Date</strong></TableCell>
                             <TableCell><strong>Agent Name</strong></TableCell>
                         </TableRow>
                     </TableHead>
@@ -277,6 +282,19 @@ export default function LeadTabs({ onTabChange, data,onMonthChange }) {
                                 <TableCell>
                                     ${row?.Loan_Amount__c?.toLocaleString() || 0} {/* Add $ symbol and format number */}
                                 </TableCell>
+                                <TableCell>
+                                    {row.Cash_Collected__c || 0}
+                                </TableCell>
+                                <TableCell>
+                                    {row.Invoice_Paid_Date__c
+                                        ? new Date(row.Invoice_Paid_Date__c).toLocaleDateString('en-US', {
+                                            month: '2-digit',
+                                            day: '2-digit',
+                                            year: 'numeric',
+                                        })
+                                        : '--'}
+                                </TableCell>
+
                                 <TableCell>{row?.agent || "-"}</TableCell>
                             </TableRow>
 
@@ -290,25 +308,25 @@ export default function LeadTabs({ onTabChange, data,onMonthChange }) {
     return (
         <Box sx={{ width: "100%", p: 3 }}>
             {/* Date Dropdown */}
-            {(tab == 0 ||tab == 1 ||tab == 2 || tab == 3 || tab == 4 || tab == 5 )&&
-             <div className="flex justify-end">
-                <FormControl sx={{ mb: 3, width: 200, }}>
-                    <InputLabel>Month</InputLabel>
-                    <Select
-                        value={selectedMonth}
-                        onChange={handleMonthChange}
-                        label="Month"
-                    >
-                        {['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'].map((month, index) => (
-                            <MenuItem key={index} value={month}>
-                                {month} 25
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-            </div>
+            {(tab == 0 || tab == 1 || tab == 2 || tab == 3 || tab == 4 || tab == 5) &&
+                <div className="flex justify-end">
+                    <FormControl sx={{ mb: 3, width: 200, }}>
+                        <InputLabel>Month</InputLabel>
+                        <Select
+                            value={selectedMonth}
+                            onChange={handleMonthChange}
+                            label="Month"
+                        >
+                            {['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'].map((month, index) => (
+                                <MenuItem key={index} value={month}>
+                                    {month} 25
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </div>
             }
-           
+
             {/* Tabs */}
             <Tabs
                 value={tab}
@@ -333,7 +351,7 @@ export default function LeadTabs({ onTabChange, data,onMonthChange }) {
             {/* New Leads Tab */}
             {(tab === 0 || tab === 1 || tab === 2 || tab === 3 || tab === 4 || tab === 5) && (
                 <Card sx={{ mt: 0, p: 2 }}>
-                    <CardContent sx={{mt:0}}>
+                    <CardContent sx={{ mt: 0 }}>
                         {groupedLeads.length === 0 ? (
                             <Typography variant="h6" align="center" sx={{ py: 3, color: "gray" }}>
                                 No data found
