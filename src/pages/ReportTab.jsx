@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { 
   Box, Paper, Select, MenuItem, FormControl, InputLabel, 
   Button, Table, TableBody, TableCell, TableContainer, 
-  TableHead, TableRow, Typography, Grid 
+  TableHead, TableRow, Typography, Grid, Divider 
 } from '@mui/material';
 import * as XLSX from 'xlsx';
 import { getSalesforceToken } from '../store/slices/authSlice';
@@ -14,7 +14,7 @@ const ReportTab = () => {
   const [statusFilter, setStatusFilter] = useState('Funded');
   const [monthFilter, setMonthFilter] = useState('');
 
-  // 1. Filtering Logic
+  // 1. Filtering Logic for Table & Top Tiles (Filtered View)
   const filteredData = useMemo(() => {
     return fundedData.filter((item) => {
       const matchesStatus = statusFilter === 'All' || 
@@ -28,32 +28,44 @@ const ReportTab = () => {
     });
   }, [fundedData, statusFilter, monthFilter]);
 
-  // 2. Metrics Calculations for Cards
-  const metrics = useMemo(() => {
-    const totalApplications = filteredData.length;
-    
-    // Sum Cash_Collected__c (Converting string to float)
-    const totalCash = filteredData.reduce((acc, item) => {
-      const val = parseFloat(item.Cash_Collected__c) || 0;
-      return acc + val;
-    }, 0);
+  // 2. Calculation Helper Function
+  const calculateMetrics = (data) => {
+    let cash = 0;
+    let loan = 0;
+    const breakdown = {};
 
-    // Group Cash Collected by Program Type
-    const cashByProgram = filteredData.reduce((acc, item) => {
+    data.forEach(item => {
+      const c = parseFloat(item.Cash_Collected__c) || 0;
+      const l = parseFloat(item.Loan_Amount__c) || 0;
       const type = item.Loan_Program_Type__c || 'Unknown';
-      const val = parseFloat(item.Cash_Collected__c) || 0;
-      acc[type] = (acc[type] || 0) + val;
-      return acc;
-    }, {});
 
-    return { totalApplications, totalCash, cashByProgram };
-  }, [filteredData]);
+      cash += c;
+      loan += l;
+      if (!breakdown[type]) breakdown[type] = { cash: 0, loan: 0 };
+      breakdown[type].cash += c;
+      breakdown[type].loan += l;
+    });
 
-  // 3. Dynamic Columns
+    return { count: data.length, cash, loan, breakdown };
+  };
+
+  // 3. Generate Metrics for both Sections
+  const filteredMetrics = useMemo(() => calculateMetrics(filteredData), [filteredData]);
+  
+  const yearlyMetrics = useMemo(() => {
+    // Filter data specifically for the year 2026 only
+    const yearData = fundedData.filter(item => {
+        const d = new Date(item.CreatedDate);
+        return d.getFullYear() === 2026;
+    });
+    return calculateMetrics(yearData);
+  }, [fundedData]);
+
+  // 4. Dynamic Columns
   const columns = useMemo(() => {
-    if (filteredData.length === 0) return [];
-    return Object.keys(filteredData[0]).filter(key => key !== 'Id' && key !== 'attributes');
-  }, [filteredData]);
+    if (fundedData.length === 0) return [];
+    return Object.keys(fundedData[0]).filter(key => key !== 'Id' && key !== 'attributes');
+  }, [fundedData]);
 
   const downloadExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(filteredData);
@@ -65,7 +77,7 @@ const ReportTab = () => {
   const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const dispatch = useDispatch();
 const { salesforceToken, portalUserId } = useSelector((state) => state.auth);
-   useEffect(() => {
+  useEffect(() => {
       if (!salesforceToken) {
         dispatch(getSalesforceToken()); // Fetch the Salesforce token if not available
       } else {
@@ -73,89 +85,97 @@ const { salesforceToken, portalUserId } = useSelector((state) => state.auth);
       }
     }, [dispatch, salesforceToken]);
 
-  return (
-    <Box sx={{ p: 3 }} className="bg-gray-100 min-h-screen p-6">
-      <Typography variant="h5" sx={{ mb: 3, fontWeight: 'bold' }}>Funded Report Dashboard</Typography>
-
-      {/* --- DASHBOARD CARDS SECTION --- */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        {/* Total Funded (Cash Collected) */}
-        <Grid item xs={12} sm={4}>
-          <Paper sx={{ p: 3, textAlign: 'center', bgcolor: '#f0f9ff', borderLeft: '5px solid #00a3ff' }}>
-            <Typography variant="overline" color="textSecondary">Total Cash Collected</Typography>
-            <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#0070d2' }}>
-              ${metrics.totalCash.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-            </Typography>
+  // Reusable Tile Component
+  const MetricTiles = ({ title, data, colorScheme }) => (
+    <Box sx={{ mb: 4 }}>
+      <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold', color: '#546e7a' }}>{title}</Typography>
+      <Grid container spacing={2}>
+        <Grid item xs={12} sm={6} md={3}>
+          <Paper sx={{ p: 2, textAlign: 'center', borderTop: `4px solid ${colorScheme.app}` }}>
+            <Typography variant="overline" color="textSecondary">Applications</Typography>
+            <Typography variant="h5" sx={{ fontWeight: 'bold' }}>{data.count}</Typography>
           </Paper>
         </Grid>
-
-        {/* Total Applications */}
-        <Grid item xs={12} sm={4}>
-          <Paper sx={{ p: 3, textAlign: 'center', bgcolor: '#f0fff4', borderLeft: '5px solid #48bb78' }}>
-            <Typography variant="overline" color="textSecondary">Total Applications</Typography>
-            <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#2f855a' }}>
-              {metrics.totalApplications}
-            </Typography>
+        <Grid item xs={12} sm={6} md={3}>
+          <Paper sx={{ p: 2, textAlign: 'center', borderTop: `4px solid ${colorScheme.cash}` }}>
+            <Typography variant="overline" color="textSecondary">Cash Collected</Typography>
+            <Typography variant="h5" sx={{ fontWeight: 'bold' }}>${data.cash.toLocaleString()}</Typography>
           </Paper>
         </Grid>
-
-        {/* Cash by Program (Small Scrollable List) */}
-        <Grid item xs={12} sm={4}>
-          <Paper sx={{ p: 2, height: '100%', maxHeight: 120, overflowY: 'auto', bgcolor: '#fffaf0', borderLeft: '5px solid #ed8936' }}>
-            <Typography variant="caption" sx={{ fontWeight: 'bold', display: 'block', mb: 1 }}>By Program Type</Typography>
-            {Object.entries(metrics.cashByProgram).map(([type, total]) => (
-              <Box key={type} sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                <Typography variant="caption">{type}:</Typography>
-                <Typography variant="caption" sx={{ fontWeight: 'bold' }}>${total.toLocaleString()}</Typography>
-              </Box>
-            ))}
+        <Grid item xs={12} sm={6} md={3}>
+          <Paper sx={{ p: 2, textAlign: 'center', borderTop: `4px solid ${colorScheme.loan}` }}>
+            <Typography variant="overline" color="textSecondary">Loan Amount</Typography>
+            <Typography variant="h5" sx={{ fontWeight: 'bold' }}>${data.loan.toLocaleString()}</Typography>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Paper sx={{ p: 1.5, height: '100%', bgcolor: '#f8fafc' }}>
+            <Typography variant="caption" sx={{ fontWeight: 'bold', display: 'block', mb: 1, textAlign: 'center' }}>Breakdown (Cash | Loan)</Typography>
+            <Box sx={{ maxHeight: 60, overflowY: 'auto' }}>
+              {Object.entries(data.breakdown).map(([type, vals]) => (
+                <Box key={type} sx={{ display: 'flex', justifyContent: 'space-between', px: 1 }}>
+                  <Typography sx={{ fontSize: '0.65rem', fontWeight: 'bold' }}>{type}</Typography>
+                  <Typography sx={{ fontSize: '0.65rem' }}>${vals.cash.toLocaleString()} | ${vals.loan.toLocaleString()}</Typography>
+                </Box>
+              ))}
+            </Box>
           </Paper>
         </Grid>
       </Grid>
+    </Box>
+  );
 
-      {/* --- FILTERS SECTION --- */}
-      <Paper sx={{ p: 2, mb: 3, display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
-        <FormControl size="small" sx={{ minWidth: 150 }}>
+  return (
+    <Box sx={{ p: 3 }} className="bg-gray-100 min-h-screen p-6">
+      {/* SECTION 1: SELECTED VIEW (FILTERED) */}
+      <MetricTiles 
+        title={monthFilter === '' ? "Current View (All Months)" : `Current View (${months[monthFilter]})`} 
+        data={filteredMetrics} 
+        colorScheme={{ app: '#48bb78', cash: '#00a3ff', loan: '#f56565' }} 
+      />
+
+      <Divider sx={{ my: 4 }} />
+
+      {/* SECTION 2: THIS YEAR (TOTAL 2026) */}
+      <MetricTiles 
+        title="Performance: This Year (2026)" 
+        data={yearlyMetrics} 
+        colorScheme={{ app: '#81c784', cash: '#4fc3f7', loan: '#e57373' }} 
+      />
+
+      {/* FILTERS & TABLE */}
+      <Paper sx={{ p: 2, mb: 3, display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap',  }}>
+        <FormControl size="small" sx={{ minWidth: 150, bgcolor: 'white' }}>
           <InputLabel>Status</InputLabel>
           <Select value={statusFilter} label="Status" onChange={(e) => setStatusFilter(e.target.value)}>
             <MenuItem value="All">All</MenuItem>
             <MenuItem value="Funded">Funded</MenuItem>
           </Select>
         </FormControl>
-
-        <FormControl size="small" sx={{ minWidth: 150 }}>
-          <InputLabel>Month (2026)</InputLabel>
-          <Select value={monthFilter} label="Month (2026)" onChange={(e) => setMonthFilter(e.target.value)}>
+        <FormControl size="small" sx={{ minWidth: 150, bgcolor: 'white' }}>
+          <InputLabel>Month</InputLabel>
+          <Select value={monthFilter} label="Month" onChange={(e) => setMonthFilter(e.target.value)}>
             <MenuItem value="">All Months</MenuItem>
-            {months.map((m, index) => (
-              <MenuItem key={m} value={index}>{m}</MenuItem>
-            ))}
+            {months.map((m, index) => <MenuItem key={m} value={index}>{m}</MenuItem>)}
           </Select>
         </FormControl>
-
-        <Button variant="contained" color="success" onClick={downloadExcel} sx={{ ml: { md: 'auto' } }}>
-          Download Excel
-        </Button>
+        <Button variant="contained" color="success" onClick={downloadExcel} sx={{ ml: 'auto' }}>Download Excel</Button>
       </Paper>
 
-      {/* --- DATA TABLE --- */}
-      <TableContainer component={Paper} sx={{ maxHeight: 500 }}>
+      <TableContainer component={Paper} sx={{ maxHeight: 400 }}>
         <Table stickyHeader size="small">
           <TableHead>
             <TableRow>
               {columns.map((col) => (
-                <TableCell key={col} sx={{ fontWeight: 'bold', bgcolor: '#f8f9fa' }}>
-                  {col.replace('__c', '').replace(/_/g, ' ')}
-                </TableCell>
+                <TableCell key={col} sx={{ fontWeight: 'bold', bgcolor: '#eceff1', whiteSpace: 'nowrap',
+                                                minWidth: '150px'}}>{col.replace('__c', '').replace(/_/g, ' ')}</TableCell>
               ))}
             </TableRow>
           </TableHead>
           <TableBody>
             {filteredData.map((row, index) => (
               <TableRow key={index} hover>
-                {columns.map((col) => (
-                  <TableCell key={col}>{row[col]?.toString() || '-'}</TableCell>
-                ))}
+                {columns.map((col) => <TableCell key={col}>{row[col]?.toString() || '-'}</TableCell>)}
               </TableRow>
             ))}
           </TableBody>

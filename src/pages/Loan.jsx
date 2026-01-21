@@ -97,6 +97,8 @@ function Loan() {
         }, 0);
 
         console.log("This month cash collected:", totalCashThisMonth);
+        console.log(loanByTypeAllTime,'loanByTypeAllTime')
+        console.log(cashCollectedAllTime,'cashCollectedAllTime')
     }, [loanByTypeThisMonth, loanByTypeAllTime, cashCollectedThisMonth, cashCollectedAllTime, totalApproved]);
 
     // --- CLICK HANDLERS ---
@@ -217,7 +219,7 @@ function Loan() {
 
                                 // Get the year from the record and the year for "Last Year"
                                 const recordYear = new Date(item.CreatedDate).getFullYear();
-                                const lastYear = new Date().getFullYear() - 1;
+                                const lastYear = new Date().getFullYear() ;
 
                                 return recordYear === lastYear;
                             })
@@ -236,7 +238,7 @@ function Loan() {
                         ${cashCollectedAllTime
                             .filter(item => {
                                 if (!item.CreatedDate) return false;
-                                return new Date(item.CreatedDate).getFullYear() === new Date().getFullYear() - 1;
+                                return new Date(item.CreatedDate).getFullYear() === new Date().getFullYear() ;
                             })
                             .map(item => Number(item.Loan_Amount__c || 0))
                             .reduce((sum, amount) => sum + amount, 0)
