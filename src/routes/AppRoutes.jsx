@@ -13,6 +13,7 @@ import Loan from '../pages/Loan';
 import ForgotPasswordPage2 from '../pages/ForgotPasswordPage2';
 import ResetPasswordPage from '../pages/ResetPasswordPage';
 import ForgotResetPasswordPage from '../pages/ForgotPasswordPage2';
+import ReportTab from '../pages/ReportTab';
 
 const AppRoutes = () => {
   return (
@@ -25,6 +26,7 @@ const AppRoutes = () => {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/applications" element={<Applications />} />
           <Route path="/loan" element={<Loan />} />
+          <Route path="/report" element={<ReportTab />} />
         </Route>
         
         {/* Routes that don't need the sidebar */}

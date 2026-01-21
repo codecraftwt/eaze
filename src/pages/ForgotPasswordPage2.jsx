@@ -160,16 +160,16 @@ const ForgotResetPasswordPage = () => {
             // Show Forgot Password form if no token in the URL
             <>
               <h2 className="text-3xl font-semibold text-blue-600">Forgot Your Password?</h2>
-              <p className="mt-2 text-gray-500">Enter your email address to reset your password.</p>
+              <p className="mt-2 text-gray-500">Enter your Username to reset your password.</p>
 
               <form onSubmit={handleForgotPasswordSubmit} className="mt-8 space-y-6">
                 <div className="flex flex-col">
-                  <label className="text-sm text-gray-600">Email Address</label>
+                  <label className="text-sm text-gray-600">Username</label>
                   <input
                     type="email"
                     value={email}
                     onChange={handleEmailChange}
-                    placeholder="Enter your email"
+                    placeholder="Enter your username"
                     className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-600"
                     required
                   />

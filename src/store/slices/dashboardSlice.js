@@ -185,7 +185,21 @@ export const getCashCollectedAllTime = createAsyncThunk(
     }
   }
 );
-
+export const getFundedData = createAsyncThunk(
+  'dashboard/getFundedData',
+  async ({ accountId, token }, { rejectWithValue }) => {
+    try {
+      const data = await fetchData(
+        'getfundeddata', 
+        { accountId, leadSource: LEADSOURCE }, 
+        token
+      );
+      return data?.data || [];
+    } catch (err) {
+      return rejectWithValue(err);
+    }
+  }
+);
 
 export const transformLeadData = (data) => {
   return data.map(item => {
@@ -223,6 +237,7 @@ const dashboardSlice = createSlice({
   loanByTypeAllTime: [],
   cashCollectedThisMonth: [],
   cashCollectedAllTime: [],
+  fundedData: [],
     status: 'idle', // 'loading', 'succeeded', 'failed'
     error: null,
   },
@@ -389,6 +404,19 @@ const dashboardSlice = createSlice({
   state.cashCollectedAllTime = action.payload;
 })
 .addCase(getCashCollectedAllTime.rejected, (state, action) => {
+  state.status = 'failed';
+  state.error = action.payload || action.error.message;
+})
+
+// Funded Data
+.addCase(getFundedData.pending, (state) => {
+  state.status = 'loading';
+})
+.addCase(getFundedData.fulfilled, (state, action) => {
+  state.status = 'succeeded';
+  state.fundedData = action.payload;
+})
+.addCase(getFundedData.rejected, (state, action) => {
   state.status = 'failed';
   state.error = action.payload || action.error.message;
 })

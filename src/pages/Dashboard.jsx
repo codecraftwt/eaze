@@ -1,9 +1,10 @@
 import React, { use, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getTotalApplicationsThisMonth, getTotalApplications, getApprovedThisMonth, getTotalApproved, getDeclinedThisMonth, getTotalDeclined, getPreApprovedThisMonth, getTotalPreApproved, getTotalDeclinePercent, getTopDeclineReason, getLoanByTypeThisMonth, getLoanByTypeAllTime, getCashCollectedThisMonth, getCashCollectedAllTime } from '../store/slices/dashboardSlice'; // Ensure correct imports
+import { getTotalApplicationsThisMonth, getTotalApplications, getApprovedThisMonth, getTotalApproved, getDeclinedThisMonth, getTotalDeclined, getPreApprovedThisMonth, getTotalPreApproved, getTotalDeclinePercent, getTopDeclineReason, getLoanByTypeThisMonth, getLoanByTypeAllTime, getCashCollectedThisMonth, getCashCollectedAllTime, getFundedData } from '../store/slices/dashboardSlice'; // Ensure correct imports
 import { getSalesforceToken } from '../store/slices/authSlice'; // Ensure correct import
 import { BarChart } from '@mui/x-charts/BarChart';
 import PopupModal from '../components/PopupModal';
+import FundedByProgramChart from '../components/FundedByProgramChart';
 
 export function valueFormatter(value) {
   return `${value}mm`;
@@ -64,8 +65,9 @@ function Dashboard() {
     totalPreApproved,
     totalDeclinePercent,
     topDeclineReason,
+    fundedData
   } = useSelector((state) => state.dashboard);
-const [selectedYear, setSelectedYear] = useState('2026');
+  const [selectedYear, setSelectedYear] = useState('2026');
   const [isModalOpen, setModalOpen] = useState(false);
   const [isModalAllOpen, setModalAllOpen] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState('Jan 25');
@@ -367,37 +369,37 @@ const [selectedYear, setSelectedYear] = useState('2026');
   // this month
 
   function formatLeadsByStatusUpdated(data, categoryMap, yearToFilter) {
-  // Dynamically generate labels like "Jan 26" or "Jan 25"
-  const shortYear = yearToFilter.slice(-2); 
-  const months = [
-    `Jan ${shortYear}`, `Feb ${shortYear}`, `Mar ${shortYear}`, `Apr ${shortYear}`, 
-    `May ${shortYear}`, `Jun ${shortYear}`, `Jul ${shortYear}`, `Aug ${shortYear}`,
-    `Sep ${shortYear}`, `Oct ${shortYear}`, `Nov ${shortYear}`, `Dec ${shortYear}`
-  ];
+    // Dynamically generate labels like "Jan 26" or "Jan 25"
+    const shortYear = yearToFilter.slice(-2);
+    const months = [
+      `Jan ${shortYear}`, `Feb ${shortYear}`, `Mar ${shortYear}`, `Apr ${shortYear}`,
+      `May ${shortYear}`, `Jun ${shortYear}`, `Jul ${shortYear}`, `Aug ${shortYear}`,
+      `Sep ${shortYear}`, `Oct ${shortYear}`, `Nov ${shortYear}`, `Dec ${shortYear}`
+    ];
 
-  const approved = new Array(12).fill(0);
-  const current = new Array(12).fill(0);
-  const declined = new Array(12).fill(0);
+    const approved = new Array(12).fill(0);
+    const current = new Array(12).fill(0);
+    const declined = new Array(12).fill(0);
 
-  data.forEach(lead => {
-    const parsedDate = new Date(lead.CreatedDate);
-    const month = parsedDate.getMonth();
-    const year = parsedDate.getFullYear();
+    data.forEach(lead => {
+      const parsedDate = new Date(lead.CreatedDate);
+      const month = parsedDate.getMonth();
+      const year = parsedDate.getFullYear();
 
-    // Only process the data for the year selected in the dropdown
-    if (year.toString() === yearToFilter) {
-      if (categoryMap.approved.includes(lead.Status)) {
-        approved[month] += 1;
-      } else if (categoryMap.declined.includes(lead.Status)) {
-        declined[month] += 1;
-      } else if (categoryMap.preApproved.includes(lead.Status)) {
-        current[month] += 1;
+      // Only process the data for the year selected in the dropdown
+      if (year.toString() === yearToFilter) {
+        if (categoryMap.approved.includes(lead.Status)) {
+          approved[month] += 1;
+        } else if (categoryMap.declined.includes(lead.Status)) {
+          declined[month] += 1;
+        } else if (categoryMap.preApproved.includes(lead.Status)) {
+          current[month] += 1;
+        }
       }
-    }
-  });
+    });
 
-  return { months, approved, current, declined };
-}
+    return { months, approved, current, declined };
+  }
   function formatLeadsByStatusUpdatedNew(data, categoryMap) {
     // Initialize arrays for Approved, Current (Pre-Approved), Declined, and Closed Lost counts
     const months = [
@@ -517,6 +519,8 @@ const [selectedYear, setSelectedYear] = useState('2026');
       dispatch(getLoanByTypeAllTime({ accountId: portalUserId, token: salesforceToken }));
       dispatch(getCashCollectedThisMonth({ accountId: portalUserId, token: salesforceToken }));
       dispatch(getCashCollectedAllTime({ accountId: portalUserId, token: salesforceToken }));
+
+      dispatch(getFundedData({ accountId: portalUserId, token: salesforceToken }));
     }
   }, [dispatch, salesforceToken]);
 
@@ -547,7 +551,7 @@ const [selectedYear, setSelectedYear] = useState('2026');
         item.Status.toLowerCase().startsWith("declined"));
       console.log([...new Set(closedLost.map(item => item.Status))], 'declined status')
       setGroupedAllMonthData(result);
-      const barChat = formatLeadsByStatusUpdated(totalApplications, categoryMap,selectedYear);
+      const barChat = formatLeadsByStatusUpdated(totalApplications, categoryMap, selectedYear);
       // const barChatNew = formatLeadsByStatusUpdatedNew(totalApplications, categoryMap);
       // console.log(barChatNew, 'barChatNew')
       console.log(barChat, 'barChat')
@@ -572,6 +576,10 @@ const [selectedYear, setSelectedYear] = useState('2026');
       console.log(totalDeclinePercent, 'totalDeclinePercent')
     }
 
+    if (fundedData.length !== 0) {
+      console.log(fundedData, 'fundedData')
+    }
+
   }, [
     totalApplicationsThisMonth,
     approvedApplicationsThisMonth,
@@ -582,7 +590,8 @@ const [selectedYear, setSelectedYear] = useState('2026');
     totalDeclined,
     totalPreApproved,
     totalDeclinePercent,
-    selectedYear
+    selectedYear,
+    fundedData
   ]);
 
   useEffect(() => {
@@ -683,18 +692,18 @@ const [selectedYear, setSelectedYear] = useState('2026');
       {/* <MonthlySummaryChart /> */}
       <div className="bg-white p-6 rounded-lg shadow-md mt-6">
         <div className="flex justify-between items-center mb-4">
-    <h3 className="text-xl font-semibold">Monthly Summary</h3>
-    
-    {/* Year Dropdown */}
-    <select
-      value={selectedYear}
-      onChange={(e) => setSelectedYear(e.target.value)}
-      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
-    >
-      <option value="2025">2025</option>
-      <option value="2026">2026</option>
-    </select>
-  </div>
+          <h3 className="text-xl font-semibold">Monthly Summary</h3>
+
+          {/* Year Dropdown */}
+          <select
+            value={selectedYear}
+            onChange={(e) => setSelectedYear(e.target.value)}
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+          >
+            <option value="2025">2025</option>
+            <option value="2026">2026</option>
+          </select>
+        </div>
         {barChartData?.months.length > 0 ||
           barChartData?.approved.length > 0 || barChartData?.declined.length > 0 ||
           barChartData?.current.length > 0 ? (
@@ -710,6 +719,17 @@ const [selectedYear, setSelectedYear] = useState('2026');
         ) : (
           <div>No data available</div> // Fallback message when no data exists
         )}
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Use lg:col-span-2 to give the chart enough horizontal space for labels */}
+        <div className="lg:col-span-2">
+          <FundedByProgramChart fundedData={fundedData} />
+        </div>
+
+        {/* Other cards can stay col-span-1 */}
+        <div>
+          {/* Another Card */}
+        </div>
       </div>
       <PopupModal groupedData={groupedThisMonthData} isActive={isActive} isOpen={isModalOpen} onClose={closeModal} title="Declined Summary" content="Declined — Client Does Not Meet Minimum Credit Requirements" />
       <PopupModal groupedData={groupedAllMonthData} isActive={isActive} isOpen={isModalAllOpen} onClose={closeAllModal} title="Declined Summary" content="Declined — Client Does Not Meet Minimum Credit Requirements" />
