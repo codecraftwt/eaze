@@ -1,11 +1,13 @@
-import React, { useState, useMemo } from 'react';
-import { useSelector } from 'react-redux';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { 
   Box, Paper, Select, MenuItem, FormControl, InputLabel, 
   Button, Table, TableBody, TableCell, TableContainer, 
   TableHead, TableRow, Typography, Grid 
 } from '@mui/material';
 import * as XLSX from 'xlsx';
+import { getSalesforceToken } from '../store/slices/authSlice';
+import { getFundedData } from '../store/slices/dashboardSlice';
 
 const ReportTab = () => {
   const { fundedData } = useSelector((state) => state.dashboard);
@@ -61,9 +63,18 @@ const ReportTab = () => {
   };
 
   const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const dispatch = useDispatch();
+const { salesforceToken, portalUserId } = useSelector((state) => state.auth);
+   useEffect(() => {
+      if (!salesforceToken) {
+        dispatch(getSalesforceToken()); // Fetch the Salesforce token if not available
+      } else {
+        dispatch(getFundedData({ accountId: portalUserId, token: salesforceToken }));
+      }
+    }, [dispatch, salesforceToken]);
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 3 }} className="bg-gray-100 min-h-screen p-6">
       <Typography variant="h5" sx={{ mb: 3, fontWeight: 'bold' }}>Funded Report Dashboard</Typography>
 
       {/* --- DASHBOARD CARDS SECTION --- */}
