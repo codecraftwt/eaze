@@ -5,6 +5,7 @@ import { getSalesforceToken } from '../store/slices/authSlice'; // Ensure correc
 import { BarChart } from '@mui/x-charts/BarChart';
 import PopupModal from '../components/PopupModal';
 import FundedByProgramChart from '../components/FundedByProgramChart';
+import LeadPerformanceChart from '../components/LeadPerformanceChart';
 
 export function valueFormatter(value) {
   return `${value}mm`;
@@ -727,8 +728,9 @@ function Dashboard() {
         </div>
 
         {/* Other cards can stay col-span-1 */}
-        <div>
+        <div className="lg:col-span-2">
           {/* Another Card */}
+          <LeadPerformanceChart data={fundedData}/>
         </div>
       </div>
       <PopupModal groupedData={groupedThisMonthData} isActive={isActive} isOpen={isModalOpen} onClose={closeModal} title="Declined Summary" content="Declined — Client Does Not Meet Minimum Credit Requirements" />

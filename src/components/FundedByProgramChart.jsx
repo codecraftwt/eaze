@@ -53,7 +53,7 @@ const FundedByProgramChart = ({ fundedData }) => {
         />
       </Box>
       
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1, alignItems: 'center' }}>
+      {/* <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1, alignItems: 'center' }}>
         <Link 
           href="#" 
           underline="hover" 
@@ -64,7 +64,7 @@ const FundedByProgramChart = ({ fundedData }) => {
         <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.7rem' }}>
           As of Jan 21, 2026
         </Typography>
-      </Box>
+      </Box> */}
     </Paper>
   );
 };

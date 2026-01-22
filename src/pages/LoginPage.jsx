@@ -5,13 +5,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { loginUser, getSalesforceToken } from "../store/slices/authSlice";
 import { toast } from "react-toastify";
 import logo from '../assets/image.png';
-
+import sample from '../assets/image (5).png';
+import { FaInfoCircle } from "react-icons/fa";
 const LoginPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const { status, error, salesforceToken } = useSelector((state) => state.auth);
-
+const [showTooltip, setShowTooltip] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -89,6 +90,36 @@ const LoginPage = () => {
           </div>
 
           <h2 className="text-3xl font-semibold text-blue-600">Welcome Back</h2>
+          {/* --- ADDED NOTE SECTION --- */}
+          <div className="mt-4 p-3 bg-blue-50 border-l-4 border-blue-500 rounded flex items-start space-x-2 relative">
+            <p className="text-xs text-blue-800 leading-relaxed">
+              <strong>Note:</strong> After creating an account or resetting your password, you will receive a <b>username</b> in your email. Please use that username to log in here.
+            </p>
+            
+            {/* Info Icon with Hover Logic */}
+            <div 
+              className="cursor-pointer text-blue-600 mt-1"
+              onMouseEnter={() => setShowTooltip(true)}
+              onMouseLeave={() => setShowTooltip(false)}
+            >
+              <FaInfoCircle size={16} />
+              
+              {/* Tooltip Image Preview */}
+              {showTooltip && (
+                <div className="absolute z-[100] top-full left-1/2 transform -translate-x-1/2 mt-2 p-2 bg-white border border-gray-200 shadow-2xl rounded-lg w-72">
+                  <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-white border-t border-l rotate-45"></div>
+                  <p className="text-[10px] text-gray-500 mb-1 text-center">Example: Check your email inbox</p>
+                  <img 
+                    src={sample} 
+                    alt="Email Preview" 
+                    className="rounded border"
+                  />
+                  {/* <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-white border-b border-r rotate-45"></div> */}
+                </div>
+              )}
+            </div>
+          </div>
+          {/* -------------------------- */}
           <p className="mt-2 text-gray-500">
             Sign in to access your applications and dashboard.
           </p>
