@@ -7,7 +7,7 @@ import {
 } from '@mui/material';
 import * as XLSX from 'xlsx';
 import { getSalesforceToken } from '../store/slices/authSlice';
-import { getFundedData } from '../store/slices/dashboardSlice';
+import { getFundedData, getTotalApproved } from '../store/slices/dashboardSlice';
 
 const ReportTab = () => {
   const { fundedData } = useSelector((state) => state.dashboard);
@@ -77,11 +77,19 @@ const ReportTab = () => {
   const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const dispatch = useDispatch();
 const { salesforceToken, portalUserId } = useSelector((state) => state.auth);
+const {
+        totalApproved,
+        loanByTypeThisMonth,
+        loanByTypeAllTime,
+        cashCollectedThisMonth,
+        cashCollectedAllTime,
+    } = useSelector((state) => state.dashboard);
   useEffect(() => {
       if (!salesforceToken) {
         dispatch(getSalesforceToken()); // Fetch the Salesforce token if not available
       } else {
         dispatch(getFundedData({ accountId: portalUserId, token: salesforceToken }));
+        dispatch(getTotalApproved({ accountId: portalUserId, token: salesforceToken }));
       }
     }, [dispatch, salesforceToken]);
 
@@ -127,6 +135,14 @@ const { salesforceToken, portalUserId } = useSelector((state) => state.auth);
 
   return (
     <Box sx={{ p: 3 }} className="bg-gray-100 min-h-screen p-6">
+      <header className="bg-white p-4 shadow rounded-md mb-6">
+                <div className="flex justify-between items-center">
+                    <h1 className="text-xl font-semibold">Report</h1>
+                    <p className="text-sm text-gray-500 ">
+                        {totalApproved[0]?.Account_Name__c}
+                    </p>
+                </div>
+            </header>
       {/* SECTION 1: SELECTED VIEW (FILTERED) */}
       <MetricTiles 
         title={monthFilter === '' ? "Current View (All Months)" : `Current View (${months[monthFilter]})`} 
