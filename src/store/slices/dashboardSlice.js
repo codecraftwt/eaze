@@ -201,6 +201,22 @@ export const getFundedData = createAsyncThunk(
   }
 );
 
+export const getCashCollectedLastMonth = createAsyncThunk(
+  'dashboard/getCashCollectedLastMonth',
+  async ({ accountId, token }, { rejectWithValue }) => {
+    try {
+      const data = await fetchData(
+        'getcashcollectedamountlastmonth', // Assumed endpoint based on pattern
+        { accountId, leadSource: LEADSOURCE },
+        token
+      );
+      return data?.data || [];
+    } catch (err) {
+      return rejectWithValue(err);
+    }
+  }
+);
+
 export const transformLeadData = (data) => {
   return data.map(item => {
     const updatedItem = { ...item };
@@ -236,6 +252,7 @@ const dashboardSlice = createSlice({
     loanByTypeThisMonth: [],
   loanByTypeAllTime: [],
   cashCollectedThisMonth: [],
+  cashCollectedLastMonth: [],
   cashCollectedAllTime: [],
   fundedData: [],
     status: 'idle', // 'loading', 'succeeded', 'failed'
@@ -394,6 +411,18 @@ const dashboardSlice = createSlice({
   state.status = 'failed';
   state.error = action.payload || action.error.message;
 })
+
+.addCase(getCashCollectedLastMonth.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(getCashCollectedLastMonth.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.cashCollectedLastMonth = action.payload;
+      })
+      .addCase(getCashCollectedLastMonth.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload || action.error.message;
+      })
 
 // Cash Collected – All Time
 .addCase(getCashCollectedAllTime.pending, (state) => {

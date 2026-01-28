@@ -137,7 +137,7 @@ const {
     <Box sx={{ p: 3 }} className="bg-gray-100 min-h-screen p-6">
       <header className="bg-white p-4 shadow rounded-md mb-6">
                 <div className="flex justify-between items-center">
-                    <h1 className="text-xl font-semibold">Report</h1>
+                    <h1 className="text-xl font-semibold">Funded</h1>
                     <p className="text-sm text-gray-500 ">
                         {totalApproved[0]?.Account_Name__c}
                     </p>

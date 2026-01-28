@@ -83,6 +83,13 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           {isOpen && <span className="transition-opacity duration-300 ease-in-out">Applications</span>}
         </Link>
         <Link
+          to="/report"
+          className={`flex items-center space-x-3 py-2 px-3 rounded-xl transition-all duration-300 ease-in-out ${isActive("/report")}`}
+        >
+          <ClipboardList size={20} className="transition-all duration-300 ease-in-out" />
+          {isOpen && <span className="transition-opacity duration-300 ease-in-out">My Report</span>}
+        </Link>
+        <Link
           to="/loan"
           className={`flex items-center space-x-3 py-2 px-3 rounded-xl transition-all duration-300 ease-in-out ${isActive("/loan")}`}
         >
@@ -90,11 +97,11 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           {isOpen && <span className="transition-opacity duration-300 ease-in-out">loan</span>}
         </Link>
         <Link
-          to="/report"
-          className={`flex items-center space-x-3 py-2 px-3 rounded-xl transition-all duration-300 ease-in-out ${isActive("/report")}`}
+          to="/funded"
+          className={`flex items-center space-x-3 py-2 px-3 rounded-xl transition-all duration-300 ease-in-out ${isActive("/funded")}`}
         >
           <HandCoins size={20} className="transition-all duration-300 ease-in-out" />
-          {isOpen && <span className="transition-opacity duration-300 ease-in-out">Report</span>}
+          {isOpen && <span className="transition-opacity duration-300 ease-in-out">Funded</span>}
         </Link>
 
         <Link
