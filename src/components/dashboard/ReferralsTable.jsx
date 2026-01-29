@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getSalesforceToken } from "../../store/slices/authSlice";
 import { getTotalApplications } from "../../store/slices/dashboardSlice";
 import { isSameMonth } from "date-fns";
+import { getMonthAndYear } from "../../lib/dateUtils";
 // Vibrant status colors with light backgrounds and colored text
 export function getStatusStyles(status) {
   switch (status) {
@@ -51,6 +52,7 @@ export function ReferralsTable({ onViewAll, selectedDate }) {
 
 
   const dispatch = useDispatch();
+   const { month, year } = getMonthAndYear(selectedDate)
   const { salesforceToken, portalUserId } = useSelector((state) => state.auth);
   const {
     cashCollectedAllTime, totalApplications
@@ -60,7 +62,7 @@ export function ReferralsTable({ onViewAll, selectedDate }) {
     if (!salesforceToken) {
       dispatch(getSalesforceToken());
     } else {
-      dispatch(getTotalApplications({ accountId: portalUserId, token: salesforceToken }));
+      dispatch(getTotalApplications({ accountId: portalUserId, token: salesforceToken,month:month,year:year }));
 
     }
   }, [dispatch, salesforceToken, selectedDate]);
@@ -72,6 +74,8 @@ export function ReferralsTable({ onViewAll, selectedDate }) {
       return isSameMonth(appDate, selectedDate);
     });
   }, [totalApplications, selectedDate]);
+
+  console.log(filteredApplicationsNew,'filteredApplicationsNew')
   return (
     <Card className="p-3 md:p-5 shadow-sm border border-border rounded-xl md:rounded-2xl bg-card">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
@@ -114,40 +118,58 @@ export function ReferralsTable({ onViewAll, selectedDate }) {
         </div> */}
       </div>
       <div className="space-y-1">
-        <div className="grid grid-cols-3 md:grid-cols-[2fr_1fr_1fr_1fr] gap-0 text-xs text-muted-foreground font-medium py-2 border-b border-border text-[#707a8f]">
-          <span>Name</span>
-          {/* <span>Status</span> */}
-          <span className="hidden md:block">Program</span>
-          <span className="text-right">Amount</span>
+  {/* Table Header: Updated to 6 columns */}
+  <div className="grid grid-cols-3 md:grid-cols-[1.5fr_1fr_1fr_1.5fr_1fr_1fr] gap-4 text-xs text-muted-foreground font-medium py-2 border-b border-border text-[#707a8f] px-2">
+    <span>Name</span>
+    <span className="hidden md:block">Program</span>
+    <span className="text-right">Cash</span>
+    <span className="text-right hidden md:block">Email</span>
+    <span className="text-right hidden md:block">Mobile</span>
+    <span className="text-right">Loan Amount</span>
+  </div>
+
+  <ScrollArea className="h-[300px] md:h-[400px]">
+    {filteredApplicationsNew.map((application, index) => (
+      <div
+        key={application.Id || index}
+        className="grid grid-cols-3 md:grid-cols-[1.5fr_1fr_1fr_1.5fr_1fr_1fr] gap-4 items-center py-2 hover:bg-muted/50 rounded-lg px-2 transition-colors cursor-pointer group"
+      >
+        {/* 1. Name */}
+        <span className="font-medium text-foreground text-xs md:text-sm truncate">
+          {application.Name}
+        </span>
+
+        {/* 2. Program (Hidden on mobile) */}
+        <span className="text-muted-foreground text-xs md:text-sm hidden md:block truncate">
+          {application.Loan_Program_Type__c}
+        </span>
+
+        {/* 3. Cash Collected */}
+        <span className="text-right text-foreground text-xs md:text-sm font-medium">
+          {application.Cash_Collected__c ? `$${Number(application.Cash_Collected__c).toLocaleString()}` : '--'}
+        </span>
+
+        {/* 4. Email (Hidden on mobile) */}
+        <span className="text-right text-muted-foreground text-xs md:text-sm hidden md:block truncate">
+          {application.Email}
+        </span>
+
+        {/* 5. Mobile (Hidden on mobile) */}
+        <span className="text-right text-muted-foreground text-xs md:text-sm hidden md:block truncate">
+          {application.MobilePhone}
+        </span>
+
+        {/* 6. Loan Amount + Arrow */}
+        <div className="flex items-center justify-end gap-1">
+          <span className="text-foreground font-medium text-xs md:text-sm">
+            ${application.Loan_Amount__c?.toLocaleString()}
+          </span>
+          <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block" />
         </div>
-        <ScrollArea className="h-[300px] md:h-[400px]">
-          {filteredApplicationsNew.map((application, index) => (
-            <div
-              key={index}
-              className="grid grid-cols-3 md:grid-cols-[2fr_1fr_1fr_1fr] gap-0 items-center py-1.5 md:py-2 hover:bg-muted/50 rounded-lg px-1 md:px-2 -mx-1 md:-mx-2 transition-colors cursor-pointer group"
-            >
-              <span className="font-medium text-foreground text-xs md:text-sm truncate font-thin">
-                {application.Name}
-              </span>
-              {/* <Badge
-                variant="custom"
-                className={`${getStatusStyles(application.status)} text-xs w-fit`}
-              >
-                {application.status}
-              </Badge> */}
-              <span className="text-muted-foreground text-xs md:text-sm hidden md:block">
-                {application.Loan_Program_Type__c}
-              </span>
-              <div className="flex items-center justify-end gap-2">
-                <span className="text-foreground text-xs md:text-sm">
-                  ${application.Loan_Amount__c}
-                </span>
-                <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block" />
-              </div>
-            </div>
-          ))}
-        </ScrollArea>
       </div>
+    ))}
+  </ScrollArea>
+</div>
     </Card>
   );
 }

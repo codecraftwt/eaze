@@ -13,7 +13,8 @@ import { getWeeklyFundingVolume } from "../../lib/mockData";
 import { subMonths } from "date-fns";
 import { useDispatch, useSelector } from "react-redux";
 import { getSalesforceToken } from "../../store/slices/authSlice";
-import { getFundedData } from "../../store/slices/dashboardSlice";
+import { getFundedData, getFundedLastMonthData } from "../../store/slices/dashboardSlice";
+import { getMonthAndYear } from "../../lib/dateUtils";
 // EAZE Brand Colors
 const COLORS = {
   thisMonth: "#2D3A4F", // Deep Navy
@@ -62,18 +63,25 @@ export function FundingVolumeChart({ selectedDate }) {
   // Generate data based on selected month using centralized data
 
 
-  
+  const { month, year } = getMonthAndYear(selectedDate)
+  // Calculate Last Month and Last Year
+const lastMonth = month === 1 ? 12 : month - 1;
+const lastYear = month === 1 ? year - 1 : year;
+
+console.log(`Current: ${month}/${year}`);
+console.log(`Last Month: ${lastMonth}/${lastYear}`);
    const dispatch = useDispatch();
   const { salesforceToken, portalUserId } = useSelector((state) => state.auth);
   const {
-    cashCollectedAllTime, fundedData
+    cashCollectedAllTime, fundedData,fundedLastMonthData
   } = useSelector((state) => state.dashboard);
 
   useEffect(() => {
     if (!salesforceToken) {
       dispatch(getSalesforceToken());
     } else {
-      dispatch(getFundedData({ accountId: portalUserId, token: salesforceToken }));
+      dispatch(getFundedData({ accountId: portalUserId, token: salesforceToken ,month:month,year:year}));
+      dispatch(getFundedLastMonthData({ accountId: portalUserId, token: salesforceToken ,month:lastMonth,year:lastYear}));
 
     }
   }, [dispatch, salesforceToken, selectedDate]);
@@ -86,7 +94,7 @@ export function FundingVolumeChart({ selectedDate }) {
 
   // Generate data based on selected month using centralized data
   const thisMonthData = useMemo(() => getWeeklyFundingVolume(currentDate,fundedData), [currentDate,selectedDate,fundedData]);
-  const lastMonthData = useMemo(() => getWeeklyFundingVolume(lastMonthDate,fundedData), [lastMonthDate,selectedDate,fundedData]);
+  const lastMonthData = useMemo(() => getWeeklyFundingVolume(lastMonthDate,fundedLastMonthData), [lastMonthDate,selectedDate,fundedLastMonthData]);
   
   // Combine this month and last month data
   
@@ -115,7 +123,9 @@ export function FundingVolumeChart({ selectedDate }) {
           <Button
             variant={showComparison ? "default" : "outline"}
             size="sm"
-            className="h-7 px-2 md:px-3 text-xs"
+            className={`h-7 px-2 md:px-3 text-xs transition-colors ${
+    showComparison ? "text-white" : "text-muted-foreground"
+  }`}
             onClick={() => setShowComparison(!showComparison)}
           >
             vs Last Month

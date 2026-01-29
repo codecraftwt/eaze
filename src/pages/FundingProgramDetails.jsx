@@ -23,7 +23,8 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getSalesforceToken } from "../store/slices/authSlice";
-import { getCashCollectedAllTime, getFundedData, getTotalApproved } from "../store/slices/dashboardSlice";
+import { getCashCollectedAllTime, getCashCollectedThisMonth, getFundedData, getTotalApproved } from "../store/slices/dashboardSlice";
+import { getMonthAndYear } from "../lib/dateUtils";
 const programData = {
   eazecap: {
     name: "EazeCap",
@@ -964,7 +965,7 @@ export function FundingProgramDetails({ program, onBack }) {
     window.URL.revokeObjectURL(url);
   };
 
-
+const { month, year } = getMonthAndYear(selectedDate)
 const dispatch = useDispatch();
 const { salesforceToken, portalUserId } = useSelector((state) => state.auth);
 const {
@@ -978,28 +979,28 @@ const {
       if (!salesforceToken) {
         dispatch(getSalesforceToken()); // Fetch the Salesforce token if not available
       } else {
-        dispatch(getCashCollectedAllTime({ accountId: portalUserId, token: salesforceToken }));
+        dispatch(getCashCollectedThisMonth({ accountId: portalUserId, token: salesforceToken,month:month,year:year }));
         // dispatch(getTotalApproved({ accountId: portalUserId, token: salesforceToken }));
       }
-    }, [dispatch, salesforceToken]);
+    }, [dispatch, salesforceToken,selectedDate]);
 
     useEffect(() => {
-    if (cashCollectedAllTime.length > 0 && programId) {
-        console.log('Raw Data:', cashCollectedAllTime);
+    if (cashCollectedThisMonth.length > 0 && programId) {
+        console.log('Raw Data:', cashCollectedThisMonth);
 
-        const filteredData = cashCollectedAllTime.filter(item => 
+        const filteredData = cashCollectedThisMonth.filter(item => 
             // Case-insensitive check to avoid "Elite" vs "elite" bugs
             item.Loan_Program_Type__c?.toLowerCase() === programId.toLowerCase()
         );
 
         console.log(`Filtered Data for ${programId}:`, filteredData);
     }
-}, [cashCollectedAllTime, programId]); // Added programId to dependencies
+}, [cashCollectedThisMonth, programId]); // Added programId to dependencies
 
 
 const filteredApplications2 = useMemo(() => {
   // 1. First, filter by the dynamic Program ID from the URL
-  const byProgram = cashCollectedAllTime.filter(item => 
+  const byProgram = cashCollectedThisMonth.filter(item => 
     item.Loan_Program_Type__c?.toLowerCase() === programId?.toLowerCase()
   );
 
@@ -1017,7 +1018,7 @@ const filteredApplications2 = useMemo(() => {
 
     return isSameMonth(appDate, selectedDate);
   });
-}, [cashCollectedAllTime, programId, selectedDate]);
+}, [cashCollectedThisMonth, programId, selectedDate]);
 
 console.log(filteredApplications2,'filteredApplications2')
 

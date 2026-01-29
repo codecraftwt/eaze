@@ -8,10 +8,11 @@ import { getPerformanceData } from "../../lib/mockData";
 import { useDispatch, useSelector } from "react-redux";
 import { getSalesforceToken } from "../../store/slices/authSlice";
 import { getCashCollectedAllTime, getCashCollectedLastMonth, getCashCollectedThisMonth } from "../../store/slices/dashboardSlice";
+import { getMonthAndYear } from "../../lib/dateUtils";
 export function EarningsForecast({ selectedDate }) {
 
    const dispatch = useDispatch();
-    
+    const { month, year } = getMonthAndYear(selectedDate)
     // 1. Get data from Redux
     const { salesforceToken, portalUserId } = useSelector((state) => state.auth);
     const { cashCollectedThisMonth, cashCollectedLastMonth,cashCollectedAllTime } = useSelector((state) => state.dashboard);
@@ -21,9 +22,9 @@ export function EarningsForecast({ selectedDate }) {
       if (!salesforceToken) {
         dispatch(getSalesforceToken());
       } else if (portalUserId) {
-        dispatch(getCashCollectedThisMonth({ accountId: portalUserId, token: salesforceToken }));
-        dispatch(getCashCollectedLastMonth({ accountId: portalUserId, token: salesforceToken }));
-        dispatch(getCashCollectedAllTime({ accountId: portalUserId, token: salesforceToken }));
+        dispatch(getCashCollectedThisMonth({ accountId: portalUserId, token: salesforceToken,month:month,year:year }));
+        dispatch(getCashCollectedLastMonth({ accountId: portalUserId, token: salesforceToken,month:month,year:year }));
+        dispatch(getCashCollectedAllTime({ accountId: portalUserId, token: salesforceToken,month:month,year:year }));
       }
     }, [dispatch, salesforceToken, portalUserId, selectedDate]);
 

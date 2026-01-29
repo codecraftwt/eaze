@@ -8,13 +8,15 @@ const REGISTRATION_CODE = "001cY00000JXauEQAT";
 const LEADSOURCE = import.meta.env.VITE_LEADSOURCE;
 
 // Helper function to make API requests
-const fetchData = async (endpoint, { accountId, leadSource }, token) => {
+const fetchData = async (endpoint, { accountId, leadSource,month,year }, token) => {
   try {
     const response = await axios.post(
       `${API_URL}/services/apexrest/salesforce/portal/api/${endpoint}`,
       {
         accountId,
         leadSource,
+        month: month ?? 0,
+        year: year ?? 0,
       },
       {
         headers: {
@@ -32,8 +34,8 @@ const fetchData = async (endpoint, { accountId, leadSource }, token) => {
 // Thunks for each API endpoint
 export const getTotalApplicationsThisMonth = createAsyncThunk(
   'dashboard/getTotalApplicationsThisMonth',
-  async ({ accountId, leadSource, token }, { rejectWithValue }) => {
-    const data = await fetchData('gettotalapplicationthismonth', { accountId: accountId, leadSource: LEADSOURCE }, token)
+  async ({ accountId, leadSource, token, month,year }, { rejectWithValue }) => {
+    const data = await fetchData('gettotalapplicationthismonth', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, token)
       .catch(rejectWithValue);
 
       // console.log(data, 'data');
@@ -43,8 +45,8 @@ export const getTotalApplicationsThisMonth = createAsyncThunk(
 
 export const getApprovedThisMonth = createAsyncThunk(
   'dashboard/getApprovedThisMonth',
-  async ({ accountId, leadSource, token }, { rejectWithValue }) => {
-    const data = await fetchData('getapprovedthismonth', { accountId: accountId, leadSource: LEADSOURCE }, token)
+  async ({ accountId, leadSource, token , month,year}, { rejectWithValue }) => {
+    const data = await fetchData('getapprovedthismonth', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, token)
       .catch(rejectWithValue);
     return data?.data || [];
   }
@@ -52,8 +54,8 @@ export const getApprovedThisMonth = createAsyncThunk(
 
 export const getPreApprovedThisMonth = createAsyncThunk(
   'dashboard/getPreApprovedThisMonth',
-  async ({ accountId, leadSource, token }, { rejectWithValue }) => {
-    const data = await fetchData('getpreapprovedthismonth', { accountId: accountId, leadSource: LEADSOURCE }, token)
+  async ({ accountId, leadSource, token, month,year }, { rejectWithValue }) => {
+    const data = await fetchData('getpreapprovedthismonth', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, token)
       .catch(rejectWithValue);
     return data?.data || [];
   }
@@ -61,8 +63,8 @@ export const getPreApprovedThisMonth = createAsyncThunk(
 
 export const getDeclinedThisMonth = createAsyncThunk(
   'dashboard/getDeclinedThisMonth',
-  async ({ accountId, leadSource, token }, { rejectWithValue }) => {
-    const data = await fetchData('getdeclinethismonth', { accountId: accountId, leadSource: LEADSOURCE }, token)
+  async ({ accountId, leadSource, token , month,year}, { rejectWithValue }) => {
+    const data = await fetchData('getdeclinethismonth', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, token)
       .catch(rejectWithValue);
     return data?.data || [];
   }
@@ -70,8 +72,8 @@ export const getDeclinedThisMonth = createAsyncThunk(
 
 export const getTotalApplications = createAsyncThunk(
   'dashboard/getTotalApplications',
-  async ({ accountId, leadSource, token }, { rejectWithValue }) => {
-    const data = await fetchData('gettotalapplication', { accountId: accountId, leadSource: LEADSOURCE }, token)
+  async ({ accountId, leadSource, token , month,year}, { rejectWithValue }) => {
+    const data = await fetchData('gettotalapplication', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, token)
       .catch(rejectWithValue);
     return data?.data || [];
   }
@@ -79,8 +81,8 @@ export const getTotalApplications = createAsyncThunk(
 
 export const getTotalApproved = createAsyncThunk(
   'dashboard/getTotalApproved',
-  async ({ accountId, leadSource, token }, { rejectWithValue }) => {
-    const data = await fetchData('gettotalapproved', { accountId: accountId, leadSource: LEADSOURCE }, token)
+  async ({ accountId, leadSource, token, month,year}, { rejectWithValue }) => {
+    const data = await fetchData('gettotalapproved', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, token)
       .catch(rejectWithValue);
     return data?.data || [];
   }
@@ -88,8 +90,8 @@ export const getTotalApproved = createAsyncThunk(
 
 export const getTotalDeclined = createAsyncThunk(
   'dashboard/getTotalDeclined',
-  async ({ accountId, leadSource, token }, { rejectWithValue }) => {
-    const data = await fetchData('gettotaldeclined', { accountId: accountId, leadSource: LEADSOURCE }, token)
+  async ({ accountId, leadSource, token , month,year}, { rejectWithValue }) => {
+    const data = await fetchData('gettotaldeclined', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, token)
       .catch(rejectWithValue);
     return data?.data || [];
   }
@@ -97,8 +99,8 @@ export const getTotalDeclined = createAsyncThunk(
 
 export const getTotalPreApproved = createAsyncThunk(
   'dashboard/getTotalPreApproved',
-  async ({ accountId, leadSource, token }, { rejectWithValue }) => {
-    const data = await fetchData('gettotalpreapproved', { accountId: accountId, leadSource: LEADSOURCE }, token)
+  async ({ accountId, leadSource, token, month,year }, { rejectWithValue }) => {
+    const data = await fetchData('gettotalpreapproved', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, token)
       .catch(rejectWithValue);
     return data?.data || [];
   }
@@ -106,8 +108,8 @@ export const getTotalPreApproved = createAsyncThunk(
 
 export const getTotalDeclinePercent = createAsyncThunk(
   'dashboard/getTotalDeclinePercent',
-  async ({ accountId, leadSource, token }, { rejectWithValue }) => {
-    const data = await fetchData('gettotaldeclinepercent', { accountId: accountId, leadSource: LEADSOURCE }, token)
+  async ({ accountId, leadSource, token , month,year}, { rejectWithValue }) => {
+    const data = await fetchData('gettotaldeclinepercent', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, token)
       .catch(rejectWithValue);
     return data?.data || [];
   }
@@ -115,8 +117,8 @@ export const getTotalDeclinePercent = createAsyncThunk(
 
 export const getTopDeclineReason = createAsyncThunk(
   'dashboard/getTopDeclineReason',
-  async ({ accountId, leadSource, token }, { rejectWithValue }) => {
-    const data = await fetchData('gettopdeclinereason', { accountId: accountId, leadSource: LEADSOURCE }, token)
+  async ({ accountId, leadSource, token, month,year }, { rejectWithValue }) => {
+    const data = await fetchData('gettopdeclinereason', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, token)
       .catch(rejectWithValue);
     return data?.data || [];
   }
@@ -124,11 +126,11 @@ export const getTopDeclineReason = createAsyncThunk(
 
 export const getLoanByTypeThisMonth = createAsyncThunk(
   'dashboard/getLoanByTypeThisMonth',
-  async ({ accountId, token }, { rejectWithValue }) => {
+  async ({ accountId, token , month,year}, { rejectWithValue }) => {
     try {
       const data = await fetchData(
         'getloanbytype',
-        { accountId, leadSource: LEADSOURCE },
+        { accountId, leadSource: LEADSOURCE,month:month,year:year },
         token
       );
       return data?.data || [];
@@ -140,11 +142,11 @@ export const getLoanByTypeThisMonth = createAsyncThunk(
 
 export const getLoanByTypeAllTime = createAsyncThunk(
   'dashboard/getLoanByTypeAllTime',
-  async ({ accountId, token }, { rejectWithValue }) => {
+  async ({ accountId, token , month,year}, { rejectWithValue }) => {
     try {
       const data = await fetchData(
         'getloanbytypealltime',
-        { accountId, leadSource: LEADSOURCE },
+        { accountId, leadSource: LEADSOURCE ,month:month,year:year},
         token
       );
       return data?.data || [];
@@ -156,11 +158,11 @@ export const getLoanByTypeAllTime = createAsyncThunk(
 
 export const getCashCollectedThisMonth = createAsyncThunk(
   'dashboard/getCashCollectedThisMonth',
-  async ({ accountId, token }, { rejectWithValue }) => {
+  async ({ accountId, token , month,year}, { rejectWithValue }) => {
     try {
       const data = await fetchData(
         'getcashcollectedamount',
-        { accountId, leadSource: LEADSOURCE },
+        { accountId, leadSource: LEADSOURCE,month:month,year:year },
         token
       );
       return data?.data || [];
@@ -172,11 +174,11 @@ export const getCashCollectedThisMonth = createAsyncThunk(
 
 export const getCashCollectedAllTime = createAsyncThunk(
   'dashboard/getCashCollectedAllTime',
-  async ({ accountId, token }, { rejectWithValue }) => {
+  async ({ accountId, token , month,year}, { rejectWithValue }) => {
     try {
       const data = await fetchData(
         'getcashcollectedamountalltime',
-        { accountId, leadSource: LEADSOURCE },
+        { accountId, leadSource: LEADSOURCE,month:month,year:year },
         token
       );
       return data?.data || [];
@@ -187,11 +189,26 @@ export const getCashCollectedAllTime = createAsyncThunk(
 );
 export const getFundedData = createAsyncThunk(
   'dashboard/getFundedData',
-  async ({ accountId, token }, { rejectWithValue }) => {
+  async ({ accountId, token , month,year}, { rejectWithValue }) => {
     try {
       const data = await fetchData(
         'getfundeddata', 
-        { accountId, leadSource: LEADSOURCE }, 
+        { accountId, leadSource: LEADSOURCE,month:month,year:year }, 
+        token
+      );
+      return data?.data || [];
+    } catch (err) {
+      return rejectWithValue(err);
+    }
+  }
+);
+export const getFundedLastMonthData = createAsyncThunk(
+  'dashboard/getFundedLastMonthData',
+  async ({ accountId, token , month,year}, { rejectWithValue }) => {
+    try {
+      const data = await fetchData(
+        'getfundeddata', 
+        { accountId, leadSource: LEADSOURCE,month:month,year:year }, 
         token
       );
       return data?.data || [];
@@ -203,11 +220,11 @@ export const getFundedData = createAsyncThunk(
 
 export const getCashCollectedLastMonth = createAsyncThunk(
   'dashboard/getCashCollectedLastMonth',
-  async ({ accountId, token }, { rejectWithValue }) => {
+  async ({ accountId, token , month,year}, { rejectWithValue }) => {
     try {
       const data = await fetchData(
         'getcashcollectedamountlastmonth', // Assumed endpoint based on pattern
-        { accountId, leadSource: LEADSOURCE },
+        { accountId, leadSource: LEADSOURCE,month:month,year:year },
         token
       );
       return data?.data || [];
@@ -255,6 +272,7 @@ const dashboardSlice = createSlice({
   cashCollectedLastMonth: [],
   cashCollectedAllTime: [],
   fundedData: [],
+  fundedLastMonthData: [],
     status: 'idle', // 'loading', 'succeeded', 'failed'
     error: null,
   },
@@ -448,6 +466,21 @@ const dashboardSlice = createSlice({
 .addCase(getFundedData.rejected, (state, action) => {
   state.status = 'failed';
   state.error = action.payload || action.error.message;
+})
+
+// Funded Data (Last Month)
+.addCase(getFundedLastMonthData.pending, (state) => {
+  // We use a different status property if you don't want to 
+  // trigger the main screen loader
+  state.lastMonthStatus = 'loading'; 
+})
+.addCase(getFundedLastMonthData.fulfilled, (state, action) => {
+  state.lastMonthStatus = 'succeeded';
+  state.fundedLastMonthData = action.payload; // Store in a separate array
+})
+.addCase(getFundedLastMonthData.rejected, (state, action) => {
+  state.lastMonthStatus = 'failed';
+  state.lastMonthError = action.payload || action.error.message;
 })
 
   },

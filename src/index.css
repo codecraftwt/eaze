@@ -86,3 +86,15 @@ background-color: #1f30511a
     background-color: #edeff2
 
 }
+.border-l-success {
+    border-left-color: #1fad6b;
+}
+.border-l-4 {
+    border-left-width: 4px;
+}
+.border-l-warning {
+    border-left-color: #f9a006;
+}
+.border-l-destructive {
+    border-left-color: #e23636;
+}

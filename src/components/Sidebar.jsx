@@ -8,6 +8,7 @@ import {
   HandCoins,
 } from "lucide-react";
 import logo from '../assets/image.png';
+import eazeLogo from "../assets/eaze-logo.png";
 import { logout } from '../store/slices/authSlice';
 import { persistor } from '../store/store';
 import { useDispatch } from 'react-redux';
@@ -53,7 +54,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           ${isOpen ? "justify-between" : "flex-col-reverse"}
         `}
       >
-        <img src={logo} alt="Logo" className="w-12 transition-all duration-300 ease-in-out"  style={isOpen ? { width: '170px', height: '70px' } : {}}/>
+        <img src={eazeLogo} alt="Logo" className="w-12 transition-all duration-300 ease-in-out"  style={isOpen ? { width: '170px', height: '70px' } : {}}/>
 
         {/* Toggle Button */}
         <button

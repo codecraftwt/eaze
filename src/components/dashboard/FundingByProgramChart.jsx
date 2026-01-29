@@ -12,8 +12,9 @@ import {
 import { getFundingByProgram } from "../../lib/mockData";
 import { useDispatch, useSelector } from "react-redux";
 import { getSalesforceToken } from "../../store/slices/authSlice";
-import { getCashCollectedAllTime } from "../../store/slices/dashboardSlice";
+import { getCashCollectedAllTime, getFundedData } from "../../store/slices/dashboardSlice";
 import { isSameMonth } from "date-fns";
+import { getMonthAndYear } from "../../lib/dateUtils";
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
@@ -35,19 +36,20 @@ export function FundingByProgramChart({ selectedDate }) {
     () => getFundingByProgram(selectedDate || new Date()),
     [selectedDate],
   );
+  const { month, year } = getMonthAndYear(selectedDate)
   
 
   const dispatch = useDispatch();
   const { salesforceToken, portalUserId } = useSelector((state) => state.auth);
   const {
-   cashCollectedAllTime
+   cashCollectedAllTime,fundedData
   } = useSelector((state) => state.dashboard);
 
   useEffect(() => {
     if (!salesforceToken) {
       dispatch(getSalesforceToken()); // Fetch the Salesforce token if not available
     } else {
-      dispatch(getCashCollectedAllTime({ accountId: portalUserId, token: salesforceToken }));
+      dispatch(getFundedData({ accountId: portalUserId, token: salesforceToken,month:month,year:year }));
      
     }
   }, [dispatch, salesforceToken, selectedDate]);
@@ -63,14 +65,14 @@ export function FundingByProgramChart({ selectedDate }) {
   };
 
   // 2. Loop through API data and filter by selectedDate
-  if (cashCollectedAllTime && Array.isArray(cashCollectedAllTime)) {
-    cashCollectedAllTime.forEach((app) => {
+  if (fundedData && Array.isArray(fundedData)) {
+    fundedData.forEach((app) => {
       const appDate = new Date(app.CreatedDate);
       
       if (isSameMonth(appDate, selectedDate)) {
         const program = app.Loan_Program_Type__c; // e.g., "Eaze Cap"
         if (program && typeof totals[program] !== 'undefined') {
-          totals[program] += Number(app.Loan_Amount__c || 0);
+          totals[program] += Number(app.Cash_Collected__c || 0);
         }
       }
     });
@@ -99,7 +101,12 @@ export function FundingByProgramChart({ selectedDate }) {
       fill: "hsl(40, 45%, 45%)",
     },
   ];
-}, [cashCollectedAllTime, selectedDate]);
+}, [fundedData, selectedDate]);
+
+
+useEffect(()=>{
+  console.log(cashCollectedAllTime.map(m=>m.Cash_Collected__c),'cashCollectedAllTime.map(m=>m.Cash_Collected__c)')
+},[cashCollectedAllTime])
 
  const total = chartData.reduce((sum, p) => sum + p.value, 0);
   return (

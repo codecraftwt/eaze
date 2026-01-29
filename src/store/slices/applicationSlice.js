@@ -7,11 +7,11 @@ const REGISTRATION_CODE = "001cY00000JXauEQAT"; // You can also use an environme
 const LEADSOURCE = import.meta.env.VITE_LEADSOURCE; // Lead source can also be dynamic from env
 
 // Helper function to fetch data
-const fetchData = async (endpoint, { accountId, leadSource }, token) => {
+const fetchData = async (endpoint, { accountId, leadSource,month,year  }, token) => {
   try {
     const response = await axios.post(
       `${API_URL}/services/apexrest/salesforce/portal/api/${endpoint}`,
-      { accountId, leadSource },
+      { accountId, leadSource ,month: month ?? 0,year: year ?? 0, },
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -28,8 +28,8 @@ const fetchData = async (endpoint, { accountId, leadSource }, token) => {
 // Async thunks for fetching various lead statuses
 export const getNewLead = createAsyncThunk(
   'application/getNewLead',
-  async ({ accountId, leadSource, token }, { rejectWithValue }) => {
-    const data = await fetchData('getnewlead', { accountId: accountId, leadSource: LEADSOURCE }, token)
+  async ({ accountId, leadSource, token, month,year }, { rejectWithValue }) => {
+    const data = await fetchData('getnewlead', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, token)
       .catch(rejectWithValue);
     return data?.data || [];
   }
@@ -37,8 +37,8 @@ export const getNewLead = createAsyncThunk(
 
 export const getPreApprovedLead = createAsyncThunk(
   'application/getPreApprovedLead',
-  async ({ accountId, leadSource, token }, { rejectWithValue }) => {
-    const data = await fetchData('getpreapprovedlead', { accountId: accountId, leadSource: LEADSOURCE }, token)
+  async ({ accountId, leadSource, token, month,year }, { rejectWithValue }) => {
+    const data = await fetchData('getpreapprovedlead', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, token)
       .catch(rejectWithValue);
     return data?.data || [];
   }
@@ -46,8 +46,8 @@ export const getPreApprovedLead = createAsyncThunk(
 
 export const getApprovedLead = createAsyncThunk(
   'application/getApprovedLead',
-  async ({ accountId, leadSource, token }, { rejectWithValue }) => {
-    const data = await fetchData('getapprovedlead', { accountId: accountId, leadSource: LEADSOURCE }, token)
+  async ({ accountId, leadSource, token , month,year}, { rejectWithValue }) => {
+    const data = await fetchData('getapprovedlead', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, token)
       .catch(rejectWithValue);
     return data?.data || [];
   }
@@ -55,8 +55,8 @@ export const getApprovedLead = createAsyncThunk(
 
 export const getApplicationDeclineLead = createAsyncThunk(
   'application/getApplicationDeclineLead',
-  async ({ accountId, leadSource, token }, { rejectWithValue }) => {
-    const data = await fetchData('getapplicationdeclinelead', { accountId: accountId, leadSource: LEADSOURCE }, token)
+  async ({ accountId, leadSource, token , month,year}, { rejectWithValue }) => {
+    const data = await fetchData('getapplicationdeclinelead', { accountId: accountId, leadSource: LEADSOURCE ,month:month,year:year}, token)
       .catch(rejectWithValue);
     return data?.data || [];
   }
@@ -64,8 +64,8 @@ export const getApplicationDeclineLead = createAsyncThunk(
 
 export const getClosedLost = createAsyncThunk(
   'application/getClosedLost',
-  async ({ accountId, leadSource, token }, { rejectWithValue }) => {
-    const data = await fetchData('getclosedlost', { accountId: accountId, leadSource: LEADSOURCE }, token)
+  async ({ accountId, leadSource, token , month,year}, { rejectWithValue }) => {
+    const data = await fetchData('getclosedlost', { accountId: accountId, leadSource: LEADSOURCE ,month:month,year:year}, token)
       .catch(rejectWithValue);
     return data?.data || [];
   }
@@ -73,8 +73,8 @@ export const getClosedLost = createAsyncThunk(
 
 export const getAllDeclined = createAsyncThunk(
   'application/getAllDeclined',
-  async ({ accountId, leadSource, token }, { rejectWithValue }) => {
-    const data = await fetchData('getalldeclined', { accountId: accountId, leadSource: LEADSOURCE }, token)
+  async ({ accountId, leadSource, token , month,year}, { rejectWithValue }) => {
+    const data = await fetchData('getalldeclined', { accountId: accountId, leadSource: LEADSOURCE ,month:month,year:year}, token)
       .catch(rejectWithValue);
     return data?.data || [];
   }

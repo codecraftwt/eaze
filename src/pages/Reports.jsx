@@ -25,7 +25,8 @@ import * as XLSX from "xlsx";
 import { format, subMonths, addMonths, isSameMonth, parse } from "date-fns";
 import { useDispatch, useSelector } from "react-redux";
 import { getSalesforceToken } from "../store/slices/authSlice";
-import { getCashCollectedAllTime } from "../store/slices/dashboardSlice";
+import { getCashCollectedAllTime, getCashCollectedThisMonth, getDeclinedThisMonth, getFundedData } from "../store/slices/dashboardSlice";
+import { getMonthAndYear } from "../lib/dateUtils";
 // Program colors matching charts
 const PROGRAM_COLORS = {
     all: "#2D3A4F", // Deep Navy
@@ -331,10 +332,10 @@ export function Reports() {
     const programName =
         fundingPrograms.find((p) => p.id === selectedProgram)?.name ||
         "All Programs";
-   
 
+    console.log(selectedDate, 'selectedDate')
 
-
+    const { month, year } = getMonthAndYear(selectedDate)
     const dispatch = useDispatch();
     const { salesforceToken, portalUserId } = useSelector((state) => state.auth);
     const {
@@ -343,37 +344,42 @@ export function Reports() {
         loanByTypeAllTime,
         cashCollectedThisMonth,
         cashCollectedAllTime,
+        fundedData,
+        declinedApplicationsThisMonth
     } = useSelector((state) => state.dashboard);
     useEffect(() => {
         if (!salesforceToken) {
             dispatch(getSalesforceToken()); // Fetch the Salesforce token if not available
         } else {
-            dispatch(getCashCollectedAllTime({ accountId: portalUserId, token: salesforceToken }));
+            dispatch(getFundedData({ accountId: portalUserId, token: salesforceToken, month: month, year: year }));
+            dispatch(getDeclinedThisMonth({ accountId: portalUserId, token: salesforceToken, month: month, year: year }));
+            dispatch(getCashCollectedThisMonth({ accountId: portalUserId, token: salesforceToken, month: month, year: year }));
             // dispatch(getTotalApproved({ accountId: portalUserId, token: salesforceToken }));
         }
-    }, [dispatch, salesforceToken]);
+    }, [dispatch, salesforceToken, selectedDate]);
 
     useEffect(() => {
-        if (cashCollectedAllTime.length > 0 && selectedProgram) {
-            console.log('Raw Data:', cashCollectedAllTime);
+        if (fundedData.length > 0 && selectedProgram) {
+            console.log('Raw Data:', fundedData);
 
-            const filteredData = cashCollectedAllTime.filter(item =>
+            const filteredData = fundedData.filter(item =>
                 // Case-insensitive check to avoid "Elite" vs "elite" bugs
                 item.Loan_Program_Type__c?.toLowerCase() === selectedProgram.toLowerCase()
             );
 
             console.log(`Filtered Data for ${selectedProgram}:`, filteredData);
         }
-    }, [cashCollectedAllTime, selectedProgram]); // Added programId to dependencies
+        console.log(declinedApplicationsThisMonth, 'declinedApplicationsThisMonth')
+    }, [fundedData, selectedProgram, declinedApplicationsThisMonth]); // Added programId to dependencies
 
 
     const filteredApplications2 = useMemo(() => {
         // 1. First, filter by the dynamic Program ID from the URL
-        const byProgram = cashCollectedAllTime.filter(item => {
-        if (selectedProgram?.toLowerCase() === "all") return true;
-        
-        return item.Loan_Program_Type__c?.toLowerCase() === selectedProgram?.toLowerCase();
-    });
+        const byProgram = fundedData.filter(item => {
+            if (selectedProgram?.toLowerCase() === "all") return true;
+
+            return item.Loan_Program_Type__c?.toLowerCase() === selectedProgram?.toLowerCase();
+        });
 
         // 2. Then, filter that result by the Selected Month
         return byProgram.filter((app) => {
@@ -389,7 +395,7 @@ export function Reports() {
 
             return isSameMonth(appDate, selectedDate);
         });
-    }, [cashCollectedAllTime, selectedProgram, selectedDate]);
+    }, [fundedData, selectedProgram, selectedDate]);
 
     console.log(filteredApplications2, 'filteredApplications2')
 
@@ -427,7 +433,7 @@ export function Reports() {
 
     console.log(stats, 'stats')
 
-     const generateExcel = (reportType) => {
+    const generateExcel = (reportType) => {
         // Create Excel workbook
         const wb = XLSX.utils.book_new();
         // Summary data
@@ -497,6 +503,38 @@ export function Reports() {
     };
 
 
+    const totalDeclinedAmount = useMemo(() => {
+        return declinedApplicationsThisMonth.reduce((acc, curr) => {
+            // 1. Check if "All Programs" is selected OR if the program matches the row
+            const isAll = selectedProgram === "all";
+
+            // Normalize strings to lowercase to ensure they match (e.g., "Eaze Cap" vs "eaze cap")
+            const isMatch = curr.Loan_Program_Type__c?.toLowerCase() === selectedProgram?.toLowerCase();
+
+            if (isAll || isMatch) {
+                return acc + (Number(curr.Loan_Amount__c) || 0);
+            }
+
+            return acc;
+        }, 0);
+    }, [declinedApplicationsThisMonth, selectedProgram]);
+    const totalLoanAmount = useMemo(() => {
+        return cashCollectedThisMonth.reduce((acc, curr) => {
+            // 1. Check if "All Programs" is selected OR if the program matches the row
+            const isAll = selectedProgram === "all";
+
+            // Normalize strings to lowercase to ensure they match (e.g., "Eaze Cap" vs "eaze cap")
+            const isMatch = curr.Loan_Program_Type__c?.toLowerCase() === selectedProgram?.toLowerCase();
+
+            if (isAll || isMatch) {
+                return acc + (Number(curr.Loan_Amount__c) || 0);
+            }
+
+            return acc;
+        }, 0);
+    }, [cashCollectedThisMonth, selectedProgram]);
+
+
     return (
         <div className="p-4 md:p-6 space-y-6 bg-background">
             {/* Header */}
@@ -546,8 +584,8 @@ export function Reports() {
                             key={program.id}
                             onClick={() => setSelectedProgram(program.id)}
                             className={`flex items-center justify-center gap-2 px-3 md:px-6 py-3 md:py-4 rounded-lg md:rounded-xl text-xs md:text-sm font-medium transition-all ${selectedProgram === program.id
-                                    ? "bg-primary text-primary-foreground shadow-md text-white"
-                                    : "bg-card border border-border text-foreground hover:bg-accent hover:text-accent-foreground"
+                                ? "bg-primary text-primary-foreground shadow-md text-white"
+                                : "bg-card border border-border text-foreground hover:bg-accent hover:text-accent-foreground"
                                 }`}
                         >
                             <span
@@ -567,7 +605,7 @@ export function Reports() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
                 <Card className="hover:shadow-md transition-shadow cursor-pointer">
                     <CardHeader className="flex flex-row items-center gap-3 p-3 md:p-4 pb-2">
-                        <div className="p-2 bg-primary/10 rounded-lg">
+                        <div className="p-2 bg-primary-10 rounded-lg">
                             <FileText className="h-4 w-4 md:h-5 md:w-5 text-primary" />
                         </div>
                         <div>
@@ -575,7 +613,11 @@ export function Reports() {
                                 Monthly Summary
                             </CardTitle>
                             <p className="text-xs text-muted-foreground">
-                                January 2025 • {programName}
+                                {selectedDate ? (
+                                    `${new Date(selectedDate).toLocaleString('default', { month: 'long' })} ${new Date(selectedDate).getFullYear()}`
+                                ) : (
+                                    "All Time"
+                                )} • {programName}
                             </p>
                         </div>
                     </CardHeader>
@@ -594,7 +636,7 @@ export function Reports() {
 
                 <Card className="hover:shadow-md transition-shadow cursor-pointer">
                     <CardHeader className="flex flex-row items-center gap-3 p-3 md:p-4 pb-2">
-                        <div className="p-2 bg-primary/10 rounded-lg">
+                        <div className="p-2 bg-primary-10 rounded-lg">
                             <CalendarIcon className="h-4 w-4 md:h-5 md:w-5 text-primary" />
                         </div>
                         <div>
@@ -621,7 +663,7 @@ export function Reports() {
 
                 <Card className="hover:shadow-md transition-shadow cursor-pointer">
                     <CardHeader className="flex flex-row items-center gap-3 p-3 md:p-4 pb-2">
-                        <div className="p-2 bg-primary/10 rounded-lg">
+                        <div className="p-2 bg-primary-10 rounded-lg">
                             <FileText className="h-4 w-4 md:h-5 md:w-5 text-primary" />
                         </div>
                         <div>
@@ -629,7 +671,7 @@ export function Reports() {
                                 Yearly Report
                             </CardTitle>
                             <p className="text-xs text-muted-foreground">
-                                2024 • {programName}
+                                {year} • {programName}
                             </p>
                         </div>
                     </CardHeader>
@@ -658,7 +700,7 @@ export function Reports() {
                     <CardContent className="pt-6">
                         <div className="flex items-center gap-4">
                             <div className="p-2 bg-success/15 rounded-full">
-                                <CheckCircle className="h-6 w-6 text-success" />
+                                <CheckCircle className="h-6 w-6 text-[#1fad6b]" />
                             </div>
                             <div>
                                 <p className="text-sm text-muted-foreground">
@@ -683,7 +725,7 @@ export function Reports() {
                                     Total In Progress
                                 </p>
                                 <p className="text-2xl font-bold text-warning">
-                                    ${stats.pending.amount.toLocaleString()}
+                                    ${totalLoanAmount.toLocaleString()}
                                 </p>
                             </div>
                         </div>
@@ -699,7 +741,7 @@ export function Reports() {
                             <div>
                                 <p className="text-sm text-muted-foreground">Total Declined</p>
                                 <p className="text-2xl font-bold text-destructive">
-                                    ${stats.disqualified.amount.toLocaleString()}
+                                    ${totalDeclinedAmount.toLocaleString()}
                                 </p>
                             </div>
                         </div>

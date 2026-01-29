@@ -225,7 +225,7 @@ export function getWeeklyFundingVolume(targetDate, data) {
       const weekIndex = Math.min(3, Math.floor((dayOfMonth - 1) / 7));
       
       // Use the Salesforce field Loan_Amount__c
-      weeks[weekIndex] += Number(app.Loan_Amount__c || 0);
+      weeks[weekIndex] += Number(app.Cash_Collected__c || 0);
     }
   });
   

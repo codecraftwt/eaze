@@ -1,9 +1,14 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 // import { Card } from "@/components/ui/card";
 import { ArrowRight } from "lucide-react";
 // import { getMonthlyStats } from "@/lib/mockData";
 import { Card } from "../ui/card";
 import { getMonthlyStats } from "../../lib/mockData";
+import { getMonthAndYear } from "../../lib/dateUtils";
+import { useDispatch, useSelector } from "react-redux";
+import { getSalesforceToken } from "../../store/slices/authSlice";
+import { getNewLead } from "../../store/slices/applicationSlice";
+import { getApprovedThisMonth, getFundedData, getPreApprovedThisMonth } from "../../store/slices/dashboardSlice";
 // EAZE Brand Colors - Executive-grade palette (muted tones)
 // These colors are consistent with ReferralsTable status badges
 const COLORS = {
@@ -17,34 +22,70 @@ export function DealPipelineChart({ selectedDate }) {
     () => getMonthlyStats(selectedDate || new Date()),
     [selectedDate],
   );
+  const { month, year } =getMonthAndYear(selectedDate)
+  const dispatch = useDispatch();
+  const { salesforceToken, portalUserId } = useSelector((state) => state.auth);
+  const {
+    totalApproved,
+    loanByTypeThisMonth,
+    loanByTypeAllTime,
+    cashCollectedThisMonth,
+    cashCollectedAllTime,
+    totalApplications,
+    fundedData,
+    preApprovedApplicationsThisMonth,
+    approvedApplicationsThisMonth
+
+  } = useSelector((state) => state.dashboard);
+  const {
+    
+newLeads
+
+  } = useSelector((state) => state.application);
+  useEffect(() => {
+    if (!salesforceToken) {
+      dispatch(getSalesforceToken()); // Fetch the Salesforce token if not available
+    } else {
+      dispatch(getFundedData({ accountId: portalUserId, token: salesforceToken,month:month,year:year }));
+      dispatch(getNewLead({ accountId: portalUserId, token: salesforceToken,month:month,year:year }));
+      dispatch(getPreApprovedThisMonth({ accountId: portalUserId, token: salesforceToken,month:month,year:year }));
+      dispatch(getApprovedThisMonth({ accountId: portalUserId, token: salesforceToken,month:month,year:year }));
+    }
+  }, [dispatch, salesforceToken,selectedDate]);
+
+
   const { pipeline } = stats;
-  const maxCount = pipeline.submitted;
-  const pipelineStages = [
+  const maxCount = newLeads.length + preApprovedApplicationsThisMonth.length+approvedApplicationsThisMonth.length+fundedData.length|| 0;
+
+const pipelineStages = useMemo(() => {
+  return [
     {
-      name: "Submitted",
-      count: pipeline.submitted,
+      name: "New leads",
+      count: maxCount,
+      // count: newLeads.length,
       color: COLORS.submitted,
-      width: "100%",
+      width: "100%", // Always 100% since it's the maxCount
     },
     {
-      name: "In Review",
-      count: pipeline.inReview,
+      name: "Pre approved",
+      count: preApprovedApplicationsThisMonth.length,
       color: COLORS.inReview,
-      width: `${Math.round((pipeline.inReview / maxCount) * 100)}%`,
+      width: `${Math.round((preApprovedApplicationsThisMonth.length / maxCount) * 100)}%`,
     },
     {
       name: "Approved",
-      count: pipeline.approved,
+      count: approvedApplicationsThisMonth.length,
       color: COLORS.approved,
-      width: `${Math.round((pipeline.approved / maxCount) * 100)}%`,
+      width: `${Math.round((approvedApplicationsThisMonth.length / maxCount) * 100)}%`,
     },
     {
       name: "Funded",
-      count: pipeline.funded,
+      count: fundedData.length,
       color: COLORS.funded,
-      width: `${Math.round((pipeline.funded / maxCount) * 100)}%`,
+      width: `${Math.round((fundedData.length / maxCount) * 100)}%`,
     },
   ];
+}, [newLeads, preApprovedApplicationsThisMonth, approvedApplicationsThisMonth, fundedData, maxCount]);
   return (
     <Card className="p-4 md:p-5 shadow-sm border border-border rounded-xl md:rounded-2xl bg-card">
       <h3 className="font-semibold text-foreground mb-4 md:mb-6 text-sm md:text-base">
