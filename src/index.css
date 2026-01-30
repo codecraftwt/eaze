@@ -98,3 +98,9 @@ background-color: #1f30511a
 .border-l-destructive {
     border-left-color: #e23636;
 }
+.bg-muted{
+  background-color: #e8eaee;
+}
+.text-muted-foreground {
+    color: #707a8f;
+}

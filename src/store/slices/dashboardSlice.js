@@ -30,6 +30,28 @@ const fetchData = async (endpoint, { accountId, leadSource,month,year }, token) 
     throw error.response?.data?.message || error.message;
   }
 };
+const fetchData2 = async (endpoint, { accountId, leadSource }, token) => {
+  try {
+    const response = await axios.post(
+      `${API_URL}/services/apexrest/salesforce/portal/api/${endpoint}`,
+      {
+        accountId,
+        leadSource,
+        month: 1,
+        year: 2026,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data?.message || error.message;
+  }
+};
 
 // Thunks for each API endpoint
 export const getTotalApplicationsThisMonth = createAsyncThunk(
@@ -202,6 +224,21 @@ export const getFundedData = createAsyncThunk(
     }
   }
 );
+export const getFundedData2 = createAsyncThunk(
+  'dashboard/getFundedData2',
+  async ({ accountId, token }, { rejectWithValue }) => {
+    try {
+      const data = await fetchData2(
+        'getfundeddata', 
+        { accountId, leadSource: LEADSOURCE}, 
+        token
+      );
+      return data?.data || [];
+    } catch (err) {
+      return rejectWithValue(err);
+    }
+  }
+);
 export const getFundedLastMonthData = createAsyncThunk(
   'dashboard/getFundedLastMonthData',
   async ({ accountId, token , month,year}, { rejectWithValue }) => {
@@ -272,6 +309,7 @@ const dashboardSlice = createSlice({
   cashCollectedLastMonth: [],
   cashCollectedAllTime: [],
   fundedData: [],
+  fundedData2: [],
   fundedLastMonthData: [],
     status: 'idle', // 'loading', 'succeeded', 'failed'
     error: null,
@@ -464,6 +502,18 @@ const dashboardSlice = createSlice({
   state.fundedData = action.payload;
 })
 .addCase(getFundedData.rejected, (state, action) => {
+  state.status = 'failed';
+  state.error = action.payload || action.error.message;
+})
+// Funded Data2
+.addCase(getFundedData2.pending, (state) => {
+  state.status = 'loading';
+})
+.addCase(getFundedData2.fulfilled, (state, action) => {
+  state.status = 'succeeded';
+  state.fundedData2 = action.payload;
+})
+.addCase(getFundedData2.rejected, (state, action) => {
   state.status = 'failed';
   state.error = action.payload || action.error.message;
 })

@@ -23,6 +23,8 @@ export function getStatusStyles(status) {
       return "bg-[#10B981]/10 text-[#10B981] border border-[#10B981]/20 hover:bg-[#10B981]/15"; // Emerald
     case "Disqualified":
       return "bg-[#EF4444]/10 text-[#EF4444] border border-[#EF4444]/20 hover:bg-[#EF4444]/15"; // Red
+    case "Unknown":
+      return "bg-[#64748b]/10 text-[#64748b] border border-[#64748b]/20 hover:bg-[#64748b]/15"; // Slate/Gray
     default:
       return "bg-muted text-muted-foreground border-0";
   }
@@ -113,9 +115,15 @@ export function ReferralsTable({ onViewAll, selectedDate }) {
           </span>
 
           {/* 3. Status */}
-          <span className="text-center md:text-left text-xs md:text-sm truncate bg-muted/30 px-2 py-1 rounded-full md:bg-transparent md:p-0">
+          {/* <span className="text-center md:text-left text-xs md:text-sm truncate bg-muted/30 px-2 py-1 rounded-full md:bg-transparent md:p-0">
             {application.Lead_Partner_Status__c}
-          </span>
+          </span> */}
+          <Badge
+                variant="custom"
+                className={`${getStatusStyles(application.Lead_Partner_Status__c)} text-xs w-fit`}
+              >
+                {application.Lead_Partner_Status__c}
+              </Badge>
 
           {/* 4. Cash Collected (Hidden on mobile) */}
           <span className="text-right text-foreground text-xs md:text-sm font-medium hidden md:block">

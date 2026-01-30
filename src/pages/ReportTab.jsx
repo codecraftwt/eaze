@@ -7,16 +7,16 @@ import {
 } from '@mui/material';
 import * as XLSX from 'xlsx';
 import { getSalesforceToken } from '../store/slices/authSlice';
-import { getFundedData, getTotalApproved } from '../store/slices/dashboardSlice';
+import { getFundedData, getFundedData2, getTotalApproved } from '../store/slices/dashboardSlice';
 
 const ReportTab = () => {
-  const { fundedData } = useSelector((state) => state.dashboard);
+  const { fundedData2 } = useSelector((state) => state.dashboard);
   const [statusFilter, setStatusFilter] = useState('Funded');
   const [monthFilter, setMonthFilter] = useState('');
 
   // 1. Filtering Logic for Table & Top Tiles (Filtered View)
   const filteredData = useMemo(() => {
-    return fundedData.filter((item) => {
+    return fundedData2.filter((item) => {
       const matchesStatus = statusFilter === 'All' || 
         (item.Status && item.Status.toLowerCase().includes('funded'));
       
@@ -26,7 +26,7 @@ const ReportTab = () => {
       
       return matchesStatus && matchesMonth;
     });
-  }, [fundedData, statusFilter, monthFilter]);
+  }, [fundedData2, statusFilter, monthFilter]);
 
   // 2. Calculation Helper Function
   const calculateMetrics = (data) => {
@@ -54,18 +54,18 @@ const ReportTab = () => {
   
   const yearlyMetrics = useMemo(() => {
     // Filter data specifically for the year 2026 only
-    const yearData = fundedData.filter(item => {
+    const yearData = fundedData2.filter(item => {
         const d = new Date(item.CreatedDate);
         return d.getFullYear() === 2026;
     });
     return calculateMetrics(yearData);
-  }, [fundedData]);
+  }, [fundedData2]);
 
   // 4. Dynamic Columns
   const columns = useMemo(() => {
-    if (fundedData.length === 0) return [];
-    return Object.keys(fundedData[0]).filter(key => key !== 'Id' && key !== 'attributes');
-  }, [fundedData]);
+    if (fundedData2.length === 0) return [];
+    return Object.keys(fundedData2[0]).filter(key => key !== 'Id' && key !== 'attributes');
+  }, [fundedData2]);
 
   const downloadExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(filteredData);
@@ -88,7 +88,8 @@ const {
       if (!salesforceToken) {
         dispatch(getSalesforceToken()); // Fetch the Salesforce token if not available
       } else {
-        dispatch(getFundedData({ accountId: portalUserId, token: salesforceToken }));
+        console.log('hiiiiii')
+        dispatch(getFundedData2({ accountId: portalUserId, token: salesforceToken }));
         dispatch(getTotalApproved({ accountId: portalUserId, token: salesforceToken }));
       }
     }, [dispatch, salesforceToken]);

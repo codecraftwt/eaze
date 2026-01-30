@@ -1,11 +1,15 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
-  LayoutGrid,
-  ClipboardList,
+  LayoutGrid,     // Dashboard
+  FileText,       // My Report
+  Users,          // Affiliate
+  HandCoins,      // Loan
+  CheckCircle2,   // Funded (or ShieldCheck)
+  Layers,         // Applications
   LogOut,
+  ClipboardList,
   Menu,
-  HandCoins,
 } from "lucide-react";
 import logo from '../assets/image.png';
 import eazeLogo from "../assets/eaze-logo.png";
@@ -79,8 +83,15 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           to="/report"
           className={`flex items-center space-x-3 py-2 px-3 rounded-xl transition-all duration-300 ease-in-out ${isActive("/report")}`}
         >
-          <ClipboardList size={20} className="transition-all duration-300 ease-in-out" />
+          <FileText size={20} className="transition-all duration-300 ease-in-out" />
           {isOpen && <span className="transition-opacity duration-300 ease-in-out">My Report</span>}
+        </Link>
+        <Link
+          to="/affiliate"
+          className={`flex items-center space-x-3 py-2 px-3 rounded-xl transition-all duration-300 ease-in-out ${isActive("/affiliate")}`}
+        >
+          <Users size={20} className="transition-all duration-300 ease-in-out" />
+          {isOpen && <span className="transition-opacity duration-300 ease-in-out">Become an Affiliate</span>}
         </Link>
         <Link
           to="/loan"
@@ -93,23 +104,17 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           to="/funded"
           className={`flex items-center space-x-3 py-2 px-3 rounded-xl transition-all duration-300 ease-in-out ${isActive("/funded")}`}
         >
-          <HandCoins size={20} className="transition-all duration-300 ease-in-out" />
+          <CheckCircle2 size={20} className="transition-all duration-300 ease-in-out" />
           {isOpen && <span className="transition-opacity duration-300 ease-in-out">Funded</span>}
         </Link>
         <Link
           to="/applications"
           className={`flex items-center space-x-3 py-2 px-3 rounded-xl transition-all duration-300 ease-in-out ${isActive("/applications")}`}
         >
-          <ClipboardList size={20} className="transition-all duration-300 ease-in-out" />
+          <Layers size={20} className="transition-all duration-300 ease-in-out" />
           {isOpen && <span className="transition-opacity duration-300 ease-in-out">Applications</span>}
         </Link>
-        <Link
-          to="/affiliate"
-          className={`flex items-center space-x-3 py-2 px-3 rounded-xl transition-all duration-300 ease-in-out ${isActive("/affiliate")}`}
-        >
-          <ClipboardList size={20} className="transition-all duration-300 ease-in-out" />
-          {isOpen && <span className="transition-opacity duration-300 ease-in-out">Become an Affiliate</span>}
-        </Link>
+        
         
         
         
