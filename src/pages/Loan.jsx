@@ -96,9 +96,9 @@ function Loan() {
             return sum;
         }, 0);
 
-        console.log("This month cash collected:", totalCashThisMonth);
-        console.log(loanByTypeAllTime,'loanByTypeAllTime')
-        console.log(cashCollectedAllTime,'cashCollectedAllTime')
+        //console.log("This month cash collected:", totalCashThisMonth);
+        //console.log(loanByTypeAllTime,'loanByTypeAllTime')
+        //console.log(cashCollectedAllTime,'cashCollectedAllTime')
     }, [loanByTypeThisMonth, loanByTypeAllTime, cashCollectedThisMonth, cashCollectedAllTime, totalApproved]);
 
     // --- CLICK HANDLERS ---

@@ -21,7 +21,7 @@ export function getStatusStyles(status) {
       return "bg-[#10B981]/10 text-[#10B981] border border-[#10B981]/20 hover:bg-[#10B981]/15"; // Emerald
     case "Funded":
       return "bg-[#10B981]/10 text-[#10B981] border border-[#10B981]/20 hover:bg-[#10B981]/15"; // Emerald
-    case "Disqualified":
+    case "Declined":
       return "bg-[#EF4444]/10 text-[#EF4444] border border-[#EF4444]/20 hover:bg-[#EF4444]/15"; // Red
     case "Unknown":
       return "bg-[#64748b]/10 text-[#64748b] border border-[#64748b]/20 hover:bg-[#64748b]/15"; // Slate/Gray
@@ -77,7 +77,7 @@ export function ReferralsTable({ onViewAll, selectedDate }) {
     });
   }, [totalApplications, selectedDate]);
 
-  console.log(filteredApplicationsNew,'filteredApplicationsNew')
+  //console.log(filteredApplicationsNew,'filteredApplicationsNew')
   return (
    <Card className="p-3 md:p-5 shadow-sm border border-border rounded-xl md:rounded-2xl bg-card">
   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">

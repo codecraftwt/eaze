@@ -270,8 +270,8 @@ export function getFundingByProgram(targetDate) {
 }
 // Get performance comparison (current vs previous month)
 export function getPerformanceData(targetDate,thisMonth,lastMonth,alltime) {
-  console.log(thisMonth,'thisMonth')
-  console.log(lastMonth,'lastMonth')
+  //console.log(thisMonth,'thisMonth')
+  //console.log(lastMonth,'lastMonth')
   const currentStats = getMonthlyStats(targetDate);
   const previousMonth = subMonths(targetDate, 1);
   const previousStats = getMonthlyStats(previousMonth);
@@ -287,9 +287,9 @@ export function getPerformanceData(targetDate,thisMonth,lastMonth,alltime) {
   const currentAmount = calculateTotal(thisMonth);
     const lastMonthAmount = calculateTotal(lastMonth);
     const alltimeamount = calculateTotal(alltime);
-    console.log(currentAmount,'currentAmount')
-    console.log(lastMonthAmount,'lastMonthAmount')
-    console.log(alltimeamount,'alltimeamount')
+    //console.log(currentAmount,'currentAmount')
+    //console.log(lastMonthAmount,'lastMonthAmount')
+    //console.log(alltimeamount,'alltimeamount')
   return {
     lastMonth: {
       month: format(previousMonth, "MMM yyyy"),

@@ -37,8 +37,8 @@ export function Dashboard({ onNavigate, onNavigateToProgram }) {
   );
 
   useEffect(() => {
-    console.log(fundingProgram, 'fundingProgram')
-    console.log(selectedDate, 'selectedDate')
+    //console.log(fundingProgram, 'fundingProgram')
+    //console.log(selectedDate, 'selectedDate')
 
   }, [fundingProgram, selectedDate])
 
@@ -75,7 +75,7 @@ export function Dashboard({ onNavigate, onNavigateToProgram }) {
       dispatch(getApprovedThisMonth({ accountId: portalUserId, token: salesforceToken, month: month, year: year }));
     }
   }, [dispatch, salesforceToken, selectedDate]);
-  console.log(totalApplicationsThisMonth.length,'totalApplicationsThisMonth')
+  //console.log(totalApplicationsThisMonth.length,'totalApplicationsThisMonth')
   const maxCount = newLeads.length + preApprovedApplicationsThisMonth.length + approvedApplicationsThisMonth.length + fundedData.length || 0;
 
   const totalCashCollected = useMemo(() => {

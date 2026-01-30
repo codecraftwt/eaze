@@ -105,7 +105,7 @@ export function FundingByProgramChart({ selectedDate }) {
 
 
 useEffect(()=>{
-  console.log(cashCollectedAllTime.map(m=>m.Cash_Collected__c),'cashCollectedAllTime.map(m=>m.Cash_Collected__c)')
+  //console.log(cashCollectedAllTime.map(m=>m.Cash_Collected__c),'cashCollectedAllTime.map(m=>m.Cash_Collected__c)')
 },[cashCollectedAllTime])
 
  const total = chartData.reduce((sum, p) => sum + p.value, 0);

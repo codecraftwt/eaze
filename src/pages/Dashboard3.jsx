@@ -317,14 +317,14 @@ function Dashboard3() {
 
   //     // Helper function to get the month index from the date
   //     // function getMonthIndex(date) {
-  //     //   console.log(date, 'date')
+  //     //   //console.log(date, 'date')
   //     //   const month = new Date(date).getMonth(); // Get the month index (0-11)
-  //     //   // console.log(month, 'month')
+  //     //   // //console.log(month, 'month')
   //     //   return month;
   //     // }
 
   //     function getMonthIndex(date) {
-  //   // console.log(date, 'date');
+  //   // //console.log(date, 'date');
 
   //   const parsedDate = new Date(date);  // Convert the string to a Date object
   //   const month = parsedDate.getMonth(); // Get the month index (0-11)
@@ -332,7 +332,7 @@ function Dashboard3() {
 
   //   // Adjust the year part to only consider the last two digits
   //   const yearShort = year % 100;  // This gets the last two digits (e.g., 2022 -> 22)
-  //   // console.log(month, 'month', yearShort, 'yearShort');
+  //   // //console.log(month, 'month', yearShort, 'yearShort');
 
   //   // If the year is 2022 or 2023, for example, you could map it to "25" as needed
   //   // Example: year == 2022 -> 25 or use your own logic to adjust the mapping
@@ -344,7 +344,7 @@ function Dashboard3() {
   //     // Process each lead and classify by month and status
   //     data.forEach(lead => {
   //       const monthIndex = getMonthIndex(lead.CreatedDate);
-  //       // console.log(monthIndex, 'monthIndex')
+  //       // //console.log(monthIndex, 'monthIndex')
   //       // Increment count for total leads
   //       if (categoryMap.approved.includes(lead.Status)) {
   //         approved[monthIndex] += 1; // Increment approved leads
@@ -528,57 +528,57 @@ function Dashboard3() {
   useEffect(() => {
     // Only log when the data is available (non-empty or updated)
     if (totalApplicationsThisMonth.length !== 0) {
-      console.log(totalApplicationsThisMonth, 'totalApplicationsThisMonth');
-      console.log(totalApplicationsThisMonth, 'totalApplicationsThisMonth');
+      //console.log(totalApplicationsThisMonth, 'totalApplicationsThisMonth');
+      //console.log(totalApplicationsThisMonth, 'totalApplicationsThisMonth');
       const result = groupLeadStatuses(categoryMap, totalApplicationsThisMonth);
-      console.log(result, 'result')
+      //console.log(result, 'result')
       setGroupedThisMonthData(result);
-      //   console.log(totalApplicationsThisMonth.map(item => item.Loan_Amount__c || 0)   // extract only loan amounts
+      //   //console.log(totalApplicationsThisMonth.map(item => item.Loan_Amount__c || 0)   // extract only loan amounts
       // .reduce((sum, amount) => sum + amount, 0), 'totalApplicationsThisMonth--this month loan amount');
       const closedLost = totalApplicationsThisMonth.filter(item =>
         item.Status.toLowerCase().startsWith("closed lost"));
-      console.log([...new Set(closedLost.map(item => item.Status))], 'closedLost status')
+      //console.log([...new Set(closedLost.map(item => item.Status))], 'closedLost status')
 
       //       const declinedCount = getDeclinedLeadsCount(categoryMap, totalApplicationsThisMonth);
-      // console.log('Declined Leads Count for This Month-----:', declinedCount);
+      // //console.log('Declined Leads Count for This Month-----:', declinedCount);
     }
 
     // Total stats
     if (totalApplications.length !== 0) {
-      console.log(totalApplications, 'totalApplications');
+      //console.log(totalApplications, 'totalApplications');
       const result = groupLeadStatuses(categoryMap, totalApplications);
-      console.log(result, 'result')
+      //console.log(result, 'result')
       const closedLost = totalApplications.filter(item =>
         item.Status.toLowerCase().startsWith("declined"));
-      console.log([...new Set(closedLost.map(item => item.Status))], 'declined status')
+      //console.log([...new Set(closedLost.map(item => item.Status))], 'declined status')
       setGroupedAllMonthData(result);
       const barChat = formatLeadsByStatusUpdated(totalApplications, categoryMap, selectedYear);
       // const barChatNew = formatLeadsByStatusUpdatedNew(totalApplications, categoryMap);
-      // console.log(barChatNew, 'barChatNew')
-      console.log(barChat, 'barChat')
+      // //console.log(barChatNew, 'barChatNew')
+      //console.log(barChat, 'barChat')
       setBarChartData(barChat);
 
       const declinedCount = getDeclinedLeadsCount(categoryMapNew, totalApplications);
-      console.log('Declined Leads Count for This Month:', declinedCount);
+      //console.log('Declined Leads Count for This Month:', declinedCount);
 
       const declinedCountNew = filterDeclinedLeadsForMonth(totalApplications, "Dec 25", categoryMapNew);
-      console.log(declinedCountNew, 'declinedCountNew----')
-      //   console.log(totalApplications.length, 'totalApplications');
-      //   console.log(totalApplications.map(item => item.Loan_Amount__c || 0)   // extract only loan amounts
+      //console.log(declinedCountNew, 'declinedCountNew----')
+      //   //console.log(totalApplications.length, 'totalApplications');
+      //   //console.log(totalApplications.map(item => item.Loan_Amount__c || 0)   // extract only loan amounts
       // .reduce((sum, amount) => sum + amount, 0), 'totalApplications--this month loan amount');
     }
 
     if (totalApproved.length !== 0) {
-      console.log(totalApproved, 'totalApproved')
-      console.log(totalApproved.map(item => item.Loan_Amount__c || 0).reduce((sum, amount) => sum + amount, 0), 'totalApproved');
+      //console.log(totalApproved, 'totalApproved')
+      //console.log(totalApproved.map(item => item.Loan_Amount__c || 0).reduce((sum, amount) => sum + amount, 0), 'totalApproved');
     }
 
     if (totalDeclinePercent !== null) {
-      console.log(totalDeclinePercent, 'totalDeclinePercent')
+      //console.log(totalDeclinePercent, 'totalDeclinePercent')
     }
 
     if (fundedData.length !== 0) {
-      console.log(fundedData, 'fundedData')
+      //console.log(fundedData, 'fundedData')
     }
 
   }, [
@@ -597,9 +597,9 @@ function Dashboard3() {
 
   useEffect(() => {
     if (totalApplications.length !== 0) {
-      console.log(totalApplications, 'totalApplications-----------');
+      //console.log(totalApplications, 'totalApplications-----------');
       const data = totalApplications.filter((m) => m.Status == topDeclineReason?.decline_reason).map(item => item.Loan_Amount__c || 0).reduce((sum, amount) => sum + amount, 0).toLocaleString()
-      console.log(data, 'data')
+      //console.log(data, 'data')
     }
   }, [topDeclineReason, totalApplications]);
 

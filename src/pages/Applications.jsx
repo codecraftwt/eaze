@@ -282,10 +282,10 @@ const ApplicationsPage = () => {
     return formattedData;
   }
   // function formatPreApprovedData(leads) {
-  //   console.log(leads, 'leads')
+  //   //console.log(leads, 'leads')
   //   // Filter for leads with "Pre-Approved - Client Has Not Scheduled Call With EAZE" status
   //   const filteredLeads = leads.filter(lead => lead.Status == 'Pre-Approved Pending Income Verification');
-  //   console.log(filteredLeads, 'filteredLeads')
+  //   //console.log(filteredLeads, 'filteredLeads')
   //   // Sum the Loan_Amount__c for the filtered leads
   //   const totalLoanAmount = filteredLeads.reduce((sum, lead) => sum + lead.Loan_Amount__c, 0);
 
@@ -298,7 +298,7 @@ const ApplicationsPage = () => {
   //   ];
   // }
 function formatPreApprovedData(leads) {
-  console.log(leads, 'leads');
+  //console.log(leads, 'leads');
   
   // Group leads by their status
   const statusGroups = leads.reduce((acc, lead) => {
@@ -310,7 +310,7 @@ function formatPreApprovedData(leads) {
     return acc;
   }, {});
 
-  console.log(statusGroups, 'statusGroups');
+  //console.log(statusGroups, 'statusGroups');
 
   // Format the data for the PieChart
   const formattedData = Object.keys(statusGroups).map(status => ({
@@ -407,30 +407,30 @@ function formatPreApprovedData(leads) {
       dispatch(getTotalApproved({accountId:portalUserId, token: salesforceToken }));
       if (selectedTab === 0) {
         // New Applications
-        console.log("Fetching New Applications...");
+        //console.log("Fetching New Applications...");
         await dispatch(getNewLead({accountId:portalUserId, token: salesforceToken }));
       } else if (selectedTab === 1) {
         // Current Applications
-        console.log("Fetching Current Applications...");
+        //console.log("Fetching Current Applications...");
         await dispatch(getPreApprovedLead({accountId:portalUserId, token: salesforceToken }));
       } else if (selectedTab === 2) {
         // Approved Applications
-        console.log("Fetching Approved Applications...");
+        //console.log("Fetching Approved Applications...");
         await dispatch(getApprovedLead({accountId:portalUserId, token: salesforceToken }));
       } else if (selectedTab === 3) {
         // Declined Applications
          dispatch(getTotalApplications({accountId:portalUserId, token: salesforceToken }));
-        console.log("Fetching Declined Applications...");
+        //console.log("Fetching Declined Applications...");
         await dispatch(getApplicationDeclineLead({accountId:portalUserId, token: salesforceToken }));
         dispatch(getTotalDeclined({accountId:portalUserId, token: salesforceToken }));
               dispatch(getTopDeclineReason({accountId:portalUserId, token: salesforceToken }));
       } else if (selectedTab === 4) {
         // Closed Lost Applications
-        console.log("Fetching Closed Lost Applications...");
+        //console.log("Fetching Closed Lost Applications...");
         await dispatch(getClosedLost({accountId:portalUserId, token: salesforceToken }));
       } else if (selectedTab === 5) {
         // All Declined Applications
-        console.log("Fetching All Declined Applications...");
+        //console.log("Fetching All Declined Applications...");
         await dispatch(getAllDeclined({accountId:portalUserId, token: salesforceToken }));
       }
     };
@@ -447,8 +447,8 @@ function formatPreApprovedData(leads) {
     let groupedData = {};
     // Log the data to the console
     if (newLeads.length > 0 && selectedTab === 0) {
-      console.log("New Leads: ", newLeads);
-      console.log("New Leads: ", newLeads.length);
+      //console.log("New Leads: ", newLeads);
+      //console.log("New Leads: ", newLeads.length);
       const sumLoanAmounts = newLeads
         .map(lead => lead.Loan_Amount__c)
         .filter(amount => amount !== null)  // Filter out nulls
@@ -463,9 +463,9 @@ function formatPreApprovedData(leads) {
         })
         .reduce((acc, curr) => acc + curr, 0);
 
-      console.log("Total Loan Amount: ", sumLoanAmounts);
+      //console.log("Total Loan Amount: ", sumLoanAmounts);
       const formattedData = formatLeadsDataNew(newLeads);
-      console.log("formattedData", formattedData);
+      //console.log("formattedData", formattedData);
       setNewLeadsChartData(formattedData);
       setTotalNewleadsAmount(sumLoanAmounts);
       setNewLeadCount(newLeads.map((m) => m.Status == 'New Lead').filter((m) => m).length);
@@ -473,7 +473,7 @@ function formatPreApprovedData(leads) {
       // setGroupedLeads(Object.values(groupedData));
     }
     if (preApprovedLeads.length > 0 && selectedTab === 1) {
-      console.log("Pre-Approved Leads: ", preApprovedLeads);
+      //console.log("Pre-Approved Leads: ", preApprovedLeads);
       groupedData = groupLeadsByStatus(preApprovedLeads);
       setGroupedLeads(Object.values(groupedData));
       setPreApprovedLeadsCount(preApprovedLeads.length);
@@ -490,13 +490,13 @@ function formatPreApprovedData(leads) {
           return numericAmount;
         })
         .reduce((acc, curr) => acc + curr, 0);
-      console.log("Total Loan Amount: ", sumLoanAmounts);
+      //console.log("Total Loan Amount: ", sumLoanAmounts);
       setTotalPreApprovedLeadsAmount(sumLoanAmounts);
       const formattedData = formatChartData(preApprovedLeads);
-      console.log("Formatted Pie Chart Data:", formattedData);
+      //console.log("Formatted Pie Chart Data:", formattedData);
       setChartData(formattedData);
       const formattedPreApprovedData = formatPreApprovedData(preApprovedLeads);
-      console.log("Formatted Pie Chart Data:", formattedPreApprovedData);
+      //console.log("Formatted Pie Chart Data:", formattedPreApprovedData);
       setPreApprovedChartData(formattedPreApprovedData);
     }
     if (approvedLeads.length > 0 && selectedTab === 2) {
@@ -512,7 +512,7 @@ function formatPreApprovedData(leads) {
                 return leadMonthIndex === selectedMonthIndex && lead.Status === 'Funded - Invoice EAZE Client';
             });
 
-            console.log("Filtered Approved Leads: ", filteredLeads);
+            //console.log("Filtered Approved Leads: ", filteredLeads);
             setThisMonthApprovedCount(filteredLeads.length);
             setThisMonthApprovedRevenue(filteredLeads.reduce((acc, lead) => acc + lead.Loan_Amount__c, 0));
 
@@ -523,16 +523,16 @@ function formatPreApprovedData(leads) {
            setCompareToLastMonth(percentageChange);
            const formattedData=formatLeadsDataNew(approvedLeads);
            setApprovedChartData(formattedData);
-           console.log(formattedData,'formattedData')
-           console.log(`Percentage Change: ${percentageChange.toFixed(2)}%`);
+           //console.log(formattedData,'formattedData')
+           //console.log(`Percentage Change: ${percentageChange.toFixed(2)}%`);
 
-      console.log("Approved Leads: ", approvedLeads);
-      console.log("Approved Leads selectedMonth: ", selectedMonth);
+      //console.log("Approved Leads: ", approvedLeads);
+      //console.log("Approved Leads selectedMonth: ", selectedMonth);
       groupedData = groupLeadsByStatus(approvedLeads);
       setGroupedLeads(Object.values(groupedData));
     }
     if (applicationDeclinedLeads.length > 0 && selectedTab === 3) {
-      console.log("Application Declined Leads: ", applicationDeclinedLeads);
+      //console.log("Application Declined Leads: ", applicationDeclinedLeads);
       groupedData = groupLeadsByStatus(applicationDeclinedLeads);
       setGroupedLeads(Object.values(groupedData));
 
@@ -547,7 +547,7 @@ function formatPreApprovedData(leads) {
                 return leadMonthIndex === selectedMonthIndex 
             });
 
-            console.log("Filtered Approved Leads: ", filteredLeads);
+            //console.log("Filtered Approved Leads: ", filteredLeads);
             setThisMonthDeclinedCount(filteredLeads.length);
             setThisMonthDeclinedRevenue(filteredLeads.reduce((acc, lead) => acc + lead.Loan_Amount__c, 0));
 
@@ -559,11 +559,11 @@ function formatPreApprovedData(leads) {
             const formattedData=formatLeadsDataNew(applicationDeclinedLeads);
            setDeclinedChartData(formattedData);
            const formattedDataPie = formatChartData(filteredLeads);
-      console.log("Formatted Pie Chart Data:", formattedDataPie);
+      //console.log("Formatted Pie Chart Data:", formattedDataPie);
       setChartDeclinedData(formattedDataPie);
     }
     if (closedLostLeads.length > 0 && selectedTab === 4) {
-      console.log("Closed Lost Leads: ", closedLostLeads);
+      //console.log("Closed Lost Leads: ", closedLostLeads);
       groupedData = groupLeadsByStatus(closedLostLeads);
       setGroupedLeads(Object.values(groupedData));
 
@@ -578,7 +578,7 @@ function formatPreApprovedData(leads) {
                 return leadMonthIndex === selectedMonthIndex 
             });
 
-            console.log("Filtered Approved Leads: ", filteredLeads);
+            //console.log("Filtered Approved Leads: ", filteredLeads);
             setThisMonthClosedLostCount(filteredLeads.length);
             setThisMonthClosedLostRevenue(filteredLeads.reduce((acc, lead) => acc + lead.Loan_Amount__c, 0));
 
@@ -590,12 +590,12 @@ function formatPreApprovedData(leads) {
             const formattedData=formatLeadsDataNew(closedLostLeads);
            setClosedLostChartData(formattedData);
            const formattedDataPie = formatChartData(filteredLeads);
-      console.log("Formatted Pie Chart Data:", formattedDataPie);
+      //console.log("Formatted Pie Chart Data:", formattedDataPie);
       setChartClosedLostData(formattedDataPie);
     }
 
     if (allDeclinedLeads.length > 0 && selectedTab === 5) {
-      console.log("Closed Lost Leads: ", allDeclinedLeads);
+      //console.log("Closed Lost Leads: ", allDeclinedLeads);
       groupedData = groupLeadsByStatus(allDeclinedLeads);
       setGroupedLeads(Object.values(groupedData));
 
@@ -610,7 +610,7 @@ function formatPreApprovedData(leads) {
                 return leadMonthIndex === selectedMonthIndex 
             });
 
-            console.log("Filtered Approved Leads: ", filteredLeads);
+            //console.log("Filtered Approved Leads: ", filteredLeads);
             setThisMonthDeclinedCountPreQualifier(filteredLeads.length);
 
 
@@ -628,7 +628,7 @@ function formatPreApprovedData(leads) {
 
   useEffect(() => {
     const formattedData = formatLeadsData(newLeads);
-    console.log("formattedData", formattedData);
+    //console.log("formattedData", formattedData);
     setNewLeadsChartData(formattedData);
   }, [newLeads]);
 

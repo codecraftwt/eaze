@@ -986,14 +986,14 @@ const {
 
     useEffect(() => {
     if (cashCollectedThisMonth.length > 0 && programId) {
-        console.log('Raw Data:', cashCollectedThisMonth);
+        //console.log('Raw Data:', cashCollectedThisMonth);
 
         const filteredData = cashCollectedThisMonth.filter(item => 
             // Case-insensitive check to avoid "Elite" vs "elite" bugs
             item.Loan_Program_Type__c?.toLowerCase() === programId.toLowerCase()
         );
 
-        console.log(`Filtered Data for ${programId}:`, filteredData);
+        //console.log(`Filtered Data for ${programId}:`, filteredData);
     }
 }, [cashCollectedThisMonth, programId]); // Added programId to dependencies
 
@@ -1020,7 +1020,7 @@ const filteredApplications2 = useMemo(() => {
   });
 }, [cashCollectedThisMonth, programId, selectedDate]);
 
-console.log(filteredApplications2,'filteredApplications2')
+//console.log(filteredApplications2,'filteredApplications2')
 
 const stats = useMemo(() => {
   const initialStats = {
@@ -1054,7 +1054,7 @@ const stats = useMemo(() => {
   }, initialStats);
 }, [filteredApplications2]);
 
-console.log(stats,'stats')
+//console.log(stats,'stats')
 
 
   const handleBack = () => {

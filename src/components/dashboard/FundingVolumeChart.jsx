@@ -68,8 +68,8 @@ export function FundingVolumeChart({ selectedDate }) {
 const lastMonth = month === 1 ? 12 : month - 1;
 const lastYear = month === 1 ? year - 1 : year;
 
-console.log(`Current: ${month}/${year}`);
-console.log(`Last Month: ${lastMonth}/${lastYear}`);
+//console.log(`Current: ${month}/${year}`);
+//console.log(`Last Month: ${lastMonth}/${lastYear}`);
    const dispatch = useDispatch();
   const { salesforceToken, portalUserId } = useSelector((state) => state.auth);
   const {
@@ -87,7 +87,7 @@ console.log(`Last Month: ${lastMonth}/${lastYear}`);
   }, [dispatch, salesforceToken, selectedDate]);
 
   useEffect(()=>{
-    console.log(fundedData,'fundedData')
+    //console.log(fundedData,'fundedData')
   },[fundedData,selectedDate])
 
 
@@ -111,7 +111,7 @@ console.log(`Last Month: ${lastMonth}/${lastYear}`);
     return `$${value}`;
   };
 
-  console.log(monthData,'monthData')
+  //console.log(monthData,'monthData')
   return (
     <Card className="p-4 md:p-5 shadow-sm border border-border rounded-xl md:rounded-2xl bg-card">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 md:mb-4">

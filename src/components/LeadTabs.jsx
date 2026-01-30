@@ -48,7 +48,7 @@ export default function LeadTabs({ onTabChange, data, onMonthChange }) {
     };
 
     useEffect(() => {
-        console.log('data', data)
+        //console.log('data', data)
     }, [data]);
 
 
@@ -84,9 +84,9 @@ export default function LeadTabs({ onTabChange, data, onMonthChange }) {
         let groupedData = {};
         // Log the data to the console
         if (newLeads.length > 0 && tab === 0) {
-            console.log("New Leads: ", newLeads);
+            //console.log("New Leads: ", newLeads);
             groupedData = groupLeadsByStatus(newLeads);
-            console.log(groupedData, 'groupedData')
+            //console.log(groupedData, 'groupedData')
             setGroupedLeads(Object.values(groupedData));
 
             const selectedMonthIndex = new Date(Date.parse(selectedMonth + " 1, 2025")).getMonth();
@@ -100,7 +100,7 @@ export default function LeadTabs({ onTabChange, data, onMonthChange }) {
                 return leadMonthIndex === selectedMonthIndex
             });
 
-            console.log("Filtered Approved Leads: ", filteredLeads);
+            //console.log("Filtered Approved Leads: ", filteredLeads);
 
             // Group the filtered leads by their status
             groupedData = groupLeadsByStatus(filteredLeads);
@@ -109,7 +109,7 @@ export default function LeadTabs({ onTabChange, data, onMonthChange }) {
             setGroupedLeads(Object.values(groupedData));
         }
         if (preApprovedLeads.length > 0 && tab === 1) {
-            console.log("Pre-Approved Leads: ", preApprovedLeads);
+            //console.log("Pre-Approved Leads: ", preApprovedLeads);
             groupedData = groupLeadsByStatus(preApprovedLeads);
             setGroupedLeads(Object.values(groupedData));
 
@@ -124,7 +124,7 @@ export default function LeadTabs({ onTabChange, data, onMonthChange }) {
                 return leadMonthIndex === selectedMonthIndex
             });
 
-            console.log("Filtered Approved Leads: ", filteredLeads);
+            //console.log("Filtered Approved Leads: ", filteredLeads);
 
             // Group the filtered leads by their status
             groupedData = groupLeadsByStatus(filteredLeads);
@@ -145,7 +145,7 @@ export default function LeadTabs({ onTabChange, data, onMonthChange }) {
                 return leadMonthIndex === selectedMonthIndex && lead.Status === 'Funded - Invoice EAZE Client';
             });
 
-            console.log("Filtered Approved Leads: ", filteredLeads);
+            //console.log("Filtered Approved Leads: ", filteredLeads);
 
             // Group the filtered leads by their status
             groupedData = groupLeadsByStatus(filteredLeads);
@@ -154,7 +154,7 @@ export default function LeadTabs({ onTabChange, data, onMonthChange }) {
             setGroupedLeads(Object.values(groupedData));
         }
         if (applicationDeclinedLeads.length > 0 && tab === 3) {
-            console.log("Application Declined Leads: ", applicationDeclinedLeads);
+            //console.log("Application Declined Leads: ", applicationDeclinedLeads);
             groupedData = groupLeadsByStatus(applicationDeclinedLeads);
             setGroupedLeads(Object.values(groupedData));
 
@@ -169,7 +169,7 @@ export default function LeadTabs({ onTabChange, data, onMonthChange }) {
                 return leadMonthIndex === selectedMonthIndex
             });
 
-            console.log("Filtered Approved Leads: ", filteredLeads);
+            //console.log("Filtered Approved Leads: ", filteredLeads);
 
             // Group the filtered leads by their status
             groupedData = groupLeadsByStatus(filteredLeads);
@@ -178,7 +178,7 @@ export default function LeadTabs({ onTabChange, data, onMonthChange }) {
             setGroupedLeads(Object.values(groupedData));
         }
         if (closedLostLeads.length > 0 && tab === 4) {
-            console.log("Closed Lost Leads: ", closedLostLeads);
+            //console.log("Closed Lost Leads: ", closedLostLeads);
             groupedData = groupLeadsByStatus(closedLostLeads);
             setGroupedLeads(Object.values(groupedData));
 
@@ -194,7 +194,7 @@ export default function LeadTabs({ onTabChange, data, onMonthChange }) {
                 return leadMonthIndex === selectedMonthIndex
             });
 
-            console.log("Filtered Approved Leads: ", filteredLeads);
+            //console.log("Filtered Approved Leads: ", filteredLeads);
 
             // Group the filtered leads by their status
             groupedData = groupLeadsByStatus(filteredLeads);
@@ -204,7 +204,7 @@ export default function LeadTabs({ onTabChange, data, onMonthChange }) {
         }
 
         if (allDeclinedLeads.length > 0 && tab === 5) {
-            console.log("Closed Lost Leads: ", allDeclinedLeads);
+            //console.log("Closed Lost Leads: ", allDeclinedLeads);
             groupedData = groupLeadsByStatus(allDeclinedLeads);
             setGroupedLeads(Object.values(groupedData));
 
@@ -219,7 +219,7 @@ export default function LeadTabs({ onTabChange, data, onMonthChange }) {
                 return leadMonthIndex === selectedMonthIndex
             });
 
-            console.log("Filtered Approved Leads: ", filteredLeads);
+            //console.log("Filtered Approved Leads: ", filteredLeads);
 
             // Group the filtered leads by their status
             groupedData = groupLeadsByStatus(filteredLeads);
@@ -228,7 +228,7 @@ export default function LeadTabs({ onTabChange, data, onMonthChange }) {
             setGroupedLeads(Object.values(groupedData));
         }
 
-        console.log('status', status);
+        //console.log('status', status);
     }, [newLeads, preApprovedLeads, approvedLeads, applicationDeclinedLeads, closedLostLeads, allDeclinedLeads, tab, selectedMonth]);
 
 

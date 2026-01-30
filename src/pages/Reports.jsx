@@ -333,7 +333,7 @@ export function Reports() {
         fundingPrograms.find((p) => p.id === selectedProgram)?.name ||
         "All Programs";
 
-    console.log(selectedDate, 'selectedDate')
+    //console.log(selectedDate, 'selectedDate')
 
     const { month, year } = getMonthAndYear(selectedDate)
     const dispatch = useDispatch();
@@ -360,16 +360,16 @@ export function Reports() {
 
     useEffect(() => {
         if (fundedData.length > 0 && selectedProgram) {
-            console.log('Raw Data:', fundedData);
+            //console.log('Raw Data:', fundedData);
 
             const filteredData = fundedData.filter(item =>
                 // Case-insensitive check to avoid "Elite" vs "elite" bugs
                 item.Loan_Program_Type__c?.toLowerCase() === selectedProgram.toLowerCase()
             );
 
-            console.log(`Filtered Data for ${selectedProgram}:`, filteredData);
+            //console.log(`Filtered Data for ${selectedProgram}:`, filteredData);
         }
-        console.log(declinedApplicationsThisMonth, 'declinedApplicationsThisMonth')
+        //console.log(declinedApplicationsThisMonth, 'declinedApplicationsThisMonth')
     }, [fundedData, selectedProgram, declinedApplicationsThisMonth]); // Added programId to dependencies
 
 
@@ -397,7 +397,7 @@ export function Reports() {
         });
     }, [fundedData, selectedProgram, selectedDate]);
 
-    console.log(filteredApplications2, 'filteredApplications2')
+    //console.log(filteredApplications2, 'filteredApplications2')
 
     const stats = useMemo(() => {
         const initialStats = {
@@ -431,7 +431,7 @@ export function Reports() {
         }, initialStats);
     }, [filteredApplications2]);
 
-    console.log(stats, 'stats')
+    //console.log(stats, 'stats')
 
     const generateExcel = (reportType) => {
         // Create Excel workbook

@@ -97,7 +97,7 @@ const RegisterPage = () => {
           // registrationCode: formData.registrationCode, // send the registration code
         })
       );
-      console.log(result,'result-----')
+      //console.log(result,'result-----')
       // toast.success("Account created successfully!");
 
       // clear form
@@ -110,7 +110,7 @@ const RegisterPage = () => {
             setFormData({ email: "", password: "", confirmPassword: "", registrationCode: "" });
             setTimeout(() => navigate("/login"), 900);
           } else {
-            console.log(result.payload)
+            //console.log(result.payload)
             // 🔥 result.payload contains your API error (e.g., "Invalid email or password")
             toast.error(result.payload || "Login failed");
             if(result.payload=='Request failed with status code 401'){

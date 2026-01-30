@@ -60,7 +60,7 @@ export const getTotalApplicationsThisMonth = createAsyncThunk(
     const data = await fetchData('gettotalapplicationthismonth', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, token)
       .catch(rejectWithValue);
 
-      // console.log(data, 'data');
+      // //console.log(data, 'data');
     return data?.data || [];
   }
 );
@@ -274,7 +274,7 @@ export const getCashCollectedLastMonth = createAsyncThunk(
 export const transformLeadData = (data) => {
   return data.map(item => {
     const updatedItem = { ...item };
-    // console.log(updatedItem,'updatedItem')
+    // //console.log(updatedItem,'updatedItem')
 
     // Check if Invoice_Paid_Date__c exists, replace it with CreatedDate
     if (updatedItem.Invoice_Paid_Date__c) {
@@ -426,7 +426,7 @@ const dashboardSlice = createSlice({
       })
       .addCase(getTopDeclineReason.rejected, (state, action) => {
         state.status = 'failed';
-        console.log(action.error.message,'action.error.message')
+        //console.log(action.error.message,'action.error.message')
         state.error = action.payload || action.error.message;
       })
       // Loan By Type – This Month

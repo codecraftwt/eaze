@@ -44,13 +44,13 @@ export default function CashCollectedByMonthChart({ leads }) {
     };
   }, [leads]);
 
-  console.log(loanTypes,'loanTypes')
+  // //console.log(loanTypes,'loanTypes')
   const series = loanTypes.map((loanType) => ({
     label: loanType,
     data: months.map((month) => data[month][loanType]),
   }));
 
-  console.log(series,'series')
+  // //console.log(series,'series')
 
   return (
     <Box sx={{ width: "100%", maxWidth: 1000 }}>

@@ -62,7 +62,7 @@ const ForgotResetPasswordPage = () => {
 
     try {
       const result = await dispatch(forgotPassword({ email }));
-      console.log(result, 'result---');
+      //console.log(result, 'result---');
 
       if (result.meta.requestStatus === "fulfilled") {
         toast.success("If the email exists, a reset link has been sent.");

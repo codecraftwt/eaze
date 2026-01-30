@@ -37,7 +37,7 @@ const ForgotPasswordPage = () => {
 
     try {
       const result = await dispatch(changePassword(formData));
-      console.log(result, 'result---------');
+      //console.log(result, 'result---------');
       if (result.meta.requestStatus === "fulfilled") {
         toast.success("Your password has been updated successfully!");
         navigate("/login");

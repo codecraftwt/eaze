@@ -105,7 +105,7 @@ export const getSalesforceToken = createAsyncThunk(
 // Helper function for side effects (e.g., register)
 const register2 = (key) => {
   // Example logic for the register action (side effect)
-  console.log("Registering with key:", key);
+  //console.log("Registering with key:", key);
   // Perform any side effects (like calling an API) here
 };
 export const registerUser = createAsyncThunk(
@@ -307,7 +307,7 @@ const authSlice = createSlice({
       })
       .addCase(getSalesforceToken.rejected, (state, action) => {
         state.status = "failed";
-        console.log('tokennnn----')
+        //console.log('tokennnn----')
         state.error = action.payload;
       });
 
@@ -335,7 +335,7 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
-        console.log(action.payload, 'action.payload');
+        //console.log(action.payload, 'action.payload');
         state.status = "succeeded";
         state.user = action.payload.user;
         state.token = action.payload.token;

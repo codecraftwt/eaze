@@ -61,12 +61,12 @@ const [showTooltip, setShowTooltip] = useState(false);
 
   try {
     const result = await dispatch(loginUser(formData));
-    console.log(result,'result----')
+    //console.log(result,'result----')
     if (result.meta.requestStatus === "fulfilled") {
       // toast.success("Login successful!");
       setTimeout(() => navigate("/dashboard"), 900);
     } else {
-      console.log(result.payload)
+      //console.log(result.payload)
       // 🔥 result.payload contains your API error (e.g., "Invalid email or password")
       toast.error(result.payload || "Login failed");
       if(result.payload=='Request failed with status code 401'){

@@ -98,7 +98,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           className={`flex items-center space-x-3 py-2 px-3 rounded-xl transition-all duration-300 ease-in-out ${isActive("/loan")}`}
         >
           <HandCoins size={20} className="transition-all duration-300 ease-in-out" />
-          {isOpen && <span className="transition-opacity duration-300 ease-in-out">loan</span>}
+          {isOpen && <span className="transition-opacity duration-300 ease-in-out">Loan</span>}
         </Link>
         <Link
           to="/funded"

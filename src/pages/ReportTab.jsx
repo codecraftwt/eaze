@@ -88,7 +88,7 @@ const {
       if (!salesforceToken) {
         dispatch(getSalesforceToken()); // Fetch the Salesforce token if not available
       } else {
-        console.log('hiiiiii')
+        //console.log('hiiiiii')
         dispatch(getFundedData2({ accountId: portalUserId, token: salesforceToken }));
         dispatch(getTotalApproved({ accountId: portalUserId, token: salesforceToken }));
       }
