@@ -61,7 +61,7 @@ const pipelineStages = useMemo(() => {
   return [
     {
       name: "New leads",
-      count: maxCount,
+      count: newLeads.length,
       // count: newLeads.length,
       color: COLORS.submitted,
       width: "100%", // Always 100% since it's the maxCount
@@ -76,7 +76,10 @@ const pipelineStages = useMemo(() => {
       name: "Approved",
       count: approvedApplicationsThisMonth.length,
       color: COLORS.approved,
-      width: `${Math.round((approvedApplicationsThisMonth.length / maxCount) * 100)}%`,
+      width: `${Math.max(
+    Math.round((approvedApplicationsThisMonth.length / maxCount) * 100), 
+    30
+  )}%`,
     },
     {
       name: "Funded",

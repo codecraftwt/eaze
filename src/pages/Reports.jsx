@@ -644,7 +644,7 @@ export function Reports() {
                                 Quarterly Report
                             </CardTitle>
                             <p className="text-xs text-muted-foreground">
-                                Q4 2024 • {programName}
+                                Q1 {year} • {programName}
                             </p>
                         </div>
                     </CardHeader>

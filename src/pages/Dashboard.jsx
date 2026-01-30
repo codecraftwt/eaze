@@ -22,7 +22,7 @@ import { getMonthlyStats } from "../lib/mockData";
 import { StatCard } from "../components/dashboard/StatCard";
 import { useDispatch, useSelector } from "react-redux";
 import { getSalesforceToken } from "../store/slices/authSlice";
-import { getApprovedThisMonth, getCashCollectedAllTime, getFundedData, getPreApprovedThisMonth, getTotalApplications, getTotalApproved } from "../store/slices/dashboardSlice";
+import { getApprovedThisMonth, getCashCollectedAllTime, getFundedData, getPreApprovedThisMonth, getTotalApplications, getTotalApplicationsThisMonth, getTotalApproved } from "../store/slices/dashboardSlice";
 import { getMonthAndYear } from "../lib/dateUtils";
 import { getNewLead } from "../store/slices/applicationSlice";
 export function Dashboard({ onNavigate, onNavigateToProgram }) {
@@ -54,7 +54,8 @@ export function Dashboard({ onNavigate, onNavigateToProgram }) {
     totalApplications,
     fundedData,
     preApprovedApplicationsThisMonth,
-    approvedApplicationsThisMonth
+    approvedApplicationsThisMonth,
+    totalApplicationsThisMonth
 
   } = useSelector((state) => state.dashboard);
   const {
@@ -68,10 +69,13 @@ export function Dashboard({ onNavigate, onNavigateToProgram }) {
     } else {
       dispatch(getFundedData({ accountId: portalUserId, token: salesforceToken, month: month, year: year }));
       dispatch(getNewLead({ accountId: portalUserId, token: salesforceToken, month: month, year: year }));
+      dispatch(getTotalApplicationsThisMonth({ accountId: portalUserId, token: salesforceToken, month: month, year: year }));
+      dispatch(getTotalApproved({ accountId: portalUserId, token: salesforceToken, month: month, year: year }));
       dispatch(getPreApprovedThisMonth({ accountId: portalUserId, token: salesforceToken, month: month, year: year }));
       dispatch(getApprovedThisMonth({ accountId: portalUserId, token: salesforceToken, month: month, year: year }));
     }
   }, [dispatch, salesforceToken, selectedDate]);
+  console.log(totalApplicationsThisMonth.length,'totalApplicationsThisMonth')
   const maxCount = newLeads.length + preApprovedApplicationsThisMonth.length + approvedApplicationsThisMonth.length + fundedData.length || 0;
 
   const totalCashCollected = useMemo(() => {
@@ -131,7 +135,7 @@ export function Dashboard({ onNavigate, onNavigateToProgram }) {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <StatCard
           title="Application This Month"
-          value={maxCount}
+          value={totalApplicationsThisMonth.length}
           icon={FileText}
           variant="primary"
         />
@@ -144,7 +148,7 @@ export function Dashboard({ onNavigate, onNavigateToProgram }) {
         />
         <StatCard
           title="Approval Rate"
-          value={`${Math.round((approvedApplicationsThisMonth.length / maxCount) * 100)}%`}
+          value={`${Math.round((approvedApplicationsThisMonth.length / totalApplicationsThisMonth.length) * 100)}%`}
           icon={Percent}
           variant="light-blue"
         />

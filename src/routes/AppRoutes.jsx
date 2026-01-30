@@ -18,6 +18,7 @@ import { FundingProgramDetails } from '../pages/FundingProgramDetails';
 import { Reports } from '../pages/Reports';
 import Dashboard3 from '../pages/Dashboard3';
 import Login from '../pages/Login';
+import { Affiliate } from '../pages/Affiliate';
 
 const AppRoutes = () => {
   return (
@@ -34,6 +35,7 @@ const AppRoutes = () => {
           <Route path="/loan" element={<Loan />} />
           <Route path="/report" element={<Reports />} />
           <Route path="/funded" element={<ReportTab />} />
+          <Route path="/affiliate" element={<Affiliate />} />
         </Route>
         
         {/* Routes that don't need the sidebar */}

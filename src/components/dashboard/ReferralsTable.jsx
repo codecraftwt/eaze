@@ -77,99 +77,68 @@ export function ReferralsTable({ onViewAll, selectedDate }) {
 
   console.log(filteredApplicationsNew,'filteredApplicationsNew')
   return (
-    <Card className="p-3 md:p-5 shadow-sm border border-border rounded-xl md:rounded-2xl bg-card">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
-        <h3 className="font-semibold text-foreground text-sm md:text-base">
-          My Applications
-        </h3>
-        {/* <div className="flex flex-wrap gap-1">
-          <Button
-            variant="ghost"
-            size="sm"
-            className={`text-xs px-2 md:px-3 ${filter === "all" ? "text-primary font-medium" : "text-muted-foreground"}`}
-            onClick={() => setFilter("all")}
-          >
-            All
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className={`text-xs px-2 md:px-3 ${filter === "submitted" ? "text-primary font-medium" : "text-muted-foreground"}`}
-            onClick={() => setFilter("submitted")}
-          >
-            Submitted
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className={`text-xs px-2 md:px-3 ${filter === "funded" ? "text-primary font-medium" : "text-muted-foreground"}`}
-            onClick={() => setFilter("funded")}
-          >
-            Funded
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className={`text-xs px-2 md:px-3 ${filter === "approved" ? "text-primary font-medium" : "text-muted-foreground"}`}
-            onClick={() => setFilter("approved")}
-          >
-            Approved
-          </Button>
-        </div> */}
-      </div>
-      <div className="space-y-1">
-  {/* Table Header: Updated to 6 columns */}
-  <div className="grid grid-cols-3 md:grid-cols-[1.5fr_1fr_1fr_1.5fr_1fr_1fr] gap-4 text-xs text-muted-foreground font-medium py-2 border-b border-border text-[#707a8f] px-2">
-    <span>Name</span>
-    <span className="hidden md:block">Program</span>
-    <span className="text-right">Cash</span>
-    <span className="text-right hidden md:block">Email</span>
-    <span className="text-right hidden md:block">Mobile</span>
-    <span className="text-right">Loan Amount</span>
+   <Card className="p-3 md:p-5 shadow-sm border border-border rounded-xl md:rounded-2xl bg-card">
+  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+    <h3 className="font-semibold text-foreground text-sm md:text-base">
+      My Applications
+    </h3>
   </div>
 
-  <ScrollArea className="h-[300px] md:h-[400px]">
-    {filteredApplicationsNew.map((application, index) => (
-      <div
-        key={application.Id || index}
-        className="grid grid-cols-3 md:grid-cols-[1.5fr_1fr_1fr_1.5fr_1fr_1fr] gap-4 items-center py-2 hover:bg-muted/50 rounded-lg px-2 transition-colors cursor-pointer group"
-      >
-        {/* 1. Name */}
-        <span className="font-medium text-foreground text-xs md:text-sm truncate">
-          {application.Name}
-        </span>
+  <div className="space-y-1">
+    {/* --- TABLE HEADER --- */}
+    {/* Grid columns: 1.5fr (Name), 1fr (Program), 1fr (Status), 1fr (Cash), 1fr (Contact), 1fr (Amount) */}
+    <div className="grid grid-cols-3 md:grid-cols-[1.5fr_1fr_1fr_1fr_1.5fr_1fr] gap-4 text-xs text-muted-foreground font-medium py-2 border-b border-border px-2">
+      <span>Name</span>
+      <span className="hidden md:block">Program</span>
+      <span className="text-center md:text-left">Status</span>
+      <span className="hidden md:block text-right">Cash Collected</span>
+      <span className="hidden md:block text-right">Contact Info</span>
+      <span className="text-right">Loan Amount</span>
+    </div>
 
-        {/* 2. Program (Hidden on mobile) */}
-        <span className="text-muted-foreground text-xs md:text-sm hidden md:block truncate">
-          {application.Loan_Program_Type__c}
-        </span>
-
-        {/* 3. Cash Collected */}
-        <span className="text-right text-foreground text-xs md:text-sm font-medium">
-          {application.Cash_Collected__c ? `$${Number(application.Cash_Collected__c).toLocaleString()}` : '--'}
-        </span>
-
-        {/* 4. Email (Hidden on mobile) */}
-        <span className="text-right text-muted-foreground text-xs md:text-sm hidden md:block truncate">
-          {application.Email}
-        </span>
-
-        {/* 5. Mobile (Hidden on mobile) */}
-        <span className="text-right text-muted-foreground text-xs md:text-sm hidden md:block truncate">
-          {application.MobilePhone}
-        </span>
-
-        {/* 6. Loan Amount + Arrow */}
-        <div className="flex items-center justify-end gap-1">
-          <span className="text-foreground font-medium text-xs md:text-sm">
-            ${application.Loan_Amount__c?.toLocaleString()}
+    <ScrollArea className="h-[300px] md:h-[400px]">
+      {filteredApplicationsNew.map((application, index) => (
+        <div
+          key={application.Id || index}
+          className="grid grid-cols-3 md:grid-cols-[1.5fr_1fr_1fr_1fr_1.5fr_1fr] gap-4 items-center py-3 hover:bg-muted/50 rounded-lg px-2 transition-colors cursor-pointer group"
+        >
+          {/* 1. Name */}
+          <span className="font-medium text-foreground text-xs md:text-sm truncate">
+            {application.Name}
           </span>
-          <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block" />
+
+          {/* 2. Program (Hidden on mobile) */}
+          <span className="text-muted-foreground text-xs md:text-sm hidden md:block truncate">
+            {application.Loan_Program_Type__c || "N/A"}
+          </span>
+
+          {/* 3. Status */}
+          <span className="text-center md:text-left text-xs md:text-sm truncate bg-muted/30 px-2 py-1 rounded-full md:bg-transparent md:p-0">
+            {application.Lead_Partner_Status__c}
+          </span>
+
+          {/* 4. Cash Collected (Hidden on mobile) */}
+          <span className="text-right text-foreground text-xs md:text-sm font-medium hidden md:block">
+            {application.Cash_Collected__c ? `$${Number(application.Cash_Collected__c).toLocaleString()}` : '--'}
+          </span>
+
+          {/* 5. Contact Info (Email/Mobile combined - Hidden on mobile) */}
+          <div className="hidden md:flex flex-col text-right truncate">
+            <span className="text-muted-foreground text-[11px] truncate">{application.Email}</span>
+            <span className="text-muted-foreground text-[10px]">{application.MobilePhone}</span>
+          </div>
+
+          {/* 6. Loan Amount */}
+          <div className="flex items-center justify-end gap-1">
+            <span className="text-foreground font-bold text-xs md:text-sm text-right">
+              ${application.Loan_Amount__c?.toLocaleString() || '0'}
+            </span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block" />
+          </div>
         </div>
-      </div>
-    ))}
-  </ScrollArea>
-</div>
-    </Card>
+      ))}
+    </ScrollArea>
+  </div>
+</Card>
   );
 }

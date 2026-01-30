@@ -75,15 +75,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           <LayoutGrid size={20} className="transition-all duration-300 ease-in-out" />
           {isOpen && <span className="transition-opacity duration-300 ease-in-out">Dashboard</span>}
         </Link>
-
-        <Link
-          to="/applications"
-          className={`flex items-center space-x-3 py-2 px-3 rounded-xl transition-all duration-300 ease-in-out ${isActive("/applications")}`}
-        >
-          <ClipboardList size={20} className="transition-all duration-300 ease-in-out" />
-          {isOpen && <span className="transition-opacity duration-300 ease-in-out">Applications</span>}
-        </Link>
-        <Link
+<Link
           to="/report"
           className={`flex items-center space-x-3 py-2 px-3 rounded-xl transition-all duration-300 ease-in-out ${isActive("/report")}`}
         >
@@ -104,6 +96,23 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           <HandCoins size={20} className="transition-all duration-300 ease-in-out" />
           {isOpen && <span className="transition-opacity duration-300 ease-in-out">Funded</span>}
         </Link>
+        <Link
+          to="/applications"
+          className={`flex items-center space-x-3 py-2 px-3 rounded-xl transition-all duration-300 ease-in-out ${isActive("/applications")}`}
+        >
+          <ClipboardList size={20} className="transition-all duration-300 ease-in-out" />
+          {isOpen && <span className="transition-opacity duration-300 ease-in-out">Applications</span>}
+        </Link>
+        <Link
+          to="/affiliate"
+          className={`flex items-center space-x-3 py-2 px-3 rounded-xl transition-all duration-300 ease-in-out ${isActive("/affiliate")}`}
+        >
+          <ClipboardList size={20} className="transition-all duration-300 ease-in-out" />
+          {isOpen && <span className="transition-opacity duration-300 ease-in-out">Become an Affiliate</span>}
+        </Link>
+        
+        
+        
 
         <Link
           to="/login"
