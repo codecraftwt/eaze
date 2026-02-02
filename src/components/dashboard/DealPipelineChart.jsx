@@ -75,7 +75,7 @@ const pipelineStages = useMemo(() => {
     30}%`,
     },
     {
-      name: "Decline",
+      name: "Declined",
       count: declinedApplicationsThisMonth.length,
       color: COLORS.inReview,
       width: `${Math.round((declinedApplicationsThisMonth.length / maxCount) * 100)}%`,
