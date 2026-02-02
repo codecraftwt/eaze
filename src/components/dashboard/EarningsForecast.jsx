@@ -7,7 +7,7 @@ import { Card } from "../ui/card";
 import { getPerformanceData } from "../../lib/mockData";
 import { useDispatch, useSelector } from "react-redux";
 import { getSalesforceToken } from "../../store/slices/authSlice";
-import { getCashCollectedAllTime, getCashCollectedLastMonth, getCashCollectedThisMonth } from "../../store/slices/dashboardSlice";
+import { getCashCollectedAllTime, getCashCollectedLastMonth, getCashCollectedThisMonth, getFundedData, getFundedLastMonthData } from "../../store/slices/dashboardSlice";
 import { getMonthAndYear } from "../../lib/dateUtils";
 export function EarningsForecast({ selectedDate }) {
 
@@ -16,7 +16,7 @@ export function EarningsForecast({ selectedDate }) {
     
     // 1. Get data from Redux
     const { salesforceToken, portalUserId } = useSelector((state) => state.auth);
-    const { cashCollectedThisMonth, cashCollectedLastMonth,cashCollectedAllTime } = useSelector((state) => state.dashboard);
+    const { cashCollectedThisMonth, cashCollectedLastMonth,cashCollectedAllTime,fundedData,fundedLastMonthData } = useSelector((state) => state.dashboard);
   
     // 2. Fetch data when token or date changes
     useEffect(() => {
@@ -29,13 +29,16 @@ export function EarningsForecast({ selectedDate }) {
         dispatch(getCashCollectedThisMonth({ accountId: portalUserId, token: salesforceToken,month:month,year:year }));
         dispatch(getCashCollectedLastMonth({ accountId: portalUserId, token: salesforceToken,month:lastMonth,year:lastYear }));
         dispatch(getCashCollectedAllTime({ accountId: portalUserId, token: salesforceToken,month:month,year:year }));
+
+        dispatch(getFundedData({ accountId: portalUserId, token: salesforceToken ,month:month,year:year}));
+              dispatch(getFundedLastMonthData({ accountId: portalUserId, token: salesforceToken ,month:lastMonth,year:lastYear}));
       }
     }, [dispatch, salesforceToken, portalUserId, selectedDate]);
 
 
   const data = useMemo(
-    () => getPerformanceData(selectedDate || new Date(),cashCollectedThisMonth,cashCollectedLastMonth,cashCollectedAllTime),
-    [selectedDate,cashCollectedThisMonth,cashCollectedLastMonth],
+    () => getPerformanceData(selectedDate || new Date(),fundedData,fundedLastMonthData,cashCollectedAllTime),
+    [selectedDate,fundedData,fundedLastMonthData],
   );
 
 
