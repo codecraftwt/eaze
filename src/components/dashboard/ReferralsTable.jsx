@@ -7,7 +7,7 @@ import { ScrollArea } from "../ui/scroll-area";
 import { getMonthlyStats } from "../../lib/mockData";
 import { useDispatch, useSelector } from "react-redux";
 import { getSalesforceToken } from "../../store/slices/authSlice";
-import { getTotalApplications } from "../../store/slices/dashboardSlice";
+import { getTotalApplications, getTotalApplicationsThisMonth } from "../../store/slices/dashboardSlice";
 import { isSameMonth } from "date-fns";
 import { getMonthAndYear } from "../../lib/dateUtils";
 // Vibrant status colors with light backgrounds and colored text
@@ -57,7 +57,7 @@ export function ReferralsTable({ onViewAll, selectedDate }) {
    const { month, year } = getMonthAndYear(selectedDate)
   const { salesforceToken, portalUserId } = useSelector((state) => state.auth);
   const {
-    cashCollectedAllTime, totalApplications
+    cashCollectedAllTime, totalApplications,totalApplicationsThisMonth
   } = useSelector((state) => state.dashboard);
 
   useEffect(() => {
@@ -65,9 +65,18 @@ export function ReferralsTable({ onViewAll, selectedDate }) {
       dispatch(getSalesforceToken());
     } else {
       dispatch(getTotalApplications({ accountId: portalUserId, token: salesforceToken,month:month,year:year }));
+      dispatch(getTotalApplicationsThisMonth({ accountId: portalUserId, token: salesforceToken,month:month,year:year }));
 
     }
   }, [dispatch, salesforceToken, selectedDate]);
+
+
+  useEffect(()=>{
+    console.log(totalApplications,'totalApplications')
+    console.log(totalApplications.length,'totalApplications')
+    console.log(totalApplicationsThisMonth,'totalApplicationsThisMonth')
+    console.log(totalApplicationsThisMonth.length,'totalApplicationsThisMonth')
+  },[totalApplications])
 
   const filteredApplicationsNew = useMemo(() => {
     if (!totalApplications) return [];
@@ -99,7 +108,7 @@ export function ReferralsTable({ onViewAll, selectedDate }) {
     </div>
 
     <ScrollArea className="h-[300px] md:h-[400px]">
-      {filteredApplicationsNew.map((application, index) => (
+      {totalApplicationsThisMonth.map((application, index) => (
         <div
           key={application.Id || index}
           className="grid grid-cols-3 md:grid-cols-[1.5fr_1fr_1fr_1fr_1.5fr_1fr] gap-4 items-center py-3 hover:bg-muted/50 rounded-lg px-2 transition-colors cursor-pointer group"

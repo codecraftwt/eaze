@@ -137,8 +137,10 @@ export function Affiliate() {
           </div>
 
           <Button className="w-full gap-2 h-10 md:h-11 text-white">
-            <Mail className="h-4 w-4" />
-            Get Started
+            <a href="https://fund.eazeconsulting.com/eaze-promoter" className="flex items-center gap-[7px]">
+              <Mail className="h-4 w-4" />
+              Get Started
+            </a>
           </Button>
         </CardContent>
       </Card>
