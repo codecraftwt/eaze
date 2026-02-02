@@ -132,7 +132,7 @@ export function Dashboard({ onNavigate, onNavigateToProgram }) {
       </div>
 
       {/* Stats Row - Top KPIs */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
         <StatCard
           title="Application This Month"
           value={totalApplicationsThisMonth.length}
@@ -149,6 +149,16 @@ export function Dashboard({ onNavigate, onNavigateToProgram }) {
         <StatCard
           title="Approval Rate"
           value={`${Math.round((approvedApplicationsThisMonth.length / totalApplicationsThisMonth.length) * 100)}%`}
+          icon={Percent}
+          variant="light-blue"
+        />
+        <StatCard
+          title="Funded Rate"
+         value={
+    approvedApplicationsThisMonth?.length > 0 
+      ? `${Math.round((fundedData.length / approvedApplicationsThisMonth.length) * 100)}%` 
+      : "0%"
+  }
           icon={Percent}
           variant="light-blue"
         />

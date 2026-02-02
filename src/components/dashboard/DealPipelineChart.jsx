@@ -8,7 +8,7 @@ import { getMonthAndYear } from "../../lib/dateUtils";
 import { useDispatch, useSelector } from "react-redux";
 import { getSalesforceToken } from "../../store/slices/authSlice";
 import { getNewLead } from "../../store/slices/applicationSlice";
-import { getApprovedThisMonth, getFundedData, getPreApprovedThisMonth } from "../../store/slices/dashboardSlice";
+import { getApprovedThisMonth, getDeclinedThisMonth, getFundedData, getPreApprovedThisMonth } from "../../store/slices/dashboardSlice";
 // EAZE Brand Colors - Executive-grade palette (muted tones)
 // These colors are consistent with ReferralsTable status badges
 const COLORS = {
@@ -34,8 +34,8 @@ export function DealPipelineChart({ selectedDate }) {
     totalApplications,
     fundedData,
     preApprovedApplicationsThisMonth,
-    approvedApplicationsThisMonth
-
+    approvedApplicationsThisMonth,
+    declinedApplicationsThisMonth
   } = useSelector((state) => state.dashboard);
   const {
     
@@ -50,12 +50,13 @@ newLeads
       dispatch(getNewLead({ accountId: portalUserId, token: salesforceToken,month:month,year:year }));
       dispatch(getPreApprovedThisMonth({ accountId: portalUserId, token: salesforceToken,month:month,year:year }));
       dispatch(getApprovedThisMonth({ accountId: portalUserId, token: salesforceToken,month:month,year:year }));
+      dispatch(getDeclinedThisMonth({ accountId: portalUserId, token: salesforceToken,month:month,year:year }));
     }
   }, [dispatch, salesforceToken,selectedDate]);
 
 
   const { pipeline } = stats;
-  const maxCount = newLeads.length + preApprovedApplicationsThisMonth.length+approvedApplicationsThisMonth.length+fundedData.length|| 0;
+  const maxCount = newLeads.length + preApprovedApplicationsThisMonth.length+approvedApplicationsThisMonth.length+fundedData.length+declinedApplicationsThisMonth.length|| 0;
 
 const pipelineStages = useMemo(() => {
   return [
@@ -72,6 +73,12 @@ const pipelineStages = useMemo(() => {
       color: COLORS.inReview,
       width: `${Math.round((preApprovedApplicationsThisMonth.length / maxCount) * 100), 
     30}%`,
+    },
+    {
+      name: "Deal",
+      count: declinedApplicationsThisMonth.length,
+      color: COLORS.inReview,
+      width: `${Math.round((declinedApplicationsThisMonth.length / maxCount) * 100)}%`,
     },
     {
       name: "Approved",

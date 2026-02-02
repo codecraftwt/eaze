@@ -172,8 +172,8 @@ const lastYear = month === 1 ? year - 1 : year;
               tickLine={false}
               tick={{ fill: "#64748B", fontSize: 9 }}
               tickFormatter={formatYAxisLeft}
-              domain={[0, 1000000]}
-              ticks={[0, 200000, 400000, 600000, 800000, 1000000]}
+              domain={[0, 200000]}
+              ticks={[0, 50000, 100000, 150000, 200000]}
               interval={0}
               width={50}
             />

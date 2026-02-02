@@ -13,17 +13,21 @@ export function EarningsForecast({ selectedDate }) {
 
    const dispatch = useDispatch();
     const { month, year } = getMonthAndYear(selectedDate)
+    
     // 1. Get data from Redux
     const { salesforceToken, portalUserId } = useSelector((state) => state.auth);
     const { cashCollectedThisMonth, cashCollectedLastMonth,cashCollectedAllTime } = useSelector((state) => state.dashboard);
   
     // 2. Fetch data when token or date changes
     useEffect(() => {
+      console.log(selectedDate,'selectedDate')
       if (!salesforceToken) {
         dispatch(getSalesforceToken());
       } else if (portalUserId) {
+        const lastMonth = month === 1 ? 12 : month - 1;
+    const lastYear = month === 1 ? year - 1 : year;
         dispatch(getCashCollectedThisMonth({ accountId: portalUserId, token: salesforceToken,month:month,year:year }));
-        dispatch(getCashCollectedLastMonth({ accountId: portalUserId, token: salesforceToken,month:month,year:year }));
+        dispatch(getCashCollectedLastMonth({ accountId: portalUserId, token: salesforceToken,month:lastMonth,year:lastYear }));
         dispatch(getCashCollectedAllTime({ accountId: portalUserId, token: salesforceToken,month:month,year:year }));
       }
     }, [dispatch, salesforceToken, portalUserId, selectedDate]);

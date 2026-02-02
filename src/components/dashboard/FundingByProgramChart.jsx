@@ -140,13 +140,12 @@ useEffect(()=>{
               tickLine={false}
               tick={{ fill: "#64748B", fontSize: 10 }}
               tickFormatter={(value) => {
-                if (value >= 1000000)
-                  return `$${(value / 1000000).toFixed(0)}M`;
-                if (value >= 1000) return `$${(value / 1000).toFixed(0)}K`;
-                return `$${value}`;
-              }}
-              domain={[0, 1000000]}
-              ticks={[0, 200000, 400000, 600000, 800000, 1000000]}
+    if (value >= 1000) return `$${(value / 1000).toFixed(0)}K`;
+    return `$${value}`;
+  }}
+              domain={[0, 200000]}
+  // Define clean intervals for 200k
+  ticks={[0, 50000, 100000, 150000, 200000]}
               interval={0}
               width={50}
             />

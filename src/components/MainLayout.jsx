@@ -2,16 +2,17 @@ import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import { FaBars, FaTimes } from 'react-icons/fa';
+import { Header } from './Header';
 
 const MainLayout = () => {
   const [isOpen, setIsOpen] = useState(true); // Desktop mini/expand
   const [mobileOpen, setMobileOpen] = useState(false); // Mobile open/close
 
   return (
-    <div className="flex h-screen overflow-hidden">
-
+    <div className="flex h-screen overflow-hidden flex-col">
+      <Header/>
       {/* Sidebar */}
-      <div
+      {/* <div
         className={`
           fixed lg:relative h-full bg-gray-800 text-white
           transition-all duration-300 ease-in-out
@@ -21,14 +22,13 @@ const MainLayout = () => {
       >
         <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} />
 
-        {/* Mobile close button */}
         <button
           className="lg:hidden absolute top-4 right-4 text-black text-2xl"
           onClick={() => setMobileOpen(false)}
         >
           <FaTimes />
         </button>
-      </div>
+      </div> */}
 
       {/* Main content */}
       <div
