@@ -412,7 +412,7 @@ export function Reports() {
         });
     }, [fundedData, selectedProgram, selectedDate,totalApplicationsThisMonth,selectedStatus]);
 
-    //console.log(filteredApplications2, 'filteredApplications2')
+    console.log(filteredApplications2, 'filteredApplications2')
 
     const stats = useMemo(() => {
         const initialStats = {
@@ -553,6 +553,25 @@ const statusOptions = [
   { label: "All Applications", value: "all", color: "#94a3b8" }, // Slate
   { label: "Funded Only", value: "funded", color: "#22c55e" }    // Green
 ];
+
+let columnKeys = [];
+  if (filteredApplications2.length > 0) {
+    // Get all keys except the ones we want to hide or move
+    const allKeys = Object.keys(filteredApplications2[0]);
+    const keysToExclude = ['attributes', 'Id', 'Name'];
+    
+    // Start with 'Name', then add everything else that isn't in the excluded list
+    columnKeys = ['Name', ...allKeys.filter(key => !keysToExclude.includes(key))];
+  }
+
+  // 2. Helper to format header names (e.g., Loan_Amount__c -> Loan Amount)
+  const formatHeader = (key) => {
+    return key
+      .replace(/__c$/, '')      // Remove Salesforce custom field suffix
+      .replace(/_/g, ' ')       // Replace underscores with spaces
+      .replace(/([A-Z])/g, ' $1') // Add space before capital letters
+      .trim();
+  };
     return (
         <div className="p-4 md:p-6 space-y-6 bg-background">
             {/* Header */}
@@ -791,68 +810,41 @@ const statusOptions = [
 
             {/* Applications Table */}
             <Card>
-                <CardHeader>
-                    <CardTitle className="text-base md:text-lg">
-                        Applications ({filteredApplications2.length})
-                    </CardTitle>
-                </CardHeader>
-                <CardContent className="p-0 md:p-6">
-                    <div className="overflow-x-auto">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="whitespace-nowrap text-xs md:text-sm">
-                                        Client
-                                    </TableHead>
-                                    <TableHead className="whitespace-nowrap text-xs md:text-sm">
-                                        Amount
-                                    </TableHead>
-                                    {/* <TableHead className="whitespace-nowrap text-xs md:text-sm hidden lg:table-cell">
-                                        Term
-                                    </TableHead> */}
-                                    {/* <TableHead className="whitespace-nowrap text-xs md:text-sm">
-                                        Status
-                                    </TableHead> */}
-                                    <TableHead className="whitespace-nowrap text-xs md:text-sm hidden md:table-cell">
-                                        Program
-                                    </TableHead>
-                                    <TableHead className="whitespace-nowrap text-xs md:text-sm hidden md:table-cell">
-                                        Date
-                                    </TableHead>
-                                    <TableHead className="whitespace-nowrap text-xs md:text-sm hidden xl:table-cell">
-                                        Contact
-                                    </TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {filteredApplications2.map((app) => (
-                                    <TableRow key={app.Id}>
-                                        <TableCell className="font-medium text-xs md:text-sm max-w-[120px] truncate">
-                                            {app.Name}
-                                        </TableCell>
-                                        <TableCell className="text-xs md:text-sm whitespace-nowrap">
-                                            ${app.Loan_Amount__c.toLocaleString()}
-                                        </TableCell>
-                                        {/* <TableCell className="text-xs md:text-sm hidden lg:table-cell">
-                                            {app.term}
-                                        </TableCell> */}
-                                        {/* <TableCell>{getStatusBadge(app.status)}</TableCell> */}
-                                        <TableCell className="text-xs md:text-sm hidden md:table-cell capitalize">
-                                            {app.Loan_Program_Type__c}
-                                        </TableCell>
-                                        <TableCell className="text-xs md:text-sm hidden md:table-cell">
-                                            {app.CreatedDate}
-                                        </TableCell>
-                                        <TableCell className="text-primary text-xs md:text-sm hidden xl:table-cell">
-                                            {app.Email}
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </div>
-                </CardContent>
-            </Card>
+      <CardHeader>
+        <CardTitle className="text-base md:text-lg">
+          Applications ({filteredApplications2.length})
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="p-0 md:p-6">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                {columnKeys.map((key) => (
+                  <TableHead key={key} className="whitespace-nowrap text-xs md:text-sm capitalize">
+                    {formatHeader(key)}
+                  </TableHead>
+                ))}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredApplications2.map((app) => (
+                <TableRow key={app.Id}>
+                  {columnKeys.map((key) => (
+                    <TableCell key={`${app.Id}-${key}`} className="text-xs md:text-sm whitespace-nowrap">
+                      {/* Special formatting for specific types */}
+                      {typeof app[key] === 'number' && key.includes('Amount') 
+                        ? `$${app[key].toLocaleString()}` 
+                        : String(app[key] || '-')}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </CardContent>
+    </Card>
         </div>
     );
 }
