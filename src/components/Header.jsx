@@ -12,9 +12,9 @@ const navItems = [
   { id: "dashboard", label: "Dashboard" },
   { id: "report", label: "My Report" },
   { id: "affiliate", label: "Become an Affiliate" },
-  { id: "loan", label: "Loan" },
+  // { id: "loan", label: "Loan" },
   { id: "funded", label: "Funded" },
-  { id: "applications", label: "Applications" },
+  // { id: "applications", label: "Applications" },
 //   { id: "resources", label: "Resources" },
 ];
 
