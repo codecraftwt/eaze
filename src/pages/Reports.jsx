@@ -25,8 +25,9 @@ import * as XLSX from "xlsx";
 import { format, subMonths, addMonths, isSameMonth, parse } from "date-fns";
 import { useDispatch, useSelector } from "react-redux";
 import { getSalesforceToken } from "../store/slices/authSlice";
-import { getCashCollectedAllTime, getCashCollectedThisMonth, getDeclinedThisMonth, getFundedData } from "../store/slices/dashboardSlice";
+import { getCashCollectedAllTime, getCashCollectedThisMonth, getDeclinedThisMonth, getFundedData, getTotalApplicationsThisMonth } from "../store/slices/dashboardSlice";
 import { getMonthAndYear } from "../lib/dateUtils";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 // Program colors matching charts
 const PROGRAM_COLORS = {
     all: "#2D3A4F", // Deep Navy
@@ -41,6 +42,7 @@ const fundingPrograms = [
     { id: "platinum", name: "Platinum", color: PROGRAM_COLORS.platinum },
     { id: "diamond", name: "Diamond", color: PROGRAM_COLORS.diamond },
     { id: "elite", name: "Elite", color: PROGRAM_COLORS.elite },
+    // { id: "Funded", name: "Funded", color: PROGRAM_COLORS.elite },
 ];
 const allApplications = [
     {
@@ -303,6 +305,7 @@ const getStatusBadge = (status) => {
 };
 export function Reports() {
     const [selectedProgram, setSelectedProgram] = useState("all");
+    const [selectedStatus, setSelectedStatus] = useState("all");
     const [selectedDate, setSelectedDate] = useState(new Date());
     const handlePreviousMonth = () =>
         setSelectedDate((prev) => subMonths(prev, 1));
@@ -345,7 +348,8 @@ export function Reports() {
         cashCollectedThisMonth,
         cashCollectedAllTime,
         fundedData,
-        declinedApplicationsThisMonth
+        declinedApplicationsThisMonth,
+        totalApplicationsThisMonth
     } = useSelector((state) => state.dashboard);
     useEffect(() => {
         if (!salesforceToken) {
@@ -354,6 +358,7 @@ export function Reports() {
             dispatch(getFundedData({ accountId: portalUserId, token: salesforceToken, month: month, year: year }));
             dispatch(getDeclinedThisMonth({ accountId: portalUserId, token: salesforceToken, month: month, year: year }));
             dispatch(getCashCollectedThisMonth({ accountId: portalUserId, token: salesforceToken, month: month, year: year }));
+            dispatch(getTotalApplicationsThisMonth({ accountId: portalUserId, token: salesforceToken,month:month,year:year }));
             // dispatch(getTotalApproved({ accountId: portalUserId, token: salesforceToken }));
         }
     }, [dispatch, salesforceToken, selectedDate]);
@@ -374,12 +379,22 @@ export function Reports() {
 
 
     const filteredApplications2 = useMemo(() => {
-        // 1. First, filter by the dynamic Program ID from the URL
-        const byProgram = fundedData.filter(item => {
-            if (selectedProgram?.toLowerCase() === "all") return true;
+        // fundedData
+        // 1. Parent Filter: Filter by Lead_Partner_Status__c (All vs Funded)
+    const byStatus = totalApplicationsThisMonth.filter(item => {
+        // Assuming your filter state is called 'selectedStatus' 
+        // and it holds values like "all" or "funded"
+        if (selectedStatus?.toLowerCase() === "all") return true;
 
-            return item.Loan_Program_Type__c?.toLowerCase() === selectedProgram?.toLowerCase();
-        });
+        return item.Lead_Partner_Status__c?.toLowerCase() === "funded";
+    });
+
+    // 2. Filter by Program ID
+    const byProgram = byStatus.filter(item => {
+        if (selectedProgram?.toLowerCase() === "all") return true;
+
+        return item.Loan_Program_Type__c?.toLowerCase() === selectedProgram?.toLowerCase();
+    });
 
         // 2. Then, filter that result by the Selected Month
         return byProgram.filter((app) => {
@@ -395,7 +410,7 @@ export function Reports() {
 
             return isSameMonth(appDate, selectedDate);
         });
-    }, [fundedData, selectedProgram, selectedDate]);
+    }, [fundedData, selectedProgram, selectedDate,totalApplicationsThisMonth,selectedStatus]);
 
     //console.log(filteredApplications2, 'filteredApplications2')
 
@@ -429,7 +444,7 @@ export function Reports() {
 
             return acc;
         }, initialStats);
-    }, [filteredApplications2]);
+    }, [filteredApplications2,totalApplicationsThisMonth,selectedProgram]);
 
     //console.log(stats, 'stats')
 
@@ -534,7 +549,10 @@ export function Reports() {
         }, 0);
     }, [cashCollectedThisMonth, selectedProgram]);
 
-
+const statusOptions = [
+  { label: "All Applications", value: "all", color: "#94a3b8" }, // Slate
+  { label: "Funded Only", value: "funded", color: "#22c55e" }    // Green
+];
     return (
         <div className="p-4 md:p-6 space-y-6 bg-background">
             {/* Header */}
@@ -547,6 +565,27 @@ export function Reports() {
                         View and download your performance reports
                     </p>
                 </div>
+                <div className="flex flex-wrap items-center gap-3">
+                    {/* --- NEW PARENT FILTER START --- */}
+        <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+            <SelectTrigger className="w-full sm:w-40 bg-background border-input h-8 md:h-10 text-xs md:text-sm">
+                <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent className="bg-card border-border z-50">
+                {statusOptions.map((status) => (
+                    <SelectItem key={status.value} value={status.value} className="text-xs md:text-sm">
+                        <div className="flex items-center gap-2">
+                            <span 
+                                className="w-2 h-2 rounded-full flex-shrink-0" 
+                                style={{ backgroundColor: status.color }} 
+                            />
+                            <span>{status.label}</span>
+                        </div>
+                    </SelectItem>
+                ))}
+            </SelectContent>
+        </Select>
+        {/* --- NEW PARENT FILTER END --- */}
                 <div className="flex items-center gap-2 bg-card border border-border rounded-lg px-3 py-2">
                     <Button
                         variant="ghost"
@@ -570,6 +609,7 @@ export function Reports() {
                     >
                         <ChevronRight className="h-4 w-4" />
                     </Button>
+                </div>
                 </div>
             </div>
 

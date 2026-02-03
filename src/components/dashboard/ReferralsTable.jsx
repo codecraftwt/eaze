@@ -41,14 +41,7 @@ export function ReferralsTable({ onViewAll, selectedDate }) {
     amount: `$${app.amount.toLocaleString()}`,
     program: app.program.charAt(0).toUpperCase() + app.program.slice(1),
   }));
-  const filteredApplications = allApplications.filter((app) => {
-    if (filter === "all") return true;
-    if (filter === "submitted")
-      return app.status === "Submitted" || app.status === "In Review";
-    if (filter === "approved") return app.status === "Approved";
-    if (filter === "funded") return app.status === "Funded";
-    return true;
-  });
+  
 
   
 
@@ -86,6 +79,17 @@ export function ReferralsTable({ onViewAll, selectedDate }) {
     });
   }, [totalApplications, selectedDate]);
 
+
+  const filteredApplications = totalApplicationsThisMonth.filter((app) => {
+    if (filter === "all") return true;
+    if (filter === "Submitted")
+      return app.Lead_Partner_Status__c === "Submitted" || app.Lead_Partner_Status__c === "In Review";
+    if (filter === "Approved") return app.Lead_Partner_Status__c === "Approved";
+    if (filter === "Funded") return app.Lead_Partner_Status__c === "Funded";
+    if (filter === "Declined") return app.Lead_Partner_Status__c === "Declined";
+    return true;
+  });
+
   //console.log(filteredApplicationsNew,'filteredApplicationsNew')
   return (
    <Card className="p-3 md:p-5 shadow-sm border border-border rounded-xl md:rounded-2xl bg-card">
@@ -93,6 +97,48 @@ export function ReferralsTable({ onViewAll, selectedDate }) {
     <h3 className="font-semibold text-foreground text-sm md:text-base">
       My Applications
     </h3>
+    <div className="flex flex-wrap gap-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            className={`text-xs px-2 md:px-3 ${filter === "all" ? "text-primary font-medium" : "text-muted-foreground"}`}
+            onClick={() => setFilter("all")}
+          >
+            All
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className={`text-xs px-2 md:px-3 ${filter === "Submitted" ? "text-primary font-medium" : "text-muted-foreground"}`}
+            onClick={() => setFilter("Submitted")}
+          >
+            Submitted
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className={`text-xs px-2 md:px-3 ${filter === "Funded" ? "text-primary font-medium" : "text-muted-foreground"}`}
+            onClick={() => setFilter("Funded")}
+          >
+            Funded
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className={`text-xs px-2 md:px-3 ${filter === "Approved" ? "text-primary font-medium" : "text-muted-foreground"}`}
+            onClick={() => setFilter("Approved")}
+          >
+            Approved
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className={`text-xs px-2 md:px-3 ${filter === "Declined" ? "text-primary font-medium" : "text-muted-foreground"}`}
+            onClick={() => setFilter("Declined")}
+          >
+            Declined
+          </Button>
+        </div>
   </div>
 
   <div className="space-y-1">
@@ -108,7 +154,7 @@ export function ReferralsTable({ onViewAll, selectedDate }) {
     </div>
 
     <ScrollArea className="h-[300px] md:h-[400px]">
-      {totalApplicationsThisMonth.map((application, index) => (
+      {filteredApplications.map((application, index) => (
         <div
           key={application.Id || index}
           className="grid grid-cols-3 md:grid-cols-[1.5fr_1fr_1fr_1fr_1.5fr_1fr] gap-4 items-center py-3 hover:bg-muted/50 rounded-lg px-2 transition-colors cursor-pointer group"
