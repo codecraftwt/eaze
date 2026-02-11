@@ -556,13 +556,23 @@ const statusOptions = [
 
 let columnKeys = [];
   if (filteredApplications2.length > 0) {
-    // Get all keys except the ones we want to hide or move
-    const allKeys = Object.keys(filteredApplications2[0]);
-    const keysToExclude = ['attributes', 'Id', 'Name'];
-    
-    // Start with 'Name', then add everything else that isn't in the excluded list
-    columnKeys = ['Name', ...allKeys.filter(key => !keysToExclude.includes(key))];
-  }
+  // 1. Collect every unique key from every object in the array
+  const allUniqueKeys = new Set();
+  filteredApplications2.forEach(obj => {
+    Object.keys(obj).forEach(key => allUniqueKeys.add(key));
+  });
+
+  // Convert Set back to an array
+  const allKeys = Array.from(allUniqueKeys);
+  
+  const keysToExclude = ['attributes', 'Id', 'Name'];
+  
+  // 2. Build the final array: Start with 'Name', then add the rest
+  columnKeys = [
+    'Name', 
+    ...allKeys.filter(key => !keysToExclude.includes(key))
+  ];
+}
 
   // 2. Helper to format header names (e.g., Loan_Amount__c -> Loan Amount)
   const formatHeader = (key) => {

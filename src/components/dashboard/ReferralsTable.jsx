@@ -115,24 +115,27 @@ export function ReferralsTable({ onViewAll, selectedDate }) {
 
   // 1. Get Dynamic Keys
   const dynamicColumns = useMemo(() => {
-    if (!totalApplicationsThisMonth || totalApplicationsThisMonth.length === 0) return [];
+  if (!totalApplicationsThisMonth || totalApplicationsThisMonth.length === 0) return [];
 
-    // Get all keys from the first object, excluding metadata
-    // const excludedKeys = ["attributes","Id","Status"];
-    // return Object.keys(totalApplicationsThisMonth[0]).filter(
-    //   (key) => !excludedKeys.includes(key)
-    // );
+  // 1. Collect all unique keys from every single object in the array
+  const allKeysSet = new Set();
+  totalApplicationsThisMonth.forEach(obj => {
+    Object.keys(obj).forEach(key => allKeysSet.add(key));
+  });
 
-    const allKeys = Object.keys(totalApplicationsThisMonth[0]);
-    const excludedKeys = ["attributes", "Id", "Name", "Status", "Lead_Partner_Status__c"];
+  // 2. Define keys that should be excluded from the "rest" of the list
+  const excludedKeys = ["attributes", "Id", "Name", "Status", "Lead_Partner_Status__c"];
 
-    // Force specific order: Name first, Status second, then the rest
-    return [
-      "Name",
-      "Lead_Partner_Status__c",
-      ...allKeys.filter(key => !excludedKeys.includes(key))
-    ];
-  }, [totalApplicationsThisMonth]);
+  // 3. Filter the collected keys to get only the non-excluded ones
+  const otherKeys = Array.from(allKeysSet).filter(key => !excludedKeys.includes(key));
+
+  // 4. Return the forced order: Name, Lead Partner Status, then everything else discovered
+  return [
+    "Name",
+    "Lead_Partner_Status__c",
+    ...otherKeys
+  ];
+}, [totalApplicationsThisMonth]);
 
   const columnMinWidth = 220;
   const totalMinWidth = dynamicColumns.length * columnMinWidth;

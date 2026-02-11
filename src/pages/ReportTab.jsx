@@ -63,9 +63,21 @@ const ReportTab = () => {
 
   // 4. Dynamic Columns
   const columns = useMemo(() => {
-    if (fundedData2.length === 0) return [];
-    return Object.keys(fundedData2[0]).filter(key => key !== 'Id' && key !== 'attributes');
-  }, [fundedData2]);
+  if (fundedData2.length === 0) return [];
+
+  // 1. Collect every unique key from every object in the data array
+  const allKeysSet = new Set();
+  fundedData2.forEach(item => {
+    Object.keys(item).forEach(key => allKeysSet.add(key));
+  });
+
+  // 2. Filter out the unwanted keys and ensure "Name" is first if it exists
+  const keysToExclude = ['Id', 'attributes', 'Name'];
+  const filteredKeys = Array.from(allKeysSet).filter(key => !keysToExclude.includes(key));
+
+  // 3. Return 'Name' at the start, followed by all other discovered keys
+  return allKeysSet.has('Name') ? ['Name', ...filteredKeys] : filteredKeys;
+}, [fundedData2]);
 
   const downloadExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(filteredData);
