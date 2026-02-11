@@ -3,13 +3,34 @@ import { Card } from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { ChevronRight } from "lucide-react";
-import { ScrollArea } from "../ui/scroll-area";
+import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { getMonthlyStats } from "../../lib/mockData";
 import { useDispatch, useSelector } from "react-redux";
 import { getSalesforceToken } from "../../store/slices/authSlice";
 import { getTotalApplications, getTotalApplicationsThisMonth } from "../../store/slices/dashboardSlice";
 import { isSameMonth } from "date-fns";
 import { getMonthAndYear } from "../../lib/dateUtils";
+
+const formatHeader = (key) => {
+  if (key === "Name") return "Client Name";
+  if (key === "Lead_Partner_Status__c") return "Status";
+  return key
+    .replace(/__c$/, "")
+    .replace(/_/g, " ")
+    .replace(/([A-Z])/g, " $1")
+    .trim();
+};
+const formatValue = (key, value) => {
+  if (value === null || value === undefined) return "--";
+  if (typeof value === "number") {
+    if (key.toLowerCase().includes("amount") || key.toLowerCase().includes("cash")) {
+      return `$${value.toLocaleString()}`;
+    }
+    return value.toLocaleString();
+  }
+  return String(value);
+};
+
 // Vibrant status colors with light backgrounds and colored text
 export function getStatusStyles(status) {
   switch (status) {
@@ -41,35 +62,35 @@ export function ReferralsTable({ onViewAll, selectedDate }) {
     amount: `$${app.amount.toLocaleString()}`,
     program: app.program.charAt(0).toUpperCase() + app.program.slice(1),
   }));
-  
 
-  
+
+
 
 
   const dispatch = useDispatch();
-   const { month, year } = getMonthAndYear(selectedDate)
+  const { month, year } = getMonthAndYear(selectedDate)
   const { salesforceToken, portalUserId } = useSelector((state) => state.auth);
   const {
-    cashCollectedAllTime, totalApplications,totalApplicationsThisMonth
+    cashCollectedAllTime, totalApplications, totalApplicationsThisMonth
   } = useSelector((state) => state.dashboard);
 
   useEffect(() => {
     if (!salesforceToken) {
       dispatch(getSalesforceToken());
     } else {
-      dispatch(getTotalApplications({ accountId: portalUserId, token: salesforceToken,month:month,year:year }));
-      dispatch(getTotalApplicationsThisMonth({ accountId: portalUserId, token: salesforceToken,month:month,year:year }));
+      dispatch(getTotalApplications({ accountId: portalUserId, token: salesforceToken, month: month, year: year }));
+      dispatch(getTotalApplicationsThisMonth({ accountId: portalUserId, token: salesforceToken, month: month, year: year }));
 
     }
   }, [dispatch, salesforceToken, selectedDate]);
 
 
-  useEffect(()=>{
-    console.log(totalApplications,'totalApplications')
-    console.log(totalApplications.length,'totalApplications')
-    console.log(totalApplicationsThisMonth,'totalApplicationsThisMonth')
-    console.log(totalApplicationsThisMonth.length,'totalApplicationsThisMonth')
-  },[totalApplications])
+  useEffect(() => {
+    // console.log(totalApplications,'totalApplications')
+    // console.log(totalApplications.length,'totalApplications')
+    // console.log(totalApplicationsThisMonth,'totalApplicationsThisMonth')
+    // console.log(totalApplicationsThisMonth.length,'totalApplicationsThisMonth')
+  }, [totalApplications])
 
   const filteredApplicationsNew = useMemo(() => {
     if (!totalApplications) return [];
@@ -90,14 +111,40 @@ export function ReferralsTable({ onViewAll, selectedDate }) {
     return true;
   });
 
-  //console.log(filteredApplicationsNew,'filteredApplicationsNew')
+  // console.log(filteredApplicationsNew,'filteredApplicationsNew')
+
+  // 1. Get Dynamic Keys
+  const dynamicColumns = useMemo(() => {
+    if (!totalApplicationsThisMonth || totalApplicationsThisMonth.length === 0) return [];
+
+    // Get all keys from the first object, excluding metadata
+    // const excludedKeys = ["attributes","Id","Status"];
+    // return Object.keys(totalApplicationsThisMonth[0]).filter(
+    //   (key) => !excludedKeys.includes(key)
+    // );
+
+    const allKeys = Object.keys(totalApplicationsThisMonth[0]);
+    const excludedKeys = ["attributes", "Id", "Name", "Status", "Lead_Partner_Status__c"];
+
+    // Force specific order: Name first, Status second, then the rest
+    return [
+      "Name",
+      "Lead_Partner_Status__c",
+      ...allKeys.filter(key => !excludedKeys.includes(key))
+    ];
+  }, [totalApplicationsThisMonth]);
+
+  const columnMinWidth = 220;
+  const totalMinWidth = dynamicColumns.length * columnMinWidth;
+
+
   return (
-   <Card className="p-3 md:p-5 shadow-sm border border-border rounded-xl md:rounded-2xl bg-card">
-  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
-    <h3 className="font-semibold text-foreground text-sm md:text-base">
-      My Applications
-    </h3>
-    <div className="flex flex-wrap gap-1">
+    <Card className="p-3 md:p-5 shadow-sm border border-border rounded-xl md:rounded-2xl bg-card">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+        <h3 className="font-semibold text-foreground text-sm md:text-base">
+          My Applications
+        </h3>
+        <div className="flex flex-wrap gap-1">
           <Button
             variant="ghost"
             size="sm"
@@ -139,69 +186,84 @@ export function ReferralsTable({ onViewAll, selectedDate }) {
             Declined
           </Button>
         </div>
-  </div>
+      </div>
 
-  <div className="space-y-1">
-    {/* --- TABLE HEADER --- */}
-    {/* Grid columns: 1.5fr (Name), 1fr (Program), 1fr (Status), 1fr (Cash), 1fr (Contact), 1fr (Amount) */}
-    <div className="grid grid-cols-3 md:grid-cols-[1.5fr_1fr_1fr_1fr_1.5fr_1fr] gap-4 text-xs text-muted-foreground font-medium py-2 border-b border-border px-2">
-      <span>Name</span>
-      <span className="hidden md:block">Program</span>
-      <span className="text-center md:text-left">Status</span>
-      <span className="hidden md:block text-right">Cash Collected</span>
-      <span className="hidden md:block text-right">Contact Info</span>
-      <span className="text-right">Loan Amount</span>
-    </div>
+      <div className="overflow-x-auto">
+        <div className="min-w-[800px]"> {/* Ensures table doesn't collapse on small screens */}
 
-    <ScrollArea className="h-[300px] md:h-[400px]">
-      {filteredApplications.map((application, index) => (
-        <div
-          key={application.Id || index}
-          className="grid grid-cols-3 md:grid-cols-[1.5fr_1fr_1fr_1fr_1.5fr_1fr] gap-4 items-center py-3 hover:bg-muted/50 rounded-lg px-2 transition-colors cursor-pointer group"
-        >
-          {/* 1. Name */}
-          <span className="font-medium text-foreground text-xs md:text-sm truncate">
-            {application.Name}
-          </span>
+          {/* --- DYNAMIC HEADER --- */}
+          {/* <div 
+            className="grid gap-4 text-xs text-muted-foreground font-medium py-2 border-b border-border px-2"
+            style={{ gridTemplateColumns: `repeat(${dynamicColumns.length}, 1fr)` }}
+          >
+            {dynamicColumns.map((key) => (
+              <span key={key}>{formatHeader(key)}</span>
+            ))}
+          </div> */}
 
-          {/* 2. Program (Hidden on mobile) */}
-          <span className="text-muted-foreground text-xs md:text-sm hidden md:block truncate">
-            {application.Loan_Program_Type__c || "N/A"}
-          </span>
+          {/* --- DYNAMIC BODY --- */}
+          <ScrollArea className="w-full whitespace-nowrap rounded-md border">
+            <div style={{ minWidth: `${totalMinWidth}px` }}>
 
-          {/* 3. Status */}
-          {/* <span className="text-center md:text-left text-xs md:text-sm truncate bg-muted/30 px-2 py-1 rounded-full md:bg-transparent md:p-0">
-            {application.Lead_Partner_Status__c}
-          </span> */}
-          <Badge
-                variant="custom"
-                className={`${getStatusStyles(application.Lead_Partner_Status__c)} text-xs w-fit`}
+              {/* --- HEADER --- */}
+              <div
+                className="grid items-center bg-muted/30 py-3 px-4 border-b border-border"
+                style={{
+                  gridTemplateColumns: `repeat(${dynamicColumns.length}, minmax(${columnMinWidth}px, 1fr))`
+                }}
               >
-                {application.Lead_Partner_Status__c}
-              </Badge>
+                {dynamicColumns.map((key) => (
+                  <span key={key} className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                    {formatHeader(key)}
+                  </span>
+                ))}
+              </div>
 
-          {/* 4. Cash Collected (Hidden on mobile) */}
-          <span className="text-right text-foreground text-xs md:text-sm font-medium hidden md:block">
-            {application.Cash_Collected__c ? `$${Number(application.Cash_Collected__c).toLocaleString()}` : '--'}
-          </span>
+              {/* --- BODY --- */}
+              <div className="divide-y divide-border">
+                {filteredApplications.map((app, rowIndex) => (
+                  <div
+                    key={app.Id || rowIndex}
+                    className="grid items-center py-4 px-4 hover:bg-muted/50 transition-colors"
+                    style={{
+                      gridTemplateColumns: `repeat(${dynamicColumns.length}, minmax(${columnMinWidth}px, 1fr))`
+                    }}
+                  >
+                    {dynamicColumns.map((key) => {
+                      const val = app[key];
 
-          {/* 5. Contact Info (Email/Mobile combined - Hidden on mobile) */}
-          <div className="hidden md:flex flex-col text-right truncate">
-            <span className="text-muted-foreground text-[11px] truncate">{application.Email}</span>
-            <span className="text-muted-foreground text-[10px]">{application.MobilePhone}</span>
-          </div>
+                      return (
+                        <div key={key} className="pr-4">
+                          {key === "Lead_Partner_Status__c" || key === "Status" ? (
+                            <>
+                              {/* <Badge variant="secondary" className="font-medium text-[10px]">
+                          {val}
+                        </Badge> */}
+                              <Badge
+                                variant="custom"
+                                className={`${getStatusStyles(val)} text-xs w-fit`}
+                              >
+                                {val}
+                              </Badge>
+                            </>
+                          ) : (
+                            <span className="text-sm text-foreground truncate block">
+                              {formatValue(key, val)}
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ))}
+              </div>
+            </div>
 
-          {/* 6. Loan Amount */}
-          <div className="flex items-center justify-end gap-1">
-            <span className="text-foreground font-bold text-xs md:text-sm text-right">
-              ${application.Loan_Amount__c?.toLocaleString() || '0'}
-            </span>
-            <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block" />
-          </div>
+            {/* Adds the horizontal scrollbar at the bottom of the ScrollArea */}
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
         </div>
-      ))}
-    </ScrollArea>
-  </div>
-</Card>
+      </div>
+    </Card>
   );
 }

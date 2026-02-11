@@ -52,6 +52,28 @@ const fetchData2 = async (endpoint, { accountId, leadSource }, token) => {
     throw error.response?.data?.message || error.message;
   }
 };
+const fetchData3 = async (endpoint, { accountId, leadSource }, token) => {
+  try {
+    const response = await axios.post(
+      `${API_URL}/services/apexrest/salesforce/portal/api/${endpoint}`,
+      {
+        accountId,
+        leadSource,
+        // month: 1,
+        // year: 2026,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data?.message || error.message;
+  }
+};
 
 // Thunks for each API endpoint
 export const getTotalApplicationsThisMonth = createAsyncThunk(
@@ -255,6 +277,22 @@ export const getFundedLastMonthData = createAsyncThunk(
   }
 );
 
+export const getFundedDataThisYear = createAsyncThunk(
+  'dashboard/getFundedDataThisYear',
+  async ({ accountId, token, month, year }, { rejectWithValue }) => {
+    try {
+      const data = await fetchData3(
+        'getfundeddatathisyear', // Assuming this is the Salesforce endpoint name
+        { accountId, leadSource: LEADSOURCE, month: month, year: year },
+        token
+      );
+      return data?.data || [];
+    } catch (err) {
+      return rejectWithValue(err);
+    }
+  }
+);
+
 export const getCashCollectedLastMonth = createAsyncThunk(
   'dashboard/getCashCollectedLastMonth',
   async ({ accountId, token , month,year}, { rejectWithValue }) => {
@@ -311,6 +349,7 @@ const dashboardSlice = createSlice({
   fundedData: [],
   fundedData2: [],
   fundedLastMonthData: [],
+  fundedDataThisYear: [],
     status: 'idle', // 'loading', 'succeeded', 'failed'
     error: null,
   },
@@ -531,6 +570,18 @@ const dashboardSlice = createSlice({
 .addCase(getFundedLastMonthData.rejected, (state, action) => {
   state.lastMonthStatus = 'failed';
   state.lastMonthError = action.payload || action.error.message;
+})
+// Funded Data (This Year)
+.addCase(getFundedDataThisYear.pending, (state) => {
+  state.status = 'loading';
+})
+.addCase(getFundedDataThisYear.fulfilled, (state, action) => {
+  state.status = 'succeeded';
+  state.fundedDataThisYear = action.payload;
+})
+.addCase(getFundedDataThisYear.rejected, (state, action) => {
+  state.status = 'failed';
+  state.error = action.payload || action.error.message;
 })
 
   },
