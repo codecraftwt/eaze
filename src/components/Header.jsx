@@ -96,18 +96,14 @@ export function Header({ activeTab, onTabChange }) {
               </div>
               <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
                 {navItems.map((item) => (
-                  <Button
+                  <Link
                     key={item.id}
-                    variant="ghost"
-                    className={`w-full justify-start font-medium px-4 py-3 rounded-lg ${
-                      activeTab === item.id
-                        ? "text-foreground bg-muted"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                    }`}
-                    onClick={() => handleNavClick(item.id)}
+                    to={`/${item.id}`}
+                    onClick={() => setMobileMenuOpen(false)} // Close drawer on click
+                    className={`flex w-full items-center px-4 py-3 rounded-xl text-base transition-colors no-underline ${isActive(`/${item.id}`)}`}
                   >
                     {item.label}
-                  </Button>
+                  </Link>
                 ))}
                 <hr className="my-2 border-border" />
                 <Button
