@@ -93,7 +93,13 @@ const pipelineStages = useMemo(() => {
       name: "Funded",
       count: fundedData.length,
       color: COLORS.funded,
-      width: `${Math.round((fundedData.length / maxCount) * 100)}%`,
+      // width: `${Math.round((fundedData.length / maxCount) * 100)}%`,
+      width: (() => {
+    const actualPercentage = Math.round((fundedData.length / maxCount) * 100);
+    // console.log(actualPercentage,'actualPercentage')
+    // If 10% or below, return 30%, otherwise use the actual percentage
+    return `${fundedData.length <= 10 ? 30 : actualPercentage}%`;
+  })()
     },
   ];
 }, [newLeads, preApprovedApplicationsThisMonth, approvedApplicationsThisMonth, fundedData, maxCount]);
