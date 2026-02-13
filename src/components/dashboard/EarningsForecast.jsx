@@ -20,7 +20,7 @@ export function EarningsForecast({ selectedDate }) {
   
     // 2. Fetch data when token or date changes
     useEffect(() => {
-      console.log(selectedDate,'selectedDate')
+      // console.log(selectedDate,'selectedDate')
       if (!salesforceToken) {
         dispatch(getSalesforceToken());
       } else if (portalUserId) {

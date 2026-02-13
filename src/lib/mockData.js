@@ -287,8 +287,8 @@ export function getPerformanceData(targetDate,thisMonth,lastMonth,alltime) {
   const currentAmount = calculateTotal(thisMonth);
     const lastMonthAmount = calculateTotal(lastMonth);
     const alltimeamount = calculateTotal(alltime);
-    console.log(currentAmount,'currentAmount')
-    console.log(lastMonthAmount,'lastMonthAmount')
+    // console.log(currentAmount,'currentAmount')
+    // console.log(lastMonthAmount,'lastMonthAmount')
     //console.log(alltimeamount,'alltimeamount')
   return {
     lastMonth: {

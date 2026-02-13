@@ -14,7 +14,7 @@ const navItems = [
   { id: "affiliate", label: "Become an Affiliate" },
   // { id: "loan", label: "Loan" },
   { id: "funded", label: "Funded" },
-  { id: "add-user", label: "Add User" },
+  // { id: "add-user", label: "Add User" },
   // { id: "applications", label: "Applications" },
 //   { id: "resources", label: "Resources" },
 ];
@@ -38,8 +38,8 @@ export function Header({ activeTab, onTabChange }) {
   };
 
   const isActive = (path) =>{
-    console.log(path,'path')
-    console.log(location.pathname,'location.pathname')
+    // console.log(path,'path')
+    // console.log(location.pathname,'location.pathname')
      return location.pathname === path
         ? "bg-blue-100 text-blue-600 font-semibold"
         : "text-gray-500 hover:text-blue-600";

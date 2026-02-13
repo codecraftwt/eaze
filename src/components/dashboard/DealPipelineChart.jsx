@@ -102,7 +102,7 @@ const pipelineStages = useMemo(() => {
     const actualPercentage = Math.round((fundedData.length / maxCount) * 100);
     // console.log(actualPercentage,'actualPercentage')
     // If 10% or below, return 30%, otherwise use the actual percentage
-    return `${fundedData.length <= 10 ? 30 : actualPercentage}%`;
+    return `${fundedData.length <= 20 ? 30 : actualPercentage}%`;
   })()
     },
   ];
