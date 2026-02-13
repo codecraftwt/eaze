@@ -267,6 +267,39 @@ export const resetPassword = createAsyncThunk(
   }
 );
 
+/* =========================================================
+   7. CREATE PARTNER USER (Admin/Add User)
+========================================================= */
+export const createPartnerUser = createAsyncThunk(
+  "auth/createPartnerUser",
+  async ({ email, firstName, lastName, accountId }, { getState, rejectWithValue }) => {
+    try {
+      const token = getState().auth.salesforceToken;
+      
+      const response = await axios.post(
+        `${BASE_URL}/services/apexrest/salesforce/partnerportal/api/createuser`,
+        { email, firstName, lastName, accountId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      // Handle Salesforce success flag
+      if (!response.data.success && response.data.message) {
+        return rejectWithValue(response.data.message);
+      }
+
+      return response.data;
+    } catch (error) {
+      handleError(error);
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
 
 /* =========================================================
    SLICE
@@ -388,6 +421,20 @@ const authSlice = createSlice({
         showSuccess(action.payload.message || "Password reset successful");
       })
       .addCase(resetPassword.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      });
+
+      builder
+      .addCase(createPartnerUser.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(createPartnerUser.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        showSuccess("New user created successfully!");
+      })
+      .addCase(createPartnerUser.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
       });
