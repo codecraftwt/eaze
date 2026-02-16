@@ -432,7 +432,7 @@ const authSlice = createSlice({
       })
       .addCase(createPartnerUser.fulfilled, (state, action) => {
         state.status = "succeeded";
-        showSuccess("New user created successfully!");
+        // showSuccess("New user created successfully!");
       })
       .addCase(createPartnerUser.rejected, (state, action) => {
         state.status = "failed";

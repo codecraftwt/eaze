@@ -1,6 +1,7 @@
 import { createPartnerUser } from '../store/slices/authSlice';
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 
 const AddUserPage = () => {
     const dispatch = useDispatch();
@@ -18,21 +19,62 @@ const AddUserPage = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Payload:', JSON.stringify(formData));
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   console.log('Payload:', JSON.stringify(formData));
 
-    dispatch(createPartnerUser(formData))
-      .unwrap()
-      .then(() => {
-        // Clear form on success
-        setFormData({ firstName: '', lastName: '', email: '', accountId: portalUserId });
-      })
-      .catch((err) => {
-        console.error("Failed to create user:", err);
+  //   dispatch(createPartnerUser(formData))
+  //     .unwrap()
+  //     .then((response) => {
+  //       console.log(response,'response')
+  //       // Clear form on success
+  //       setFormData({ firstName: '', lastName: '', email: '', accountId: portalUserId });
+  //     })
+  //     .catch((err) => {
+  //       console.error("Failed to create user:", err);
+  //     });
+  //   // alert("User data captured!");
+  // };
+
+  const handleSubmit = (e) => {
+  e.preventDefault();
+
+  dispatch(createPartnerUser(formData))
+    .unwrap()
+    .then((response) => {
+
+      // If user already exists
+      if (response?.data?.alreadyExists) {
+        toast.info(
+          "This email address is already registered. Please reset your password using the 'Forgot Password' option on the login page."
+        );
+        return;
+      }
+
+      // Success case
+      toast.success("User created successfully.");
+
+      setFormData({
+        firstName: '',
+        lastName: '',
+        email: '',
+        accountId: portalUserId
       });
-    // alert("User data captured!");
-  };
+    })
+    .catch((err) => {
+      console.error("Failed to create user:", err);
+      toast.error("Something went wrong. Please try again.");
+    });
+};
+
+const handalCancel=()=>{
+  setFormData({
+        firstName: '',
+        lastName: '',
+        email: '',
+        accountId: portalUserId
+      });
+}
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
@@ -57,7 +99,7 @@ const AddUserPage = () => {
               {/* First Name */}
               <div className="flex flex-col">
                 <label className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
-                  First Name
+                  First Name<span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -73,7 +115,7 @@ const AddUserPage = () => {
               {/* Last Name */}
               <div className="flex flex-col">
                 <label className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
-                  Last Name
+                  Last Name<span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -89,7 +131,7 @@ const AddUserPage = () => {
               {/* Email Address - Full Width */}
               <div className="flex flex-col md:col-span-2">
                 <label className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
-                  Email Address
+                  Email Address<span className="text-red-500">*</span>
                 </label>
                 <input
                   type="email"
@@ -108,6 +150,7 @@ const AddUserPage = () => {
               <button
                 type="button"
                 className="mr-4 px-6 py-2 text-sm font-medium text-gray-600 hover:text-gray-800"
+                onClick={handalCancel}
               >
                 Cancel
               </button>
