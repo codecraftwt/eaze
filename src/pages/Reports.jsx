@@ -304,6 +304,7 @@ const getStatusBadge = (status) => {
     }
 };
 export function Reports() {
+    const [filter, setFilter] = useState("all");
     const [selectedProgram, setSelectedProgram] = useState("all");
     const [selectedStatus, setSelectedStatus] = useState("all");
     const [selectedDate, setSelectedDate] = useState(new Date());
@@ -358,7 +359,7 @@ export function Reports() {
             dispatch(getFundedData({ accountId: portalUserId, token: salesforceToken, month: month, year: year }));
             dispatch(getDeclinedThisMonth({ accountId: portalUserId, token: salesforceToken, month: month, year: year }));
             dispatch(getCashCollectedThisMonth({ accountId: portalUserId, token: salesforceToken, month: month, year: year }));
-            dispatch(getTotalApplicationsThisMonth({ accountId: portalUserId, token: salesforceToken,month:month,year:year }));
+            dispatch(getTotalApplicationsThisMonth({ accountId: portalUserId, token: salesforceToken, month: month, year: year }));
             // dispatch(getTotalApproved({ accountId: portalUserId, token: salesforceToken }));
         }
     }, [dispatch, salesforceToken, selectedDate]);
@@ -381,20 +382,20 @@ export function Reports() {
     const filteredApplications2 = useMemo(() => {
         // fundedData
         // 1. Parent Filter: Filter by Lead_Partner_Status__c (All vs Funded)
-    const byStatus = totalApplicationsThisMonth.filter(item => {
-        // Assuming your filter state is called 'selectedStatus' 
-        // and it holds values like "all" or "funded"
-        if (selectedStatus?.toLowerCase() === "all") return true;
+        const byStatus = totalApplicationsThisMonth.filter(item => {
+            // Assuming your filter state is called 'selectedStatus' 
+            // and it holds values like "all" or "funded"
+            if (selectedStatus?.toLowerCase() === "all") return true;
 
-        return item.Lead_Partner_Status__c?.toLowerCase() === "funded";
-    });
+            return item.Lead_Partner_Status__c?.toLowerCase() === "funded";
+        });
 
-    // 2. Filter by Program ID
-    const byProgram = byStatus.filter(item => {
-        if (selectedProgram?.toLowerCase() === "all") return true;
+        // 2. Filter by Program ID
+        const byProgram = byStatus.filter(item => {
+            if (selectedProgram?.toLowerCase() === "all") return true;
 
-        return item.Loan_Program_Type__c?.toLowerCase() === selectedProgram?.toLowerCase();
-    });
+            return item.Loan_Program_Type__c?.toLowerCase() === selectedProgram?.toLowerCase();
+        });
 
         // 2. Then, filter that result by the Selected Month
         return byProgram.filter((app) => {
@@ -410,7 +411,7 @@ export function Reports() {
 
             return isSameMonth(appDate, selectedDate);
         });
-    }, [fundedData, selectedProgram, selectedDate,totalApplicationsThisMonth,selectedStatus]);
+    }, [fundedData, selectedProgram, selectedDate, totalApplicationsThisMonth, selectedStatus]);
 
     console.log(filteredApplications2, 'filteredApplications2')
 
@@ -444,7 +445,7 @@ export function Reports() {
 
             return acc;
         }, initialStats);
-    }, [filteredApplications2,totalApplicationsThisMonth,selectedProgram]);
+    }, [filteredApplications2, totalApplicationsThisMonth, selectedProgram]);
 
     //console.log(stats, 'stats')
 
@@ -548,40 +549,68 @@ export function Reports() {
             return acc;
         }, 0);
     }, [cashCollectedThisMonth, selectedProgram]);
+    const totalLoanAmount2 = useMemo(() => {
+        return totalApplicationsThisMonth.reduce((acc, curr) => {
+            // 1. Program Filter logic
+            const isAll = selectedProgram === "all";
+            const isProgramMatch = curr.Loan_Program_Type__c?.toLowerCase() === selectedProgram?.toLowerCase();
 
-const statusOptions = [
-  { label: "All Applications", value: "all", color: "#94a3b8" }, // Slate
-  { label: "Funded Only", value: "funded", color: "#22c55e" }    // Green
-];
+            // 2. Status Filter logic: Check if status is "Approved" or "In Review"
+            // Note: Using an array makes it easy to add more valid statuses later
+            const validStatuses = ["approved", "in review"];
+            const isStatusMatch = validStatuses.includes(curr.Lead_Partner_Status__c?.toLowerCase());
 
-let columnKeys = [];
-  if (filteredApplications2.length > 0) {
-  // 1. Collect every unique key from every object in the array
-  const allUniqueKeys = new Set();
-  filteredApplications2.forEach(obj => {
-    Object.keys(obj).forEach(key => allUniqueKeys.add(key));
-  });
+            // 3. Combine logic: Must match program (or be "all") AND match the status criteria
+            if ((isAll || isProgramMatch) && isStatusMatch) {
+                return acc + (Number(curr.Loan_Amount__c) || 0);
+            }
 
-  // Convert Set back to an array
-  const allKeys = Array.from(allUniqueKeys);
-  
-  const keysToExclude = ['attributes', 'Id', 'Name'];
-  
-  // 2. Build the final array: Start with 'Name', then add the rest
-  columnKeys = [
-    'Name', 
-    ...allKeys.filter(key => !keysToExclude.includes(key))
-  ];
-}
+            return acc;
+        }, 0);
+    }, [cashCollectedThisMonth, selectedProgram, totalApplicationsThisMonth]);
+    const statusOptions = [
+        { label: "All Applications", value: "all", color: "#94a3b8" }, // Slate
+        { label: "Funded Only", value: "funded", color: "#22c55e" }    // Green
+    ];
 
-  // 2. Helper to format header names (e.g., Loan_Amount__c -> Loan Amount)
-  const formatHeader = (key) => {
-    return key
-      .replace(/__c$/, '')      // Remove Salesforce custom field suffix
-      .replace(/_/g, ' ')       // Replace underscores with spaces
-      .replace(/([A-Z])/g, ' $1') // Add space before capital letters
-      .trim();
-  };
+    let columnKeys = [];
+    if (filteredApplications2.length > 0) {
+        // 1. Collect every unique key from every object in the array
+        const allUniqueKeys = new Set();
+        filteredApplications2.forEach(obj => {
+            Object.keys(obj).forEach(key => allUniqueKeys.add(key));
+        });
+
+        // Convert Set back to an array
+        const allKeys = Array.from(allUniqueKeys);
+
+        const keysToExclude = ['attributes', 'Id', 'Name'];
+
+        // 2. Build the final array: Start with 'Name', then add the rest
+        columnKeys = [
+            'Name',
+            ...allKeys.filter(key => !keysToExclude.includes(key))
+        ];
+    }
+
+    // 2. Helper to format header names (e.g., Loan_Amount__c -> Loan Amount)
+    const formatHeader = (key) => {
+        return key
+            .replace(/__c$/, '')      // Remove Salesforce custom field suffix
+            .replace(/_/g, ' ')       // Replace underscores with spaces
+            .replace(/([A-Z])/g, ' $1') // Add space before capital letters
+            .trim();
+    };
+
+    const filteredApplications3 = filteredApplications2.filter((app) => {
+        if (filter === "all") return true;
+        if (filter === "Submitted")
+            return app.Lead_Partner_Status__c === "Submitted" || app.Lead_Partner_Status__c === "In Review";
+        if (filter === "Approved") return app.Lead_Partner_Status__c === "Approved";
+        if (filter === "Funded") return app.Lead_Partner_Status__c === "Funded";
+        if (filter === "Declined") return app.Lead_Partner_Status__c === "Declined";
+        return true;
+    });
     return (
         <div className="p-4 md:p-6 space-y-6 bg-background">
             {/* Header */}
@@ -596,49 +625,49 @@ let columnKeys = [];
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
                     {/* --- NEW PARENT FILTER START --- */}
-        <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-            <SelectTrigger className="w-full sm:w-40 bg-background border-input h-8 md:h-10 text-xs md:text-sm">
-                <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent className="bg-card border-border z-50">
-                {statusOptions.map((status) => (
-                    <SelectItem key={status.value} value={status.value} className="text-xs md:text-sm">
-                        <div className="flex items-center gap-2">
-                            <span 
-                                className="w-2 h-2 rounded-full flex-shrink-0" 
-                                style={{ backgroundColor: status.color }} 
-                            />
-                            <span>{status.label}</span>
+                    <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+                        <SelectTrigger className="w-full sm:w-40 bg-background border-input h-8 md:h-10 text-xs md:text-sm">
+                            <SelectValue placeholder="Status" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-card border-border z-50">
+                            {statusOptions.map((status) => (
+                                <SelectItem key={status.value} value={status.value} className="text-xs md:text-sm">
+                                    <div className="flex items-center gap-2">
+                                        <span
+                                            className="w-2 h-2 rounded-full flex-shrink-0"
+                                            style={{ backgroundColor: status.color }}
+                                        />
+                                        <span>{status.label}</span>
+                                    </div>
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                    {/* --- NEW PARENT FILTER END --- */}
+                    <div className="flex items-center gap-2 bg-card border border-border rounded-lg px-3 py-2">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={handlePreviousMonth}
+                        >
+                            <ChevronLeft className="h-4 w-4" />
+                        </Button>
+                        <div className="flex items-center gap-2 min-w-[140px] justify-center">
+                            <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+                            <span className="font-medium text-sm">
+                                {format(selectedDate, "MMMM yyyy")}
+                            </span>
                         </div>
-                    </SelectItem>
-                ))}
-            </SelectContent>
-        </Select>
-        {/* --- NEW PARENT FILTER END --- */}
-                <div className="flex items-center gap-2 bg-card border border-border rounded-lg px-3 py-2">
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={handlePreviousMonth}
-                    >
-                        <ChevronLeft className="h-4 w-4" />
-                    </Button>
-                    <div className="flex items-center gap-2 min-w-[140px] justify-center">
-                        <CalendarIcon className="h-4 w-4 text-muted-foreground" />
-                        <span className="font-medium text-sm">
-                            {format(selectedDate, "MMMM yyyy")}
-                        </span>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={handleNextMonth}
+                        >
+                            <ChevronRight className="h-4 w-4" />
+                        </Button>
                     </div>
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={handleNextMonth}
-                    >
-                        <ChevronRight className="h-4 w-4" />
-                    </Button>
-                </div>
                 </div>
             </div>
 
@@ -794,7 +823,7 @@ let columnKeys = [];
                                     Total In Progress
                                 </p>
                                 <p className="text-2xl font-bold text-warning">
-                                    ${totalLoanAmount.toLocaleString()}
+                                    ${totalLoanAmount2.toLocaleString()}
                                 </p>
                             </div>
                         </div>
@@ -820,41 +849,83 @@ let columnKeys = [];
 
             {/* Applications Table */}
             <Card>
-      <CardHeader>
-        <CardTitle className="text-base md:text-lg">
-          Applications ({filteredApplications2.length})
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-0 md:p-6">
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                {columnKeys.map((key) => (
-                  <TableHead key={key} className="whitespace-nowrap text-xs md:text-sm capitalize">
-                    {formatHeader(key)}
-                  </TableHead>
-                ))}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredApplications2.map((app) => (
-                <TableRow key={app.Id}>
-                  {columnKeys.map((key) => (
-                    <TableCell key={`${app.Id}-${key}`} className="text-xs md:text-sm whitespace-nowrap">
-                      {/* Special formatting for specific types */}
-                      {typeof app[key] === 'number' && key.includes('Amount') 
-                        ? `$${app[key].toLocaleString()}` 
-                        : String(app[key] || '-')}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-    </Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+                    <CardTitle className="text-base md:text-lg">
+                        Applications ({filteredApplications2.length})
+                    </CardTitle>
+                    {/* <div className="flex flex-wrap gap-1">
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            className={`text-xs px-2 md:px-3 ${filter === "all" ? "text-primary font-medium" : "text-muted-foreground"}`}
+                            onClick={() => setFilter("all")}
+                        >
+                            All
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            className={`text-xs px-2 md:px-3 ${filter === "Submitted" ? "text-primary font-medium" : "text-muted-foreground"}`}
+                            onClick={() => setFilter("Submitted")}
+                        >
+                            Submitted
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            className={`text-xs px-2 md:px-3 ${filter === "Funded" ? "text-primary font-medium" : "text-muted-foreground"}`}
+                            onClick={() => setFilter("Funded")}
+                        >
+                            Funded
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            className={`text-xs px-2 md:px-3 ${filter === "Approved" ? "text-primary font-medium" : "text-muted-foreground"}`}
+                            onClick={() => setFilter("Approved")}
+                        >
+                            Approved
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            className={`text-xs px-2 md:px-3 ${filter === "Declined" ? "text-primary font-medium" : "text-muted-foreground"}`}
+                            onClick={() => setFilter("Declined")}
+                        >
+                            Declined
+                        </Button>
+                    </div> */}
+                </CardHeader>
+                <CardContent className="p-0 md:p-6">
+                    <div className="overflow-x-auto">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    {columnKeys.map((key) => (
+                                        <TableHead key={key} className="whitespace-nowrap text-xs md:text-sm capitalize">
+                                            {formatHeader(key)}
+                                        </TableHead>
+                                    ))}
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {filteredApplications2.map((app) => (
+                                    <TableRow key={app.Id}>
+                                        {columnKeys.map((key) => (
+                                            <TableCell key={`${app.Id}-${key}`} className="text-xs md:text-sm whitespace-nowrap">
+                                                {/* Special formatting for specific types */}
+                                                {typeof app[key] === 'number' && key.includes('Amount')
+                                                    ? `$${app[key].toLocaleString()}`
+                                                    : String(app[key] || '-')}
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
+                </CardContent>
+            </Card>
         </div>
     );
 }

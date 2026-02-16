@@ -58,56 +58,102 @@ newLeads
   const { pipeline } = stats;
   const maxCount = newLeads.length + preApprovedApplicationsThisMonth.length+approvedApplicationsThisMonth.length+fundedData.length+declinedApplicationsThisMonth.length|| 0;
 
+// const pipelineStages = useMemo(() => {
+//   return [
+//     {
+//       name: "Submitted",
+//       count: newLeads.length,
+//       // count: newLeads.length,
+//       color: COLORS.submitted,
+//       width: "100%", // Always 100% since it's the maxCount
+//     },
+//     {
+//       name: "In Review",
+//       count: preApprovedApplicationsThisMonth.length,
+//       color: COLORS.inReview,
+//       width: `${Math.round((preApprovedApplicationsThisMonth.length / maxCount) * 100), 
+//     30}%`,
+//     },
+//     {
+//       name: "Declined",
+//       count: declinedApplicationsThisMonth.length,
+//       color: COLORS.inReview,
+//       // width: `${Math.round((declinedApplicationsThisMonth.length / maxCount) * 100)}%`,
+//       width: `${Math.max(
+//     Math.round((declinedApplicationsThisMonth.length / maxCount) * 100), 
+//     30
+//   )}%`,
+//     },
+//     {
+//       name: "Approved",
+//       count: approvedApplicationsThisMonth.length,
+//       color: COLORS.approved,
+//       width: `${Math.max(
+//     Math.round((approvedApplicationsThisMonth.length / maxCount) * 100), 
+//     30
+//   )}%`,
+//     },
+//     {
+//       name: "Funded",
+//       count: fundedData.length,
+//       color: COLORS.funded,
+//       // width: `${Math.round((fundedData.length / maxCount) * 100)}%`,
+//       width: (() => {
+//     const actualPercentage = Math.round((fundedData.length / maxCount) * 100);
+//     // console.log(actualPercentage,'actualPercentage')
+//     // If 10% or below, return 30%, otherwise use the actual percentage
+//     return `${fundedData.length <= 20 ? 30 : actualPercentage}%`;
+//   })()
+//     },
+//   ];
+// }, [newLeads, preApprovedApplicationsThisMonth, approvedApplicationsThisMonth, fundedData, maxCount]);
+  
+
 const pipelineStages = useMemo(() => {
+  // Helper to safely calculate width
+  const getWidth = (count) => {
+    if (!maxCount || maxCount === 0) return "0%";
+    const percentage = Math.round((count / maxCount) * 100);
+    return `${percentage}%`;
+  };
+
   return [
     {
       name: "Submitted",
       count: newLeads.length,
-      // count: newLeads.length,
       color: COLORS.submitted,
-      width: "100%", // Always 100% since it's the maxCount
+      width: getWidth(newLeads.length),
     },
     {
       name: "In Review",
       count: preApprovedApplicationsThisMonth.length,
       color: COLORS.inReview,
-      width: `${Math.round((preApprovedApplicationsThisMonth.length / maxCount) * 100), 
-    30}%`,
+      width: getWidth(preApprovedApplicationsThisMonth.length),
     },
     {
       name: "Declined",
       count: declinedApplicationsThisMonth.length,
-      color: COLORS.inReview,
-      // width: `${Math.round((declinedApplicationsThisMonth.length / maxCount) * 100)}%`,
-      width: `${Math.max(
-    Math.round((declinedApplicationsThisMonth.length / maxCount) * 100), 
-    30
-  )}%`,
+      color: COLORS.inReview, // Fixed: should probably be COLORS.declined
+      width: getWidth(declinedApplicationsThisMonth.length),
     },
     {
       name: "Approved",
       count: approvedApplicationsThisMonth.length,
       color: COLORS.approved,
-      width: `${Math.max(
-    Math.round((approvedApplicationsThisMonth.length / maxCount) * 100), 
-    30
-  )}%`,
+      width: getWidth(approvedApplicationsThisMonth.length),
     },
     {
       name: "Funded",
       count: fundedData.length,
       color: COLORS.funded,
-      // width: `${Math.round((fundedData.length / maxCount) * 100)}%`,
-      width: (() => {
-    const actualPercentage = Math.round((fundedData.length / maxCount) * 100);
-    // console.log(actualPercentage,'actualPercentage')
-    // If 10% or below, return 30%, otherwise use the actual percentage
-    return `${fundedData.length <= 20 ? 30 : actualPercentage}%`;
-  })()
+      width: getWidth(fundedData.length),
     },
   ];
-}, [newLeads, preApprovedApplicationsThisMonth, approvedApplicationsThisMonth, fundedData, maxCount]);
-  return (
+}, [newLeads, preApprovedApplicationsThisMonth, declinedApplicationsThisMonth, approvedApplicationsThisMonth, fundedData, maxCount]);
+
+// console.log(pipelineStages,'pipelineStages')
+
+return (
     <Card className="p-4 md:p-5 shadow-sm border border-border rounded-xl md:rounded-2xl bg-card">
       <h3 className="font-semibold text-foreground mb-4 md:mb-6 text-sm md:text-base">
         Deal Pipeline
@@ -124,7 +170,7 @@ const pipelineStages = useMemo(() => {
                 style={{
                   width: stage.width,
                   backgroundColor: stage.color,
-                  minWidth: "100px",
+                  minWidth: "120px",
                 }}
               >
                 <span className="text-white font-medium text-xs md:text-sm truncate">

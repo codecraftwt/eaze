@@ -101,16 +101,30 @@ export function ReferralsTable({ onViewAll, selectedDate }) {
   }, [totalApplications, selectedDate]);
 
 
-  const filteredApplications = totalApplicationsThisMonth.filter((app) => {
+  // const filteredApplications = totalApplicationsThisMonth.filter((app) => {
+  //   if (filter === "all") return true;
+  //   if (filter === "Submitted")
+  //     return app.Lead_Partner_Status__c === "Submitted" || app.Lead_Partner_Status__c === "In Review";
+  //   if (filter === "Approved") return app.Lead_Partner_Status__c === "Approved";
+  //   if (filter === "Funded") return app.Lead_Partner_Status__c === "Funded";
+  //   if (filter === "Declined") return app.Lead_Partner_Status__c === "Declined";
+  //   return true;
+  // });
+const filteredApplications = useMemo(() => {
+  return totalApplicationsThisMonth.filter((app) => {
     if (filter === "all") return true;
-    if (filter === "Submitted")
-      return app.Lead_Partner_Status__c === "Submitted" || app.Lead_Partner_Status__c === "In Review";
+    
+    // Split these two into separate logic blocks
+    if (filter === "Submitted") return app.Lead_Partner_Status__c === "Submitted";
+    if (filter === "In Review") return app.Lead_Partner_Status__c === "In Review";
+    
     if (filter === "Approved") return app.Lead_Partner_Status__c === "Approved";
     if (filter === "Funded") return app.Lead_Partner_Status__c === "Funded";
     if (filter === "Declined") return app.Lead_Partner_Status__c === "Declined";
+    
     return true;
   });
-
+}, [totalApplicationsThisMonth, filter]);
   // console.log(filteredApplicationsNew,'filteredApplicationsNew')
 
   // 1. Get Dynamic Keys
@@ -164,6 +178,14 @@ export function ReferralsTable({ onViewAll, selectedDate }) {
           >
             Submitted
           </Button>
+          <Button
+    variant="ghost"
+    size="sm"
+    className={`text-xs px-2 md:px-3 ${filter === "In Review" ? "text-primary font-medium bg-secondary/50" : "text-muted-foreground"}`}
+    onClick={() => setFilter("In Review")}
+  >
+    In Review
+  </Button>
           <Button
             variant="ghost"
             size="sm"

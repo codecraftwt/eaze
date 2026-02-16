@@ -83,9 +83,7 @@ export function Dashboard({ onNavigate, onNavigateToProgram }) {
       return acc + (parseFloat(curr.Cash_Collected__c) || 0);
     }, 0);
   }, [fundedData]);
-
-
-
+  
   return (
     <div className="p-4 md:p-6 animate-fade-in bg-background">
       {/* Header */}
@@ -148,7 +146,11 @@ export function Dashboard({ onNavigate, onNavigateToProgram }) {
         />
         <StatCard
           title="Approval Rate"
-          value={`${Math.round((approvedApplicationsThisMonth.length / totalApplicationsThisMonth.length) * 100)}%`}
+          value={
+    totalApplicationsThisMonth.length > 0 
+      ? `${Math.round((approvedApplicationsThisMonth.length / totalApplicationsThisMonth.length) * 100)}%` 
+      : "0%"
+  }
           icon={Percent}
           variant="light-blue"
         />
