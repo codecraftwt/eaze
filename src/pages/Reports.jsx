@@ -478,14 +478,25 @@ export function Reports() {
             "Date",
             "Contact",
         ];
+        // const applicationRows = filteredApplications2.map((app) => [
+        //     app.Name,
+        //     `$${app.Loan_Amount__c.toLocaleString()}`,
+        //     // app.term,
+        //     app.status,
+        //     app.Loan_Program_Type__c.charAt(0).toUpperCase() + app.Loan_Program_Type__c.slice(1),
+        //     app.CreatedDate,
+        //     app.Email,
+        // ]);
         const applicationRows = filteredApplications2.map((app) => [
-            app.Name,
-            `$${app.Loan_Amount__c.toLocaleString()}`,
+            app.Name || "N/A",
+            app.Loan_Amount__c ? `$${app.Loan_Amount__c.toLocaleString()}` : "$0",
             // app.term,
-            app.status,
-            app.Loan_Program_Type__c.charAt(0).toUpperCase() + app.Loan_Program_Type__c.slice(1),
-            app.CreatedDate,
-            app.Email,
+            app.Status || app.status || "N/A", // Handled both casing just in case
+            app.Loan_Program_Type__c
+                ? app.Loan_Program_Type__c.charAt(0).toUpperCase() + app.Loan_Program_Type__c.slice(1)
+                : "N/A", // Fallback if property is missing
+            app.CreatedDate ? new Date(app.CreatedDate).toLocaleDateString() : "N/A",
+            app.Email || "N/A",
         ]);
         const ws2 = XLSX.utils.aoa_to_sheet([
             applicationHeaders,
