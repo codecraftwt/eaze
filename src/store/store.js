@@ -6,6 +6,7 @@ import storage from 'redux-persist/lib/storage'; // Use localStorage for persist
 import authReducer from './slices/authSlice';
 import dashboardReducer from './slices/dashboardSlice'; 
 import applicationReducer from './slices/applicationSlice';
+import leadDetailReducer from './slices/leadDetailSlice';
 
 // Create persist configuration for the auth slice
 const persistConfig = {
@@ -23,6 +24,7 @@ const store = configureStore({
     auth: persistedAuthReducer,
     dashboard: dashboardReducer,
     application: applicationReducer,
+    leadDetail: leadDetailReducer,
   },
 });
 

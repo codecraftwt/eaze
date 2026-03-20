@@ -20,6 +20,7 @@ import Dashboard3 from '../pages/Dashboard3';
 import Login from '../pages/Login';
 import { Affiliate } from '../pages/Affiliate';
 import AddUserPage from '../pages/AddUserPage';
+import LeadDetail from '../pages/LeadDetail';
 
 const AppRoutes = () => {
   return (
@@ -38,6 +39,7 @@ const AppRoutes = () => {
           <Route path="/funded" element={<ReportTab />} />
           <Route path="/affiliate" element={<Affiliate />} />
           <Route path="/add-user" element={<AddUserPage />} />
+          <Route path="/lead/:id" element={<LeadDetail />} />
         </Route>
         
         {/* Routes that don't need the sidebar */}

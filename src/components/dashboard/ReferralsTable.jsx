@@ -4,6 +4,7 @@ import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { ChevronRight } from "lucide-react";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
+import { Link } from "react-router-dom";
 import { getMonthlyStats } from "../../lib/mockData";
 import { useDispatch, useSelector } from "react-redux";
 import { getSalesforceToken } from "../../store/slices/authSlice";
@@ -271,6 +272,13 @@ const filteredApplications = useMemo(() => {
                                 {val}
                               </Badge>
                             </>
+          ) : key === "Name" ? (
+                            <Link 
+                              to={`/lead/${app.Id}`}
+                              className="text-sm text-primary font-medium hover:underline truncate block hover:text-primary/90 transition-colors"
+                            >
+                              {formatValue(key, val)}
+                            </Link>
                           ) : (
                             <span className="text-sm text-foreground truncate block">
                               {formatValue(key, val)}
