@@ -6,12 +6,109 @@ import { getSalesforceToken } from '../store/slices/authSlice';
 import { Skeleton } from '../components/ui/skeleton';
 import PersonIcon from '@mui/icons-material/Person';
 
+// Keys to exclude from the detail grid
+const EXCLUDED_KEYS = new Set(['Id', 'attributes']);
+
+// Convert a Salesforce API key to a human-readable label
+const formatLabel = (key) => {
+  return key
+    .replace(/__c$/i, '')
+    .replace(/__r$/i, '')
+    .replace(/_/g, ' ')
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .replace(/\b\w/g, (c) => c.toUpperCase())
+    .trim();
+};
+
+// ── Modal Component ──
+const ClimbCreditModal = ({ isOpen, onClose, appLink, appLinkError }) => {
+  if (!isOpen) return null;
+
+  const isSuccess = !!appLink;
+
+  return (
+    // Backdrop
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      onClick={onClose}
+    >
+      {/* Modal box — stop click propagation so backdrop click closes but content click doesn't */}
+      <div
+        className="relative bg-card border border-border rounded-xl shadow-2xl w-full max-w-md mx-4 p-6 animate-fade-in"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-4 text-muted-foreground hover:text-foreground text-xl leading-none"
+        >
+          ✕
+        </button>
+
+        {isSuccess ? (
+          // ── SUCCESS STATE ──
+          <div className="flex flex-col items-center text-center gap-4">
+            <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center">
+              <span className="text-green-600 text-2xl">✓</span>
+            </div>
+            <div>
+              <h2 className="text-base font-semibold text-foreground mb-1">Application Link Ready</h2>
+              <p className="text-sm text-muted-foreground">
+                The Climb Credit loan application link has been generated successfully.
+              </p>
+            </div>
+            <a
+              href={appLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full py-2.5 rounded-lg bg-primary text-white text-sm font-medium text-center hover:opacity-90 transition-opacity"
+              onClick={onClose}
+            >
+              Click here to open
+            </a>
+            <button
+              onClick={onClose}
+              className="text-sm text-muted-foreground hover:text-foreground underline"
+            >
+              Close
+            </button>
+          </div>
+        ) : (
+          // ── ERROR STATE ──
+          <div className="flex flex-col items-center text-center gap-4">
+            <div className="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center">
+              <span className="text-red-500 text-2xl">✕</span>
+            </div>
+            <div>
+              <h2 className="text-base font-semibold text-foreground mb-1">Unable to Generate Link</h2>
+              <p className="text-sm text-muted-foreground">{appLinkError}</p>
+            </div>
+            <button
+              onClick={onClose}
+              className="w-full py-2.5 rounded-lg border border-border text-sm font-medium text-foreground hover:bg-background transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 const LeadDetail = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const { salesforceToken } = useSelector((state) => state.auth);
   const { data, status, error } = useSelector((state) => state.leadDetail);
+
   const [tokenLoading, setTokenLoading] = React.useState(false);
+
+  // ── Climb Credit modal state ──
+  const [modalOpen, setModalOpen]           = React.useState(false);
+  const [appLink, setAppLink]               = React.useState(null);
+  const [appLinkLoading, setAppLinkLoading] = React.useState(false);
+  const [appLinkError, setAppLinkError]     = React.useState(null);
 
   React.useEffect(() => {
     if (!id) return;
@@ -22,6 +119,51 @@ const LeadDetail = () => {
     }
     dispatch(getLeadData({ leadId: id, token: salesforceToken }));
   }, [id, salesforceToken, dispatch]);
+
+  // ── Handler: POST /services/apexrest/climb/application ──
+  const handleClimbCredit = async () => {
+    if (!data?.Email) {
+      setAppLink(null);
+      setAppLinkError('No email found for this lead.');
+      setModalOpen(true);
+      return;
+    }
+
+    setAppLinkLoading(true);
+    setAppLink(null);
+    setAppLinkError(null);
+
+    try {
+      const BASE_URL = 'https://eazeconsulting.my.salesforce.com';
+      const response = await fetch(`${BASE_URL}/services/apexrest/climb/application`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${salesforceToken}`,
+        },
+        body: JSON.stringify({ email: data.Email }),
+      });
+
+      const json = await response.json();
+
+      if (json?.applicationLink && json.applicationLink !== 'NO_SCHOOL_ID') {
+        setAppLink(json.applicationLink);
+        setAppLinkError(null);
+      } else if (json?.applicationLink === 'NO_SCHOOL_ID') {
+        setAppLinkError('No school ID is associated with this lead.');
+        setAppLink(null);
+      } else {
+        setAppLinkError(json?.message || 'Failed to retrieve the application link.');
+        setAppLink(null);
+      }
+    } catch (err) {
+      setAppLinkError('Network error. Please try again.');
+      setAppLink(null);
+    } finally {
+      setAppLinkLoading(false);
+      setModalOpen(true); // open modal for both success and error
+    }
+  };
 
   const loading = status === 'loading' || tokenLoading;
 
@@ -59,82 +201,76 @@ const LeadDetail = () => {
     );
   }
 
-  // Build full name from FirstName + LastName, fallback to Name field, then 'Lead'
-  const leadName   = data?.Name
-    || [data?.FirstName, data?.LastName].filter(Boolean).join(' ')
-    || 'Lead';
-  const mobile     = data?.MobilePhone   || data?.Phone   || '';
-  const email      = data?.Email         || '';
-  const leadSource = data?.LeadSource    || '';
-  const leadStatus = data?.Status        || '';
-  const agentName  = data?.Agent_Name__c || '';
+  // ── Header values ──
+  const leadName   = [data?.FirstName, data?.LastName].filter(Boolean).join(' ') || data?.Name || 'Lead';
+  const mobile     = data?.MobilePhone || data?.Phone || '';
+  const email      = data?.Email || '';
+  const leadSource = data?.LeadSource || '';
+  const leadStatus = data?.Status || '';
+  const agentName  = data?.Agent_Name__c || data?.Agent_Name_Text__c || '';
 
-  // Build personal fields dynamically from actual API keys present in data
-  // Fixed pairs: left / right — use whatever keys the API actually returns
-  const personalFields = [
-    {
-      leftLabel: 'First Name',            leftKey: 'FirstName',
-      rightLabel: 'Last Name',            rightKey: 'LastName',                    rightExpand: true,
-    },
-    {
-      leftLabel: 'Email',                 leftKey: 'Email',
-      rightLabel: 'Company',              rightKey: 'Company',
-    },
-    {
-      leftLabel: 'Mobile',                leftKey: 'MobilePhone',
-      rightLabel: 'Phone',                rightKey: 'Phone',
-    },
-    {
-      leftLabel: 'Lead Status',           leftKey: 'Status',
-      rightLabel: 'Lead Source',          rightKey: 'LeadSource',
-    },
-    {
-      leftLabel: 'Lead Record Type',      leftKey: 'RecordType',
-      rightLabel: 'Agent Name',           rightKey: 'Agent_Name__c',
-    },
-    {
-      leftLabel: 'Purpose',               leftKey: 'Purpose__c',
-      rightLabel: 'Underwriting Notes',   rightKey: 'Underwriting_Notes__c',
-    },
-    {
-      leftLabel: 'Primary Contact Email', leftKey: 'Primary_Contact_Email__c',
-      rightLabel: 'Agent Approved For Lender', rightKey: 'Agent_Approved_For_Lender__c',
-    },
-    {
-      leftLabel: 'Business Service Fee',  leftKey: 'Business_Service_Fee__c',
-      rightLabel: 'Application Lender',   rightKey: 'Application_Lender__c',
-    },
-    {
-      leftLabel: 'Discount Rate',         leftKey: 'Discount_Rate__c',
-      rightLabel: 'Citizenship Status',   rightKey: 'Citizenship_Status__c',
-    },
-  ];
+  // ── Build dynamic field list from actual API keys ──
+  const allFields = Object.keys(data)
+    .filter((key) => !EXCLUDED_KEYS.has(key))
+    .map((key) => ({
+      key,
+      label: formatLabel(key),
+      value: data[key],
+    }));
 
-  // Also collect any extra keys from data that aren't already covered above
-  const coveredKeys = new Set([
-    'Id',
-    ...personalFields.flatMap(f => [f.leftKey, f.rightKey]),
-  ]);
-  const extraFields = Object.keys(data)
-    .filter(k => !coveredKeys.has(k))
-    .map(k => ({ leftLabel: k.replace(/__c$/i, '').replace(/([A-Z])/g, ' $1').trim(), leftKey: k, rightLabel: null, rightKey: null }));
+  const fieldPairs = [];
+  for (let i = 0; i < allFields.length; i += 2) {
+    fieldPairs.push([allFields[i], allFields[i + 1] || null]);
+  }
 
   const renderFieldValue = (key, value) => {
-    const display = value != null && value !== '' ? String(value) : null;
-    if (!display) return <span className="invisible select-none">–</span>;
+    if (value === null || value === undefined || value === '') {
+      return <span className="text-sm text-muted-foreground">—</span>;
+    }
 
-    if (key === 'MobilePhone')
+    const display = String(value);
+
+    // Render raw HTML anchor strings (e.g. Credible_Application_Link__c)
+    if (display.startsWith('<a ') || display.includes('href=')) {
       return (
-        <a href={`tel:${display}`} className="text-sm text-primary no-underline hover:underline">
+        <span
+          className="text-sm [&_a]:text-blue-500 [&_a]:underline [&_a]:hover:text-blue-700"
+          dangerouslySetInnerHTML={{ __html: display }}
+        />
+      );
+    }
+
+    if (key === 'MobilePhone' || key === 'Phone') {
+      return (
+        <a href={`tel:${display}`} className="text-sm text-blue-500 hover:underline">
           {display}
         </a>
       );
-    if (key === 'Email' || key === 'Primary_Contact_Email__c')
+    }
+
+    if (key === 'Email' || key?.toLowerCase().includes('email')) {
       return (
-        <a href={`mailto:${display}`} className="text-sm text-primary no-underline hover:underline">
+        <a href={`mailto:${display}`} className="text-sm text-blue-500 hover:underline">
           {display}
         </a>
       );
+    }
+
+    // Format currency fields
+    if (
+      key?.toLowerCase().includes('amount') ||
+      key?.toLowerCase().includes('income') ||
+      key?.toLowerCase().includes('fee')
+    ) {
+      const num = parseFloat(display);
+      if (!isNaN(num)) {
+        return (
+          <span className="text-sm text-foreground">
+            ${num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </span>
+        );
+      }
+    }
 
     return <span className="text-sm text-foreground">{display}</span>;
   };
@@ -142,63 +278,74 @@ const LeadDetail = () => {
   return (
     <div className="min-h-screen bg-background text-sm text-foreground animate-fade-in">
 
+      {/* ── CLIMB CREDIT MODAL ── */}
+      <ClimbCreditModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        appLink={appLink}
+        appLinkError={appLinkError}
+      />
+
       {/* ── RECORD HEADER ── */}
       <div className="bg-card border-b border-border px-4 py-3">
 
         {/* Top row */}
         <div className="flex items-center justify-between mb-2.5">
-
-          {/* Identity */}
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 bg-primary rounded-lg flex items-center justify-center text-white flex-shrink-0">
               <PersonIcon sx={{ fontSize: 22 }} />
             </div>
             <div>
               <div className="text-xs text-muted-foreground leading-none mb-0.5">Lead</div>
-              <div className="text-lg font-bold text-foreground leading-tight">
-                {leadName}
-              </div>
+              <div className="text-lg font-bold text-foreground leading-tight">{leadName}</div>
             </div>
           </div>
 
-          {/* Single action button */}
-          <button className="px-3.5 py-[5px] rounded-md border border-border bg-primary text-white primary text-sm cursor-pointer hover:bg-background whitespace-nowrap transition-colors">
-            Apply for Climb Credit Loan Application
+          <button
+            onClick={handleClimbCredit}
+            disabled={appLinkLoading}
+            className="px-3.5 py-[5px] rounded-md border border-border bg-primary text-white text-sm cursor-pointer hover:opacity-90 whitespace-nowrap transition-opacity disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {appLinkLoading ? 'Loading...' : 'Apply for Climb Credit Loan Application'}
           </button>
         </div>
 
         {/* Meta row */}
         <div className="flex flex-wrap gap-x-10 gap-y-2 pt-0.5">
-          <div className="flex flex-col">
-            <span className="text-xs text-muted-foreground mb-0.5">Mobile</span>
-            {mobile
-              ? <a href={`tel:${mobile}`} className="text-sm text-primary no-underline hover:underline">{mobile}</a>
-              : <span className="text-sm text-foreground">—</span>
-            }
-          </div>
-          <div className="flex flex-col">
-            <span className="text-xs text-muted-foreground mb-0.5">Email</span>
-            {email
-              ? <a href={`mailto:${email}`} className="text-sm text-primary no-underline hover:underline">{email}</a>
-              : <span className="text-sm text-foreground">—</span>
-            }
-          </div>
-          <div className="flex flex-col">
-            <span className="text-xs text-muted-foreground mb-0.5">Lead Source</span>
-            <span className="text-sm text-foreground">{leadSource || '—'}</span>
-          </div>
-          <div className="flex flex-col">
-            <span className="text-xs text-muted-foreground mb-0.5">Lead Status</span>
-            <span className="text-sm text-foreground">{leadStatus || '—'}</span>
-          </div>
-          <div className="flex flex-col">
-            <span className="text-xs text-muted-foreground mb-0.5">Agent Name</span>
-            <span className="text-sm text-foreground">{agentName}</span>
-          </div>
+          {mobile && (
+            <div className="flex flex-col">
+              <span className="text-xs text-muted-foreground mb-0.5">Mobile</span>
+              <a href={`tel:${mobile}`} className="text-sm text-blue-500 hover:underline">{mobile}</a>
+            </div>
+          )}
+          {email && (
+            <div className="flex flex-col">
+              <span className="text-xs text-muted-foreground mb-0.5">Email</span>
+              <a href={`mailto:${email}`} className="text-sm text-blue-500 hover:underline">{email}</a>
+            </div>
+          )}
+          {leadSource && (
+            <div className="flex flex-col">
+              <span className="text-xs text-muted-foreground mb-0.5">Lead Source</span>
+              <span className="text-sm text-foreground">{leadSource}</span>
+            </div>
+          )}
+          {leadStatus && (
+            <div className="flex flex-col">
+              <span className="text-xs text-muted-foreground mb-0.5">Lead Status</span>
+              <span className="text-sm text-foreground">{leadStatus}</span>
+            </div>
+          )}
+          {agentName && (
+            <div className="flex flex-col">
+              <span className="text-xs text-muted-foreground mb-0.5">Agent Name</span>
+              <span className="text-sm text-foreground">{agentName}</span>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* ── TABS — Details only, Activity removed ── */}
+      {/* ── TABS ── */}
       <div className="bg-card border-b border-border px-4 flex">
         <div className="py-2.5 px-4 text-sm font-semibold text-primary border-b-2 border-primary cursor-pointer">
           Details
@@ -209,57 +356,40 @@ const LeadDetail = () => {
       <div className="p-4 md:p-6">
         <div className="bg-card border border-border rounded overflow-hidden">
 
-          {/* Section header */}
           <div className="flex items-center gap-2 px-4 py-2.5 bg-background border-b border-border font-semibold text-sm text-foreground cursor-pointer select-none">
             <span className="text-[10px] text-muted-foreground">▼</span>
             Personal Information
+            <span className="ml-auto text-xs text-muted-foreground font-normal">{allFields.length} fields</span>
           </div>
 
-          {/* 2-column fields grid */}
           <div className="grid grid-cols-2">
-            {personalFields.map(({ leftLabel, leftKey, rightLabel, rightKey, rightExpand }) => (
-              <React.Fragment key={leftKey}>
+            {fieldPairs.map(([left, right]) => (
+              <React.Fragment key={left.key}>
 
-                {/* LEFT cell */}
                 <div className="px-4 py-2.5 border-b border-r border-border">
-                  <div className="text-xs text-muted-foreground mb-1">{leftLabel}</div>
+                  <div className="text-xs text-muted-foreground mb-1">{left.label}</div>
                   <div className="flex items-center justify-between min-h-5">
-                    <div className="flex-1 min-w-0">{renderFieldValue(leftKey, data[leftKey])}</div>
+                    <div className="flex-1 min-w-0 truncate">
+                      {renderFieldValue(left.key, left.value)}
+                    </div>
                     <span className="text-muted-foreground text-xs opacity-60 cursor-pointer ml-2 flex-shrink-0">✏</span>
                   </div>
                 </div>
 
-                {/* RIGHT cell */}
                 <div className="px-4 py-2.5 border-b border-border">
-                  {rightLabel && (
+                  {right ? (
                     <>
-                      <div className="text-xs text-muted-foreground mb-1">{rightLabel}</div>
+                      <div className="text-xs text-muted-foreground mb-1">{right.label}</div>
                       <div className="flex items-center justify-between min-h-5">
-                        <div className="flex-1 min-w-0">{renderFieldValue(rightKey, data[rightKey])}</div>
-                        {rightExpand
-                          ? <span className="text-muted-foreground text-xs cursor-pointer ml-2 flex-shrink-0">⤢</span>
-                          : <span className="text-muted-foreground text-xs opacity-60 cursor-pointer ml-2 flex-shrink-0">✏</span>
-                        }
+                        <div className="flex-1 min-w-0 truncate">
+                          {renderFieldValue(right.key, right.value)}
+                        </div>
+                        <span className="text-muted-foreground text-xs opacity-60 cursor-pointer ml-2 flex-shrink-0">✏</span>
                       </div>
                     </>
-                  )}
+                  ) : null}
                 </div>
 
-              </React.Fragment>
-            ))}
-
-            {/* Extra dynamic fields not covered by fixed pairs */}
-            {extraFields.map(({ leftLabel, leftKey }, i) => (
-              <React.Fragment key={leftKey}>
-                <div className="px-4 py-2.5 border-b border-r border-border">
-                  <div className="text-xs text-muted-foreground mb-1">{leftLabel}</div>
-                  <div className="flex items-center justify-between min-h-5">
-                    <div className="flex-1 min-w-0">{renderFieldValue(leftKey, data[leftKey])}</div>
-                    <span className="text-muted-foreground text-xs opacity-60 cursor-pointer ml-2 flex-shrink-0">✏</span>
-                  </div>
-                </div>
-                {/* Empty right cell to keep grid balanced */}
-                <div className="px-4 py-2.5 border-b border-border" />
               </React.Fragment>
             ))}
           </div>
