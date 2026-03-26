@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+import { withSalesforce401Retry } from '../salesforceWith401Retry';
 
 // Base URL and other constants
 const API_URL = import.meta.env.VITE_API_URL;
@@ -21,62 +22,92 @@ const fetchData = async (endpoint, { accountId, leadSource,month,year  }, token)
     );
     return response.data;
   } catch (error) {
-    throw error.response?.data?.message || error.message;
+    throw error;
   }
 };
 
 // Async thunks for fetching various lead statuses
 export const getNewLead = createAsyncThunk(
   'application/getNewLead',
-  async ({ accountId, leadSource, token, month,year }, { rejectWithValue }) => {
-    const data = await fetchData('getnewlead', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, token)
-      .catch(rejectWithValue);
-    return data?.data || [];
+  async ({ accountId, leadSource, token, month,year }, { rejectWithValue, dispatch, getState }) => {
+    try {
+      const data = await withSalesforce401Retry(dispatch, getState, token, (t) =>
+        fetchData('getnewlead', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, t)
+      );
+      return data?.data || [];
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message || err);
+    }
   }
 );
 
 export const getPreApprovedLead = createAsyncThunk(
   'application/getPreApprovedLead',
-  async ({ accountId, leadSource, token, month,year }, { rejectWithValue }) => {
-    const data = await fetchData('getpreapprovedlead', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, token)
-      .catch(rejectWithValue);
-    return data?.data || [];
+  async ({ accountId, leadSource, token, month,year }, { rejectWithValue, dispatch, getState }) => {
+    try {
+      const data = await withSalesforce401Retry(dispatch, getState, token, (t) =>
+        fetchData('getpreapprovedlead', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, t)
+      );
+      return data?.data || [];
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message || err);
+    }
   }
 );
 
 export const getApprovedLead = createAsyncThunk(
   'application/getApprovedLead',
-  async ({ accountId, leadSource, token , month,year}, { rejectWithValue }) => {
-    const data = await fetchData('getapprovedlead', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, token)
-      .catch(rejectWithValue);
-    return data?.data || [];
+  async ({ accountId, leadSource, token , month,year}, { rejectWithValue, dispatch, getState }) => {
+    try {
+      const data = await withSalesforce401Retry(dispatch, getState, token, (t) =>
+        fetchData('getapprovedlead', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, t)
+      );
+      return data?.data || [];
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message || err);
+    }
   }
 );
 
 export const getApplicationDeclineLead = createAsyncThunk(
   'application/getApplicationDeclineLead',
-  async ({ accountId, leadSource, token , month,year}, { rejectWithValue }) => {
-    const data = await fetchData('getapplicationdeclinelead', { accountId: accountId, leadSource: LEADSOURCE ,month:month,year:year}, token)
-      .catch(rejectWithValue);
-    return data?.data || [];
+  async ({ accountId, leadSource, token , month,year}, { rejectWithValue, dispatch, getState }) => {
+    try {
+      const data = await withSalesforce401Retry(dispatch, getState, token, (t) =>
+        fetchData('getapplicationdeclinelead', { accountId: accountId, leadSource: LEADSOURCE ,month:month,year:year}, t)
+      );
+      return data?.data || [];
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message || err);
+    }
   }
 );
 
 export const getClosedLost = createAsyncThunk(
   'application/getClosedLost',
-  async ({ accountId, leadSource, token , month,year}, { rejectWithValue }) => {
-    const data = await fetchData('getclosedlost', { accountId: accountId, leadSource: LEADSOURCE ,month:month,year:year}, token)
-      .catch(rejectWithValue);
-    return data?.data || [];
+  async ({ accountId, leadSource, token , month,year}, { rejectWithValue, dispatch, getState }) => {
+    try {
+      const data = await withSalesforce401Retry(dispatch, getState, token, (t) =>
+        fetchData('getclosedlost', { accountId: accountId, leadSource: LEADSOURCE ,month:month,year:year}, t)
+      );
+      return data?.data || [];
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message || err);
+    }
   }
 );
 
 export const getAllDeclined = createAsyncThunk(
   'application/getAllDeclined',
-  async ({ accountId, leadSource, token , month,year}, { rejectWithValue }) => {
-    const data = await fetchData('getalldeclined', { accountId: accountId, leadSource: LEADSOURCE ,month:month,year:year}, token)
-      .catch(rejectWithValue);
-    return data?.data || [];
+  async ({ accountId, leadSource, token , month,year}, { rejectWithValue, dispatch, getState }) => {
+    try {
+      const data = await withSalesforce401Retry(dispatch, getState, token, (t) =>
+        fetchData('getalldeclined', { accountId: accountId, leadSource: LEADSOURCE ,month:month,year:year}, t)
+      );
+      return data?.data || [];
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message || err);
+    }
   }
 );
 

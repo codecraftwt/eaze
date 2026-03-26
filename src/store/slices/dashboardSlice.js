@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+import { withSalesforce401Retry } from '../salesforceWith401Retry';
 
 // Base URL for Salesforce API from the .env file
 const API_URL = import.meta.env.VITE_API_URL;
@@ -7,7 +8,7 @@ const REGISTRATION_CODE = "001cY00000JXauEQAT";
 // const REGISTRATION_CODE = import.meta.env.VITE_REGISTRATION_CODE;
 const LEADSOURCE = import.meta.env.VITE_LEADSOURCE;
 
-// Helper function to make API requests
+// Helper function to make API requests (preserve axios error for 401 handling)
 const fetchData = async (endpoint, { accountId, leadSource,month,year }, token) => {
   try {
     const response = await axios.post(
@@ -27,7 +28,7 @@ const fetchData = async (endpoint, { accountId, leadSource,month,year }, token) 
     );
     return response.data;
   } catch (error) {
-    throw error.response?.data?.message || error.message;
+    throw error;
   }
 };
 const fetchData2 = async (endpoint, { accountId, leadSource }, token) => {
@@ -49,7 +50,7 @@ const fetchData2 = async (endpoint, { accountId, leadSource }, token) => {
     );
     return response.data;
   } catch (error) {
-    throw error.response?.data?.message || error.message;
+    throw error;
   }
 };
 const fetchData3 = async (endpoint, { accountId, leadSource }, token) => {
@@ -71,240 +72,333 @@ const fetchData3 = async (endpoint, { accountId, leadSource }, token) => {
     );
     return response.data;
   } catch (error) {
-    throw error.response?.data?.message || error.message;
+    throw error;
   }
 };
 
 // Thunks for each API endpoint
 export const getTotalApplicationsThisMonth = createAsyncThunk(
   'dashboard/getTotalApplicationsThisMonth',
-  async ({ accountId, leadSource, token, month,year }, { rejectWithValue }) => {
-    const data = await fetchData('gettotalapplicationthismonth', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, token)
-      .catch(rejectWithValue);
-
-      // //console.log(data, 'data');
-    return data?.data || [];
+  async ({ accountId, leadSource, token, month,year }, { rejectWithValue, dispatch, getState }) => {
+    try {
+      const data = await withSalesforce401Retry(dispatch, getState, token, (t) =>
+        fetchData('gettotalapplicationthismonth', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, t)
+      );
+      return data?.data || [];
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message || err);
+    }
   }
 );
 
 export const getApprovedThisMonth = createAsyncThunk(
   'dashboard/getApprovedThisMonth',
-  async ({ accountId, leadSource, token , month,year}, { rejectWithValue }) => {
-    const data = await fetchData('getapprovedthismonth', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, token)
-      .catch(rejectWithValue);
-    return data?.data || [];
+  async ({ accountId, leadSource, token , month,year}, { rejectWithValue, dispatch, getState }) => {
+    try {
+      const data = await withSalesforce401Retry(dispatch, getState, token, (t) =>
+        fetchData('getapprovedthismonth', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, t)
+      );
+      return data?.data || [];
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message || err);
+    }
   }
 );
 
 export const getPreApprovedThisMonth = createAsyncThunk(
   'dashboard/getPreApprovedThisMonth',
-  async ({ accountId, leadSource, token, month,year }, { rejectWithValue }) => {
-    const data = await fetchData('getpreapprovedthismonth', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, token)
-      .catch(rejectWithValue);
-    return data?.data || [];
+  async ({ accountId, leadSource, token, month,year }, { rejectWithValue, dispatch, getState }) => {
+    try {
+      const data = await withSalesforce401Retry(dispatch, getState, token, (t) =>
+        fetchData('getpreapprovedthismonth', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, t)
+      );
+      return data?.data || [];
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message || err);
+    }
   }
 );
 
 export const getDeclinedThisMonth = createAsyncThunk(
   'dashboard/getDeclinedThisMonth',
-  async ({ accountId, leadSource, token , month,year}, { rejectWithValue }) => {
-    const data = await fetchData('getdeclinethismonth', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, token)
-      .catch(rejectWithValue);
-    return data?.data || [];
+  async ({ accountId, leadSource, token , month,year}, { rejectWithValue, dispatch, getState }) => {
+    try {
+      const data = await withSalesforce401Retry(dispatch, getState, token, (t) =>
+        fetchData('getdeclinethismonth', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, t)
+      );
+      return data?.data || [];
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message || err);
+    }
   }
 );
 
 export const getTotalApplications = createAsyncThunk(
   'dashboard/getTotalApplications',
-  async ({ accountId, leadSource, token , month,year}, { rejectWithValue }) => {
-    const data = await fetchData('gettotalapplication', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, token)
-      .catch(rejectWithValue);
-    return data?.data || [];
+  async ({ accountId, leadSource, token , month,year}, { rejectWithValue, dispatch, getState }) => {
+    try {
+      const data = await withSalesforce401Retry(dispatch, getState, token, (t) =>
+        fetchData('gettotalapplication', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, t)
+      );
+      return data?.data || [];
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message || err);
+    }
   }
 );
 
 export const getTotalApproved = createAsyncThunk(
   'dashboard/getTotalApproved',
-  async ({ accountId, leadSource, token, month,year}, { rejectWithValue }) => {
-    const data = await fetchData('gettotalapproved', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, token)
-      .catch(rejectWithValue);
-    return data?.data || [];
+  async ({ accountId, leadSource, token, month,year}, { rejectWithValue, dispatch, getState }) => {
+    try {
+      const data = await withSalesforce401Retry(dispatch, getState, token, (t) =>
+        fetchData('gettotalapproved', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, t)
+      );
+      return data?.data || [];
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message || err);
+    }
   }
 );
 
 export const getTotalDeclined = createAsyncThunk(
   'dashboard/getTotalDeclined',
-  async ({ accountId, leadSource, token , month,year}, { rejectWithValue }) => {
-    const data = await fetchData('gettotaldeclined', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, token)
-      .catch(rejectWithValue);
-    return data?.data || [];
+  async ({ accountId, leadSource, token , month,year}, { rejectWithValue, dispatch, getState }) => {
+    try {
+      const data = await withSalesforce401Retry(dispatch, getState, token, (t) =>
+        fetchData('gettotaldeclined', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, t)
+      );
+      return data?.data || [];
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message || err);
+    }
   }
 );
 
 export const getTotalPreApproved = createAsyncThunk(
   'dashboard/getTotalPreApproved',
-  async ({ accountId, leadSource, token, month,year }, { rejectWithValue }) => {
-    const data = await fetchData('gettotalpreapproved', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, token)
-      .catch(rejectWithValue);
-    return data?.data || [];
+  async ({ accountId, leadSource, token, month,year }, { rejectWithValue, dispatch, getState }) => {
+    try {
+      const data = await withSalesforce401Retry(dispatch, getState, token, (t) =>
+        fetchData('gettotalpreapproved', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, t)
+      );
+      return data?.data || [];
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message || err);
+    }
   }
 );
 
 export const getTotalDeclinePercent = createAsyncThunk(
   'dashboard/getTotalDeclinePercent',
-  async ({ accountId, leadSource, token , month,year}, { rejectWithValue }) => {
-    const data = await fetchData('gettotaldeclinepercent', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, token)
-      .catch(rejectWithValue);
-    return data?.data || [];
+  async ({ accountId, leadSource, token , month,year}, { rejectWithValue, dispatch, getState }) => {
+    try {
+      const data = await withSalesforce401Retry(dispatch, getState, token, (t) =>
+        fetchData('gettotaldeclinepercent', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, t)
+      );
+      return data?.data || [];
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message || err);
+    }
   }
 );
 
 export const getTopDeclineReason = createAsyncThunk(
   'dashboard/getTopDeclineReason',
-  async ({ accountId, leadSource, token, month,year }, { rejectWithValue }) => {
-    const data = await fetchData('gettopdeclinereason', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, token)
-      .catch(rejectWithValue);
-    return data?.data || [];
+  async ({ accountId, leadSource, token, month,year }, { rejectWithValue, dispatch, getState }) => {
+    try {
+      const data = await withSalesforce401Retry(dispatch, getState, token, (t) =>
+        fetchData('gettopdeclinereason', { accountId: accountId, leadSource: LEADSOURCE,month:month,year:year }, t)
+      );
+      return data?.data || [];
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message || err);
+    }
   }
 );
 
 export const getLoanByTypeThisMonth = createAsyncThunk(
   'dashboard/getLoanByTypeThisMonth',
-  async ({ accountId, token , month,year}, { rejectWithValue }) => {
+  async ({ accountId, token , month,year}, { rejectWithValue, dispatch, getState }) => {
     try {
-      const data = await fetchData(
-        'getloanbytype',
-        { accountId, leadSource: LEADSOURCE,month:month,year:year },
-        token
+      const data = await withSalesforce401Retry(dispatch, getState, token, (t) =>
+        fetchData(
+          'getloanbytype',
+          { accountId, leadSource: LEADSOURCE,month:month,year:year },
+          t
+        )
       );
       return data?.data || [];
     } catch (err) {
-      return rejectWithValue(err);
+      return rejectWithValue(err.response?.data || err.message || err);
     }
   }
 );
 
 export const getLoanByTypeAllTime = createAsyncThunk(
   'dashboard/getLoanByTypeAllTime',
-  async ({ accountId, token , month,year}, { rejectWithValue }) => {
+  async ({ accountId, token , month,year}, { rejectWithValue, dispatch, getState }) => {
     try {
-      const data = await fetchData(
-        'getloanbytypealltime',
-        { accountId, leadSource: LEADSOURCE ,month:month,year:year},
-        token
+      const data = await withSalesforce401Retry(dispatch, getState, token, (t) =>
+        fetchData(
+          'getloanbytypealltime',
+          { accountId, leadSource: LEADSOURCE ,month:month,year:year},
+          t
+        )
       );
       return data?.data || [];
     } catch (err) {
-      return rejectWithValue(err);
+      return rejectWithValue(err.response?.data || err.message || err);
     }
   }
 );
 
 export const getCashCollectedThisMonth = createAsyncThunk(
   'dashboard/getCashCollectedThisMonth',
-  async ({ accountId, token , month,year}, { rejectWithValue }) => {
+  async ({ accountId, token , month,year}, { rejectWithValue, dispatch, getState }) => {
     try {
-      const data = await fetchData(
-        'getcashcollectedamount',
-        { accountId, leadSource: LEADSOURCE,month:month,year:year },
-        token
+      const data = await withSalesforce401Retry(dispatch, getState, token, (t) =>
+        fetchData(
+          'getcashcollectedamount',
+          { accountId, leadSource: LEADSOURCE,month:month,year:year },
+          t
+        )
       );
       return data?.data || [];
     } catch (err) {
-      return rejectWithValue(err);
+      return rejectWithValue(err.response?.data || err.message || err);
     }
   }
 );
 
 export const getCashCollectedAllTime = createAsyncThunk(
   'dashboard/getCashCollectedAllTime',
-  async ({ accountId, token , month,year}, { rejectWithValue }) => {
+  async ({ accountId, token , month,year}, { rejectWithValue, dispatch, getState }) => {
     try {
-      const data = await fetchData(
-        'getcashcollectedamountalltime',
-        { accountId, leadSource: LEADSOURCE,month:month,year:year },
-        token
+      const data = await withSalesforce401Retry(dispatch, getState, token, (t) =>
+        fetchData(
+          'getcashcollectedamountalltime',
+          { accountId, leadSource: LEADSOURCE,month:month,year:year },
+          t
+        )
       );
       return data?.data || [];
     } catch (err) {
-      return rejectWithValue(err);
+      return rejectWithValue(err.response?.data || err.message || err);
     }
   }
 );
 export const getFundedData = createAsyncThunk(
   'dashboard/getFundedData',
-  async ({ accountId, token , month,year}, { rejectWithValue }) => {
+  async ({ accountId, token , month,year}, { rejectWithValue, dispatch, getState }) => {
     try {
-      const data = await fetchData(
-        'getfundeddata', 
-        { accountId, leadSource: LEADSOURCE,month:month,year:year }, 
-        token
+      const data = await withSalesforce401Retry(dispatch, getState, token, (t) =>
+        fetchData(
+          'getfundeddata', 
+          { accountId, leadSource: LEADSOURCE,month:month,year:year }, 
+          t
+        )
       );
       return data?.data || [];
     } catch (err) {
-      return rejectWithValue(err);
+      return rejectWithValue(err.response?.data || err.message || err);
     }
   }
 );
 export const getFundedData2 = createAsyncThunk(
   'dashboard/getFundedData2',
-  async ({ accountId, token }, { rejectWithValue }) => {
+  async ({ accountId, token }, { rejectWithValue, dispatch, getState }) => {
     try {
-      const data = await fetchData2(
-        'getfundeddata', 
-        { accountId, leadSource: LEADSOURCE}, 
-        token
+      const data = await withSalesforce401Retry(dispatch, getState, token, (t) =>
+        fetchData2(
+          'getfundeddata', 
+          { accountId, leadSource: LEADSOURCE}, 
+          t
+        )
       );
       return data?.data || [];
     } catch (err) {
-      return rejectWithValue(err);
+      return rejectWithValue(err.response?.data || err.message || err);
     }
   }
 );
 export const getFundedLastMonthData = createAsyncThunk(
   'dashboard/getFundedLastMonthData',
-  async ({ accountId, token , month,year}, { rejectWithValue }) => {
+  async ({ accountId, token , month,year}, { rejectWithValue, dispatch, getState }) => {
     try {
-      const data = await fetchData(
-        'getfundeddata', 
-        { accountId, leadSource: LEADSOURCE,month:month,year:year }, 
-        token
+      const data = await withSalesforce401Retry(dispatch, getState, token, (t) =>
+        fetchData(
+          'getfundeddata', 
+          { accountId, leadSource: LEADSOURCE,month:month,year:year }, 
+          t
+        )
       );
       return data?.data || [];
     } catch (err) {
-      return rejectWithValue(err);
+      return rejectWithValue(err.response?.data || err.message || err);
     }
   }
 );
 
 export const getFundedDataThisYear = createAsyncThunk(
   'dashboard/getFundedDataThisYear',
-  async ({ accountId, token, month, year }, { rejectWithValue }) => {
+  async ({ accountId, token, month, year }, { rejectWithValue, dispatch, getState }) => {
     try {
-      const data = await fetchData3(
-        'getfundeddatathisyear', // Assuming this is the Salesforce endpoint name
-        { accountId, leadSource: LEADSOURCE, month: month, year: year },
-        token
+      const data = await withSalesforce401Retry(dispatch, getState, token, (t) =>
+        fetchData3(
+          'getfundeddatathisyear', // Assuming this is the Salesforce endpoint name
+          { accountId, leadSource: LEADSOURCE, month: month, year: year },
+          t
+        )
       );
       return data?.data || [];
     } catch (err) {
-      return rejectWithValue(err);
+      return rejectWithValue(err.response?.data || err.message || err);
     }
   }
 );
 
 export const getCashCollectedLastMonth = createAsyncThunk(
   'dashboard/getCashCollectedLastMonth',
-  async ({ accountId, token , month,year}, { rejectWithValue }) => {
+  async ({ accountId, token , month,year}, { rejectWithValue, dispatch, getState }) => {
     try {
-      const data = await fetchData(
-        'getcashcollectedamountlastmonth', // Assumed endpoint based on pattern
-        { accountId, leadSource: LEADSOURCE,month:month,year:year },
-        token
+      const data = await withSalesforce401Retry(dispatch, getState, token, (t) =>
+        fetchData(
+          'getcashcollectedamountlastmonth', // Assumed endpoint based on pattern
+          { accountId, leadSource: LEADSOURCE,month:month,year:year },
+          t
+        )
       );
       return data?.data || [];
     } catch (err) {
-      return rejectWithValue(err);
+      return rejectWithValue(err.response?.data || err.message || err);
+    }
+  }
+);
+
+// Get All Accounts (e.g. master dashboard account dropdown)
+export const getAllAccounts = createAsyncThunk(
+  'dashboard/getAllAccounts',
+  async ({ token }, { rejectWithValue, dispatch, getState }) => {
+    const fetchAccounts = async (accessToken) => {
+      const response = await axios.post(
+        `${API_URL}/services/apexrest/salesforce/portal/api/getallaccounts`,
+        {
+          leadSource: LEADSOURCE,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      return response.data?.data || [];
+    };
+    try {
+      return await withSalesforce401Retry(dispatch, getState, token, fetchAccounts);
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message || err);
     }
   }
 );
@@ -350,6 +444,8 @@ const dashboardSlice = createSlice({
   fundedData2: [],
   fundedLastMonthData: [],
   fundedDataThisYear: [],
+    allAccounts: [],
+    accountsListStatus: 'idle',
     status: 'idle', // 'loading', 'succeeded', 'failed'
     error: null,
   },
@@ -583,6 +679,17 @@ const dashboardSlice = createSlice({
   state.status = 'failed';
   state.error = action.payload || action.error.message;
 })
+      .addCase(getAllAccounts.pending, (state) => {
+        state.accountsListStatus = 'loading';
+      })
+      .addCase(getAllAccounts.fulfilled, (state, action) => {
+        state.accountsListStatus = 'succeeded';
+        state.allAccounts = action.payload;
+      })
+      .addCase(getAllAccounts.rejected, (state, action) => {
+        state.accountsListStatus = 'failed';
+        state.error = action.payload || action.error.message;
+      })
 
   },
 });
