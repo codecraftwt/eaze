@@ -21,6 +21,7 @@ import Login from '../pages/Login';
 import { Affiliate } from '../pages/Affiliate';
 import AddUserPage from '../pages/AddUserPage';
 import LeadDetail from '../pages/LeadDetail';
+import ProtectedRoute from './ProtectedRoute';
 
 const AppRoutes = () => {
   return (
@@ -28,18 +29,20 @@ const AppRoutes = () => {
       <Routes>
          {/* Redirect empty route ("/") to login */}
         <Route path="/" element={<Navigate to="/login" />} />
-        {/* Routes that require the sidebar layout */}
-        <Route element={<MainLayout />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/dashboard3" element={<Dashboard3 />} />
-          <Route path="/dashboard/:programId" element={<FundingProgramDetails />} />
-          <Route path="/applications" element={<Applications />} />
-          <Route path="/loan" element={<Loan />} />
-          <Route path="/report" element={<Reports />} />
-          <Route path="/funded" element={<ReportTab />} />
-          <Route path="/affiliate" element={<Affiliate />} />
-          <Route path="/add-user" element={<AddUserPage />} />
-          <Route path="/lead/:id" element={<LeadDetail />} />
+        {/* Authenticated app: token required (see ProtectedRoute) */}
+        <Route element={<ProtectedRoute />}>
+          <Route element={<MainLayout />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/dashboard3" element={<Dashboard3 />} />
+            <Route path="/dashboard/:programId" element={<FundingProgramDetails />} />
+            <Route path="/applications" element={<Applications />} />
+            <Route path="/loan" element={<Loan />} />
+            <Route path="/report" element={<Reports />} />
+            <Route path="/funded" element={<ReportTab />} />
+            <Route path="/affiliate" element={<Affiliate />} />
+            <Route path="/add-user" element={<AddUserPage />} />
+            <Route path="/lead/:id" element={<LeadDetail />} />
+          </Route>
         </Route>
         
         {/* Routes that don't need the sidebar */}

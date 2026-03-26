@@ -351,9 +351,11 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
+        const p = action.payload;
         state.status = "succeeded";
-        state.user = action.payload.user;
-        state.token = action.payload.token;
+        state.user = p.user ?? null;
+        state.token = p.token ?? p.accessToken ?? p.access_token ?? null;
+        state.portalUserId = p.portalUserId ?? p.accountId ?? null;
         showSuccess("Registration Successful");
       })
       .addCase(registerUser.rejected, (state, action) => {
@@ -368,11 +370,11 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
-        //console.log(action.payload, 'action.payload');
+        const p = action.payload;
         state.status = "succeeded";
-        state.user = action.payload.user;
-        state.token = action.payload.token;
-        state.portalUserId = action.payload.portalUserId;
+        state.user = p.user ?? null;
+        state.token = p.token ?? p.accessToken ?? p.access_token ?? null;
+        state.portalUserId = p.portalUserId ?? p.accountId ?? null;
         showSuccess("Login Successful");
       })
       .addCase(loginUser.rejected, (state, action) => {
